@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: db_pgsql
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: securedb,
+      POSTGRES_DB: e-commerce
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:
+    driver: local
