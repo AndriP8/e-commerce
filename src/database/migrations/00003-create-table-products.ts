@@ -33,11 +33,7 @@ export async function up(db: Kysely<DB>): Promise<void> {
     .addColumn("discount", "integer")
     .addColumn("sku", "varchar", (col) => col.notNull())
     .addColumn("category_id", "uuid", (col) =>
-      col
-        .notNull()
-        .references("categories.id")
-        .onUpdate("cascade")
-        .onDelete("cascade"),
+      col.notNull().references("categories.id"),
     )
     .$call(TIMESTAMPS_COLUMN)
     .$call(SOFT_DELETE_COLUMN)

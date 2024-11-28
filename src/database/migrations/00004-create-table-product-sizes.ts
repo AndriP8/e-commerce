@@ -19,19 +19,9 @@ export async function up(db: Kysely<DB>): Promise<void> {
     .createTable("product_sizes")
     .$call(PRIMARY_KEY_COLUMN)
     .addColumn("stock", "integer", (col) => col.notNull())
-    .addColumn("size_id", "uuid", (col) =>
-      col
-        .notNull()
-        .references("sizes.id")
-        .onUpdate("cascade")
-        .onDelete("cascade"),
-    )
+    .addColumn("size_id", "uuid", (col) => col.notNull().references("sizes.id"))
     .addColumn("product_id", "uuid", (col) =>
-      col
-        .notNull()
-        .references("products.id")
-        .onUpdate("cascade")
-        .onDelete("cascade"),
+      col.notNull().references("products.id"),
     )
     .$call(TIMESTAMPS_COLUMN)
     .$call(SOFT_DELETE_COLUMN)
@@ -39,6 +29,6 @@ export async function up(db: Kysely<DB>): Promise<void> {
 }
 
 export async function down(db: Kysely<DB>): Promise<void> {
-  await db.schema.dropTable("sizes").execute();
   await db.schema.dropTable("product_sizes").execute();
+  await db.schema.dropTable("sizes").execute();
 }
