@@ -11,8 +11,8 @@ export async function up(db: Kysely<DB>): Promise<void> {
   await db.schema
     .createTable("users")
     .$call(PRIMARY_KEY_COLUMN)
-    .addColumn("name", "varchar", (col) => col.notNull())
-    .addColumn("email", "varchar", (col) => col.notNull())
+    .addColumn("name", "varchar", (col) => col.notNull().unique())
+    .addColumn("email", "varchar", (col) => col.notNull().unique())
     .addColumn("password", "varchar", (col) => col.notNull())
     .$call(TIMESTAMPS_COLUMN)
     .$call(SOFT_DELETE_COLUMN)

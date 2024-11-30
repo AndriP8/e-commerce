@@ -11,7 +11,7 @@ export async function up(db: Kysely<DB>): Promise<void> {
   await db.schema
     .createTable("orders")
     .$call(PRIMARY_KEY_COLUMN)
-    .addColumn("address", "varchar", (col) => col.notNull().unique())
+    .addColumn("address", "varchar", (col) => col.notNull())
     .addColumn("status", "varchar", (col) => col.notNull())
     .addColumn("total_amount", "integer", (col) => col.notNull())
     .addColumn("buyer_id", "uuid", (col) =>
@@ -42,5 +42,6 @@ export async function up(db: Kysely<DB>): Promise<void> {
 }
 
 export async function down(db: Kysely<DB>): Promise<void> {
-  await db.schema.dropTable("buyers").execute();
+  await db.schema.dropTable("order_items").execute();
+  await db.schema.dropTable("orders").execute();
 }

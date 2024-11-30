@@ -17,7 +17,8 @@ export async function up(db: Kysely<DB>): Promise<void> {
         .notNull()
         .defaultTo(
           sql`('000' || to_char(nextval(pg_get_serial_sequence('categories', 'code')), 'FM000'))`,
-        ),
+        )
+        .unique(),
     )
     .$call(TIMESTAMPS_COLUMN)
     .$call(SOFT_DELETE_COLUMN)
@@ -26,12 +27,12 @@ export async function up(db: Kysely<DB>): Promise<void> {
   await db.schema
     .createTable("products")
     .$call(PRIMARY_KEY_COLUMN)
-    .addColumn("name", "varchar", (col) => col.notNull())
+    .addColumn("name", "varchar", (col) => col.notNull().unique())
     .addColumn("price", "integer", (col) => col.notNull())
     .addColumn("description", "varchar", (col) => col.notNull())
     .addColumn("images", "jsonb", (col) => col.notNull())
     .addColumn("discount", "integer")
-    .addColumn("sku", "varchar", (col) => col.notNull())
+    .addColumn("sku", "varchar", (col) => col.notNull().unique())
     .addColumn("category_id", "uuid", (col) =>
       col.notNull().references("categories.id"),
     )

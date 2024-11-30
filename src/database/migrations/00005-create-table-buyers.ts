@@ -14,7 +14,7 @@ export async function up(db: Kysely<DB>): Promise<void> {
     .addColumn("name", "varchar", (col) => col.notNull().unique())
     .addColumn("email", "varchar", (col) => col.notNull().unique())
     .addColumn("password", "varchar", (col) => col.notNull())
-    .addColumn("address", "jsonb")
+    .addColumn("address", "jsonb", (col) => col.unique())
     .$call(TIMESTAMPS_COLUMN)
     .$call(SOFT_DELETE_COLUMN)
     .execute();
