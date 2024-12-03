@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { Users } from "@/lib/types/database/users-types";
+
 import { SchemaType } from "./schema-types";
 
 const registerUserPayload = z.object({
@@ -8,21 +10,10 @@ const registerUserPayload = z.object({
   password: z.string().min(6),
 });
 
-type Users = {
-  created_at: string;
-  deleted_at: string | null;
-  email: string;
-  id: string;
-  name: string;
-  password: string;
-  updated_at: string | null;
-};
-
 const registerUserResponse = z.object({
   id: z.string(),
   name: z.string(),
   email: z.string().email(),
-  password: z.string().min(6),
   created_at: z.string(),
   deleted_at: z.string(),
   updated_at: z.string(),
