@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "tsx --env-file=.env src/database/migrate.ts migrate",
-    "db:rollback": "tsx src/database/migrate.ts rollback"
+    "db:rollback": "tsx --env-file=.env src/database/migrate.ts rollback",
+    "db:seed": "tsx --env-file=.env src/database/migrate.ts seed"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

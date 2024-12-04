@@ -5,7 +5,7 @@ import * as path from "path";
 
 import { db } from "./client";
 
-type MigrationAction = "migrate" | "rollback";
+type MigrationAction = "migrate" | "rollback" | "seed";
 
 const runMigration = async (action: MigrationAction) => {
   const migrator = new Migrator({
@@ -25,7 +25,6 @@ const runMigration = async (action: MigrationAction) => {
     if (up) {
       migrationResult = await migrator.migrateUp();
     } else if (down) {
-      console.log("down");
       migrationResult = await migrator.migrateDown();
     } else {
       migrationResult = await migrator.migrateToLatest();
@@ -81,6 +80,28 @@ const runMigration = async (action: MigrationAction) => {
   }
 };
 
+const runSeed = async () => {
+  const filename = process.argv[3];
+  try {
+    if (!filename) {
+      console.error("ERROR", ":::", "you must provide a filename to seed!");
+      process.exit(1);
+    }
+
+    const seeder = await import(`./seeders/${filename}`);
+    if (typeof seeder.default !== "function") {
+      console.error("🔥 seeder file must default export a `seed` function.");
+      process.exit(1);
+    }
+    await seeder.default(db);
+    console.info(`🍀 seeder "${filename}" was executed successfully`);
+  } catch (error) {
+    console.error(`🔥 failed to seed ${filename}`);
+    console.error(error);
+    process.exit(1);
+  }
+};
+
 const migrationAction = process.argv[2] as MigrationAction;
 
 switch (migrationAction) {
@@ -91,6 +112,10 @@ switch (migrationAction) {
   case "rollback":
     console.info("🍀 Rolling back migration...");
     runMigration("rollback");
+    break;
+  case "seed":
+    console.info("🍀 Running database seeder...");
+    runSeed();
     break;
   default:
     console.warn("🔥 Invalid argument provided!");
