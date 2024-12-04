@@ -11,3 +11,15 @@ export const hashPassword = (password: string): Promise<string> => {
     });
   });
 };
+
+export const comparePassword = (
+  password: string,
+  hash: string,
+): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(password, hash, function (err, res) {
+      if (err) return reject(err);
+      return resolve(res);
+    });
+  });
+};
