@@ -4,7 +4,7 @@ type validateBodytype = {
   body:
     | z.SafeParseSuccess<unknown>
     | {
-        [k: string]: string;
+        [k: string]: unknown;
       };
   schema: z.ZodSchema;
 };
