@@ -5,6 +5,7 @@ import { db } from "@/database/client";
 import { handleApiData } from "@/lib/helpers/data-response";
 import { handleApiError, throwError } from "@/lib/helpers/error-response";
 import { validateBody } from "@/lib/helpers/validate-body";
+import { verifyToken } from "@/lib/helpers/verify-token";
 import { productSchema, sizes } from "@/lib/schema/product.schema";
 
 type EditProductParams = z.infer<typeof productSchema.update.params>;
@@ -65,10 +66,13 @@ type GetDetailProductResponse = z.infer<
   typeof productSchema.readDetail.response
 >;
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   route: { params: GetDetailProductParams },
 ) {
+  const token = request.headers.get("Authorization") || "";
+
   try {
+    await verifyToken(token);
     const product = await db
       .selectFrom("products")
       .leftJoin("categories", "products.category_id", "categories.id")
@@ -107,10 +111,13 @@ export async function GET(
 type DeleteProductParams = z.infer<typeof productSchema.delete.params>;
 type DeleteProductResponse = z.infer<typeof productSchema.delete.response>;
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   route: { params: DeleteProductParams },
 ) {
+  const token = request.headers.get("Authorization") || "";
+
   try {
+    await verifyToken(token);
     await db.transaction().execute(async () => {
       await db
         .updateTable("products")

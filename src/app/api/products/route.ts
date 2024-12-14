@@ -6,12 +6,17 @@ import { paginate } from "@/database/utils/pagination";
 import { handleApiData } from "@/lib/helpers/data-response";
 import { handleApiError, throwError } from "@/lib/helpers/error-response";
 import { validateBody } from "@/lib/helpers/validate-body";
+import { verifyToken } from "@/lib/helpers/verify-token";
 import { productSchema, sizes } from "@/lib/schema/product.schema";
 
 type CreateProductBody = z.infer<typeof productSchema.create.body>;
 type CreateProductResponse = z.infer<typeof productSchema.create.response>;
 export async function POST(request: NextRequest) {
+  const token = request.headers.get("Authorization") || "";
+
   try {
+    await verifyToken(token);
+
     const body = (await request.json()) as CreateProductBody;
 
     const { error } = validateBody({
@@ -60,11 +65,15 @@ export async function POST(request: NextRequest) {
 
 type GetProductResponse = z.infer<typeof productSchema.read.response>;
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const page = Number(searchParams.get("page"));
-  const size = Number(searchParams.get("size"));
+  const token = request.headers.get("Authorization") || "";
 
   try {
+    await verifyToken(token);
+
+    const searchParams = request.nextUrl.searchParams;
+    const page = Number(searchParams.get("page"));
+    const size = Number(searchParams.get("size"));
+
     const products = await db
       .selectFrom("products")
       .leftJoin("categories", "products.category_id", "categories.id")
