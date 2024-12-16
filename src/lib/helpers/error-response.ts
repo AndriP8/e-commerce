@@ -16,7 +16,7 @@ export function throwError(error: ErrorMessage, opts: NextResponseInit) {
 
 export function handleApiError(error: unknown, opts?: NextResponseInit) {
   if (error instanceof Error) {
-    return throwError(error.message, { ...opts });
+    return throwError(error.message, { ...opts, status: opts?.status || 400 });
   }
   return error;
 }

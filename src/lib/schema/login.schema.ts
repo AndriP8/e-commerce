@@ -11,15 +11,8 @@ const registerUserPayload = z.object({
 registerUserPayload._output satisfies Pick<Users, "email" | "password">;
 
 const registerUserResponse = z.object({
-  id: z.string(),
-  name: z.string(),
-  email: z.string().email(),
-  created_at: z.string(),
-  deleted_at: z.string(),
-  updated_at: z.string(),
-  asd: z.string(),
+  token: z.string(),
 });
-registerUserResponse._output satisfies Omit<Users, "password">;
 
 export const loginSchema = {
   path: "/login",

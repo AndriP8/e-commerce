@@ -10,6 +10,8 @@ import { comparePassword } from "@/lib/helpers/password";
 import { validateBody } from "@/lib/helpers/validate-body";
 import { loginSchema } from "@/lib/schema/login.schema";
 
+type LoginResponse = z.infer<typeof loginSchema.create.response>;
+
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as z.infer<
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
       .setExpirationTime("24h")
       .sign(key);
 
-    return handleApiData({ token }, { status: 201 });
+    return handleApiData<LoginResponse>({ token }, { status: 201 });
   } catch (error) {
     return handleApiError(error);
   }
