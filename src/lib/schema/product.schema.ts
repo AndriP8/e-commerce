@@ -71,26 +71,36 @@ export const productSchema = {
   create: {
     path: "/",
     body: createProductPayload,
-    response: createProductPayload,
+    response: z.object({
+      data: createProductPayload,
+    }),
   },
   read: {
     path: "/",
-    response: z.array(productResponse),
+    response: z.object({
+      data: z.array(productResponse),
+    }),
   },
   update: {
     path: "/:id",
     params: productParams,
     body: createProductPayload,
-    response: createProductPayload,
+    response: z.object({
+      data: createProductPayload,
+    }),
   },
   readDetail: {
     path: "/:id",
     params: productParams,
-    response: productResponse,
+    response: z.object({
+      data: productResponse,
+    }),
   },
   delete: {
     path: "/:id",
     params: productParams,
-    response: z.literal("OK"),
+    response: z.object({
+      data: z.literal("OK"),
+    }),
   },
 } satisfies Partial<SchemaType>;

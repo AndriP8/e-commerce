@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       .setExpirationTime("24h")
       .sign(key);
 
-    return handleApiData<LoginResponse>({ token }, { status: 201 });
+    return handleApiData<LoginResponse>({ data: { token } }, { status: 201 });
   } catch (error) {
     return handleApiError(error);
   }

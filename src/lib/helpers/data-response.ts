@@ -5,7 +5,7 @@ import { NextResponseInit } from "@/lib/types/response-init-types";
 type Data = unknown | unknown[];
 export function handleApiData<T>(
   data: T,
-  opts: NextResponseInit,
+  options: NextResponseInit,
 ): NextResponse<Data> {
-  return NextResponse.json({ data }, { ...opts });
+  return NextResponse.json({ ...data }, { ...options });
 }

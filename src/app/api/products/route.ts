@@ -57,7 +57,10 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    return handleApiData<CreateProductResponse>(product, { status: 201 });
+    return handleApiData<CreateProductResponse>(
+      { data: product },
+      { status: 201 },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -111,9 +114,12 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return handleApiData<GetProductResponse>(formattedProducts, {
-      status: 200,
-    });
+    return handleApiData<GetProductResponse>(
+      { data: formattedProducts },
+      {
+        status: 200,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }

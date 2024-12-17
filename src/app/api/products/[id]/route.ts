@@ -55,7 +55,10 @@ export async function PUT(
         variants: productSizeData,
       };
     });
-    return handleApiData<EditProductResponse>(product, { status: 201 });
+    return handleApiData<EditProductResponse>(
+      { data: product },
+      { status: 201 },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -100,9 +103,12 @@ export async function GET(
       })),
     };
 
-    return handleApiData<GetDetailProductResponse>(productData, {
-      status: 200,
-    });
+    return handleApiData<GetDetailProductResponse>(
+      { data: productData },
+      {
+        status: 200,
+      },
+    );
   } catch (error) {
     return handleApiError(error, { status: 400 });
   }
@@ -130,7 +136,10 @@ export async function DELETE(
         .set({ deleted_at: Date() })
         .execute();
     });
-    return handleApiData<DeleteProductResponse>("OK", { status: 200 });
+    return handleApiData<DeleteProductResponse>(
+      { data: "OK" },
+      { status: 200 },
+    );
   } catch (error) {
     return handleApiError(error);
   }

@@ -19,6 +19,8 @@ export const loginSchema = {
   create: {
     path: "/",
     body: registerUserPayload,
-    response: registerUserResponse,
+    response: z.object({
+      data: registerUserResponse,
+    }),
   },
 } satisfies Partial<SchemaType>;
