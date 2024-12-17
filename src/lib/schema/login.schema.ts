@@ -10,17 +10,13 @@ const registerUserPayload = z.object({
 });
 registerUserPayload._output satisfies Pick<Users, "email" | "password">;
 
-const registerUserResponse = z.object({
-  token: z.string(),
-});
-
 export const loginSchema = {
   path: "/login",
   create: {
     path: "/",
     body: registerUserPayload,
     response: z.object({
-      data: registerUserResponse,
+      data: z.literal("OK"),
     }),
   },
 } satisfies Partial<SchemaType>;

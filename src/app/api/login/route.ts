@@ -1,5 +1,4 @@
-import { createSecretKey } from "crypto";
-import * as jose from "jose";
+import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -7,6 +6,7 @@ import { db } from "@/database/client";
 import { handleApiData } from "@/lib/helpers/data-response";
 import { handleApiError, throwError } from "@/lib/helpers/error-response";
 import { comparePassword } from "@/lib/helpers/password";
+import { encrypt } from "@/lib/helpers/session";
 import { validateBody } from "@/lib/helpers/validate-body";
 import { loginSchema } from "@/lib/schema/login.schema";
 
@@ -36,18 +36,23 @@ export async function POST(request: NextRequest) {
     if (!isPasswordValid)
       return throwError("Invalid password", { status: 401 });
 
-    const key = createSecretKey(process.env.SECRET_KEY || "", "utf-8");
-    const token = await new jose.SignJWT({
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 1 day
+    const token = await encrypt({
       id: user.id,
       name: user.name,
       email: user.email,
-    })
-      .setProtectedHeader({ alg: "HS256", typ: "jwt" })
-      .setIssuedAt()
-      .setExpirationTime("24h")
-      .sign(key);
+    });
 
-    return handleApiData<LoginResponse>({ data: { token } }, { status: 201 });
+    const cookieStore = cookies();
+    cookieStore.set("session", token, {
+      httpOnly: true,
+      secure: true,
+      expires: expiresAt,
+      sameSite: "lax",
+      path: "/",
+    });
+
+    return handleApiData<LoginResponse>({ data: "OK" }, { status: 201 });
   } catch (error) {
     return handleApiError(error);
   }

@@ -1,6 +1,5 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Cookies from "js-cookie";
 import { EyeClosed } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -38,7 +37,6 @@ export default function Page() {
   async function onSubmit(values: LoginSchema) {
     const response = await registerUser(values);
     if (typeof response !== "string") {
-      Cookies.set("token", response.data.token);
       router.push("/backoffice");
     }
 
