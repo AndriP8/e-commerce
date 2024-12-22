@@ -25,7 +25,7 @@ const createProductPayload = z.object({
   price: z.number(),
   sku: z.string(),
   description: z.string(),
-  discount: z.number().nullable(),
+  discount: z.number().max(100).nullable(),
   images: z
     .array(z.string())
     .min(1, { message: "Please add at least one image" }),

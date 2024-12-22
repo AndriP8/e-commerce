@@ -18,7 +18,7 @@ export async function encrypt(payload: SessionPayload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("1m")
+    .setExpirationTime("1d")
     .sign(encodedKey);
 }
 
@@ -32,7 +32,7 @@ export async function decrypt(
     return payload as SessionPayload;
   } catch (error) {
     if (error instanceof Error) {
-      throwError("Invalid token", {});
+      throwError("Invalid token", { status: 401 });
     }
   }
 }
