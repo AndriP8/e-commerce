@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { Products } from "@/lib/types/database/products-types";
 
+import { paginationSchema } from "./pagination.schema";
 import { SchemaType } from "./schema-types";
 
 type ProductSize = {
@@ -41,7 +42,7 @@ const createProductPayload = z.object({
 });
 createProductPayload._output satisfies CreateProduct;
 
-const productResponse = z.object({
+const productData = z.object({
   id: z.string(),
   name: z.string(),
   price: z.number(),
@@ -60,7 +61,13 @@ const productResponse = z.object({
   updated_at: z.string().nullable(),
   deleted_at: z.string().nullable(),
 });
-productResponse._output satisfies GetProduct;
+productData._output satisfies GetProduct;
+
+const productQuery = z.object({
+  page: z.number(),
+  size: z.number(),
+  search: z.string().nullable(),
+});
 
 const productParams = z.object({
   id: z.string(),
@@ -77,8 +84,10 @@ export const productSchema = {
   },
   read: {
     path: "/",
+    query: productQuery,
     response: z.object({
-      data: z.array(productResponse),
+      data: z.array(productData),
+      pagination: paginationSchema,
     }),
   },
   update: {
@@ -93,7 +102,7 @@ export const productSchema = {
     path: "/:id",
     params: productParams,
     response: z.object({
-      data: productResponse,
+      data: productData,
     }),
   },
   delete: {

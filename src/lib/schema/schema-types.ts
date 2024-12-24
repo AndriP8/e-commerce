@@ -8,6 +8,7 @@ type GeneralSchema = {
   response: ZodSchema;
   body: ZodSchema;
   params?: ZodSchema;
+  query?: ZodSchema;
 };
 
 type ReadData = Omit<GeneralSchema, "body">;

@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/database/client";
-import { paginate } from "@/database/utils/pagination";
+import { getPaginationInfo, paginate } from "@/database/utils/pagination";
 import { handleApiData } from "@/lib/helpers/data-response";
 import { handleApiError, throwError } from "@/lib/helpers/error-response";
 import { validateBody } from "@/lib/helpers/validate-body";
@@ -76,15 +76,13 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const page = Number(searchParams.get("page"));
     const size = Number(searchParams.get("size"));
+    const search = searchParams.get("search");
 
-    const products = await db
+    const baseQuery = db
       .selectFrom("products")
       .leftJoin("categories", "products.category_id", "categories.id")
       .where("products.deleted_at", "is", null)
-      .selectAll("products")
-      .select(["categories.name as category_name"])
-      .$call((qb) => paginate(qb, { page, size }))
-      .execute();
+      .$if(!!search, (qb) => qb.where("products.name", "ilike", `%${search}%`));
 
     const sizeVariants = await db
       .selectFrom("product_sizes")
@@ -96,6 +94,12 @@ export async function GET(request: NextRequest) {
         "product_sizes.product_id",
         "sizes.size",
       ])
+      .execute();
+
+    const products = await baseQuery
+      .selectAll("products")
+      .select(["categories.name as category_name"])
+      .$call((qb) => paginate(qb, { page, size }))
       .execute();
 
     const formattedProducts = products.map((product) => {
@@ -114,8 +118,17 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    const pagination = await getPaginationInfo(
+      baseQuery,
+      { page, size },
+      products.length,
+    );
+
     return handleApiData<GetProductResponse>(
-      { data: formattedProducts },
+      {
+        data: formattedProducts,
+        pagination,
+      },
       {
         status: 200,
       },
