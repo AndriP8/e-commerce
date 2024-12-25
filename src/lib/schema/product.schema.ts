@@ -73,6 +73,17 @@ const productParams = z.object({
   id: z.string(),
 });
 
+const uploadImagePayload = z.object({
+  filename: z.string(),
+  size: z.number(),
+  content_type: z.string(),
+});
+const uploadImageResponse = z.object({ signed_url: z.string() });
+
+const deleteImageParams = z.object({
+  id: z.string(),
+});
+
 export const productSchema = {
   path: "/product",
   create: {
@@ -108,6 +119,20 @@ export const productSchema = {
   delete: {
     path: "/:id",
     params: productParams,
+    response: z.object({
+      data: z.literal("OK"),
+    }),
+  },
+  uploadImage: {
+    path: "/images",
+    body: uploadImagePayload,
+    response: z.object({
+      data: uploadImageResponse,
+    }),
+  },
+  deleteImage: {
+    path: "/images/:id",
+    params: deleteImageParams,
     response: z.object({
       data: z.literal("OK"),
     }),
