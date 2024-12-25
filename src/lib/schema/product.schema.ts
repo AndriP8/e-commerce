@@ -21,7 +21,7 @@ type GetProduct = Omit<Products, "category_id"> & {
 
 export const sizes = ["S", "M", "L", "XL", "XXL"] as const;
 
-const createProductPayload = z.object({
+const createProductBody = z.object({
   name: z.string(),
   price: z.number(),
   sku: z.string(),
@@ -40,7 +40,7 @@ const createProductPayload = z.object({
     )
     .min(1, { message: "Please add at least one variant" }),
 });
-createProductPayload._output satisfies CreateProduct;
+createProductBody._output satisfies CreateProduct;
 
 const productData = z.object({
   id: z.string(),
@@ -73,7 +73,7 @@ const productParams = z.object({
   id: z.string(),
 });
 
-const uploadImagePayload = z.object({
+const uploadImageBody = z.object({
   filename: z.string(),
   size: z.number(),
   content_type: z.string(),
@@ -88,9 +88,9 @@ export const productSchema = {
   path: "/product",
   create: {
     path: "/",
-    body: createProductPayload,
+    body: createProductBody,
     response: z.object({
-      data: createProductPayload,
+      data: createProductBody,
     }),
   },
   read: {
@@ -104,9 +104,9 @@ export const productSchema = {
   update: {
     path: "/:id",
     params: productParams,
-    body: createProductPayload,
+    body: createProductBody,
     response: z.object({
-      data: createProductPayload,
+      data: createProductBody,
     }),
   },
   readDetail: {
@@ -125,7 +125,7 @@ export const productSchema = {
   },
   uploadImage: {
     path: "/images",
-    body: uploadImagePayload,
+    body: uploadImageBody,
     response: z.object({
       data: uploadImageResponse,
     }),
