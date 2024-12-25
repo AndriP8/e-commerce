@@ -32,7 +32,7 @@ export async function decrypt(
     return payload as SessionPayload;
   } catch (error) {
     if (error instanceof Error) {
-      throwError("Invalid token", { status: 401 });
+      throw throwError("Invalid token", { status: 401 });
     }
   }
 }

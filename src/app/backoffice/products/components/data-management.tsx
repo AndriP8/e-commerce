@@ -1,5 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { useTableInfo } from "@/hooks/use-table-info";
 import { getProducts, Product } from "../data/data-fetching";
 import { useColumns } from "./columns";
 
-export function DataManagement() {
+export function DataManagement({ session }: { session: string }) {
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query);
   const { pagination, setPagination, setPageData, pageCount, paginationQuery } =
@@ -22,6 +23,7 @@ export function DataManagement() {
       const products = await getProducts({
         ...paginationQuery,
         search: debouncedQuery,
+        session,
       });
 
       if ("data" in products && "pagination" in products) {
@@ -47,7 +49,9 @@ export function DataManagement() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <Button>Add Product</Button>
+        <Button asChild>
+          <Link href="/backoffice/products/add-product">Add Product</Link>
+        </Button>
       </div>
       <DataTable
         data={data.data}
