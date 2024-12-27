@@ -26,19 +26,28 @@ const createProductBody = z.object({
   price: z.number(),
   sku: z.string(),
   description: z.string(),
-  discount: z.number().max(100).nullable(),
+  discount: z.number().min(0).max(100).nullable(),
   images: z
     .array(z.string())
-    .min(1, { message: "Please add at least one image" }),
+    .min(1, { message: "Please add at least one image" })
+    .max(4, { message: "You can add up to 4 images" }),
   category_id: z.string(),
   variants: z
     .array(
       z.object({
-        size_id: z.string(),
-        stock: z.number(),
+        size_id: z.string().min(1, { message: "Required" }),
+        stock: z.number().min(1),
       }),
     )
-    .min(1, { message: "Please add at least one variant" }),
+    .min(1, { message: "Please add at least one variant" })
+    .max(4, { message: "You can add up to 4 variants" })
+    .refine(
+      (variants) => {
+        const sizeIds = variants.map((variant) => variant.size_id);
+        return new Set(sizeIds).size === sizeIds.length;
+      },
+      { message: "You can't add duplicate size" },
+    ),
 });
 createProductBody._output satisfies CreateProduct;
 
