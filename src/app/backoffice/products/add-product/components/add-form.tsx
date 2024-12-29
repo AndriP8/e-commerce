@@ -1,14 +1,12 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2, XCircleIcon } from "lucide-react";
-import Image from "next/image";
+import { Trash2 } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -19,6 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 import { AddProductSchema, addProductSchema } from "../schema";
+import { UploadImageField } from "./upload-image-field";
 
 const sizes = [
   {
@@ -54,13 +53,14 @@ const categories = [
   },
 ];
 
-export function AddForm() {
+export function AddForm({ session }: { session: string }) {
   const form = useForm<AddProductSchema>({
     resolver: zodResolver(addProductSchema),
     defaultValues: {
       variants: [{ size_id: "", stock: 1 }],
       price: 0,
       discount: 0,
+      images: [],
     },
   });
 
@@ -305,59 +305,7 @@ export function AddForm() {
           </Button>
         </div>
         {/* Product images */}
-        <FormField
-          control={form.control}
-          name="images"
-          render={({ field }) => (
-            <div className="space-y-2">
-              <Label
-                htmlFor="image"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Image
-              </Label>
-              <Input
-                type="file"
-                ref={field.ref}
-                onChange={(e) => {
-                  if (!e.target.files) return;
-                  field.onChange(e.target.files);
-                }}
-                accept=".jpg,.png,.webp"
-                multiple
-                max={4}
-              />
-              <FormMessage />
-              {field.value && (
-                <div className="grid grid-cols-2 gap-4">
-                  {Array.from(["file"]).map((file, index) => (
-                    <div key={file} className="flex gap-2">
-                      <Image
-                        src={""}
-                        alt={`Image preview ${index + 1}`}
-                        width={200}
-                        height={200}
-                        className="size-[200px] object-cover rounded-sm"
-                      />
-                      <div className="space-y-2 w-full">
-                        <p>Filename.jpg</p>
-                        <div className="flex gap-2 items-center">
-                          <Progress className="w-full" value={50} />
-                          <Button
-                            variant="ghost"
-                            className="size-auto rounded-full p-2"
-                          >
-                            <XCircleIcon className="size-4 text-gray-700" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        />
+        <UploadImageField session={session} />
         <div>
           <Button type="submit">Submit</Button>
         </div>

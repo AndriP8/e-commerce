@@ -1,6 +1,5 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { randomUUID } from "crypto";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -26,11 +25,9 @@ export async function POST(request: NextRequest) {
     });
     if (error) return throwError(error, { status: 400 });
 
-    const key = `${randomUUID()}-${body.filename}`;
-
     const command = new PutObjectCommand({
       Bucket: process.env.BUCKET_NAME || "",
-      Key: key,
+      Key: body.id,
       ContentLength: body.size,
       ContentType: body.content_type,
     });

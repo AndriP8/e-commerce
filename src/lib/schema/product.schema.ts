@@ -29,7 +29,7 @@ const createProductBody = z.object({
   discount: z.number().min(0).max(100).nullable(),
   images: z
     .array(z.string())
-    .min(1, { message: "Please add at least one image" })
+    .min(1, { message: "Please add at least one uploaded image" })
     .max(4, { message: "You can add up to 4 images" }),
   category_id: z.string(),
   variants: z
@@ -83,6 +83,7 @@ const productParams = z.object({
 });
 
 const uploadImageBody = z.object({
+  id: z.string(),
   filename: z.string(),
   size: z.number(),
   content_type: z.string(),
