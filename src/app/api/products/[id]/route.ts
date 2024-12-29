@@ -1,9 +1,11 @@
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/database/client";
 import { handleApiData } from "@/lib/helpers/data-response";
 import { handleApiError, throwError } from "@/lib/helpers/error-response";
+import { s3ClientConfig } from "@/lib/helpers/s3";
 import { validateBody } from "@/lib/helpers/validate-body";
 import { verifyToken } from "@/lib/helpers/verify-token";
 import { productSchema, sizes } from "@/lib/schema/product.schema";
@@ -124,18 +126,39 @@ export async function DELETE(
 
   try {
     await verifyToken(token);
-    await db.transaction().execute(async () => {
-      await db
+    const productData = await db.transaction().execute(async (trx) => {
+      const updatedProduct = await trx
         .updateTable("products")
         .where("id", "=", route.params.id)
         .set({ deleted_at: Date() })
-        .execute();
-      await db
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      const updatedProductSizes = await trx
         .updateTable("product_sizes")
         .where("product_id", "=", route.params.id)
         .set({ deleted_at: Date() })
+        .returningAll()
         .execute();
+
+      return {
+        ...updatedProduct,
+        variants: updatedProductSizes,
+      };
     });
+    const productImages = JSON.parse(
+      JSON.stringify(productData.images),
+    ) as string[];
+
+    productImages.forEach(async (path) => {
+      const command = new DeleteObjectCommand({
+        Bucket: process.env.BUCKET_NAME || "",
+        Key: path,
+      });
+      await s3ClientConfig.send(command);
+      s3ClientConfig.destroy();
+    });
+
     return handleApiData<DeleteProductResponse>(
       { data: "OK" },
       { status: 200 },

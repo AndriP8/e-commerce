@@ -35,7 +35,7 @@ export function DataManagement({ session }: { session: string }) {
     queryKey: ["products", paginationQuery, debouncedQuery],
   });
 
-  const columns = useColumns();
+  const columns = useColumns(session);
 
   if (!data?.data) return null;
   if (isLoading) return <div className="mx-auto text-center">Loading...</div>;
