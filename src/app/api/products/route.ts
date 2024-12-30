@@ -2,12 +2,13 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/database/client";
+import { sizes } from "@/database/seeders/sizes.seed";
 import { getPaginationInfo, paginate } from "@/database/utils/pagination";
 import { handleApiData } from "@/lib/helpers/data-response";
 import { handleApiError, throwError } from "@/lib/helpers/error-response";
 import { validateBody } from "@/lib/helpers/validate-body";
 import { verifyToken } from "@/lib/helpers/verify-token";
-import { productSchema, sizes } from "@/lib/schema/product.schema";
+import { productSchema } from "@/lib/schema/product.schema";
 
 type CreateProductBody = z.infer<typeof productSchema.create.body>;
 type CreateProductResponse = z.infer<typeof productSchema.create.response>;

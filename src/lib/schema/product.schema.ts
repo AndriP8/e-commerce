@@ -19,8 +19,6 @@ type GetProduct = Omit<Products, "category_id"> & {
   category_name: string;
 };
 
-export const sizes = ["S", "M", "L", "XL", "XXL"] as const;
-
 const createProductBody = z.object({
   name: z.string(),
   price: z.number(),

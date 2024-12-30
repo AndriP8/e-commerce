@@ -3,12 +3,13 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/database/client";
+import { sizes } from "@/database/seeders/sizes.seed";
 import { handleApiData } from "@/lib/helpers/data-response";
 import { handleApiError, throwError } from "@/lib/helpers/error-response";
 import { s3ClientConfig } from "@/lib/helpers/s3";
 import { validateBody } from "@/lib/helpers/validate-body";
 import { verifyToken } from "@/lib/helpers/verify-token";
-import { productSchema, sizes } from "@/lib/schema/product.schema";
+import { productSchema } from "@/lib/schema/product.schema";
 
 type EditProductParams = z.infer<typeof productSchema.update.params>;
 type EditProductBody = z.infer<typeof productSchema.update.body>;

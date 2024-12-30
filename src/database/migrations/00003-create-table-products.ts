@@ -8,16 +8,21 @@ import {
 } from "../utils/common-column";
 
 export async function up(db: Kysely<DB>): Promise<void> {
+  await sql`
+      CREATE SEQUENCE categories_code_seq
+      START WITH 1
+      INCREMENT BY 1
+      MINVALUE 1
+      MAXVALUE 100
+      NO CYCLE`.execute(db);
+
   await db.schema
     .createTable("categories")
     .$call(PRIMARY_KEY_COLUMN)
     .addColumn("name", "varchar", (col) => col.notNull().unique())
     .addColumn("code", "varchar", (col) =>
       col
-        .notNull()
-        .defaultTo(
-          sql`('000' || to_char(nextval(pg_get_serial_sequence('categories', 'code')), 'FM000'))`,
-        )
+        .defaultTo(sql`to_char(nextval('categories_code_seq'), 'FM000')`)
         .unique(),
     )
     .$call(TIMESTAMPS_COLUMN)
@@ -44,4 +49,5 @@ export async function up(db: Kysely<DB>): Promise<void> {
 export async function down(db: Kysely<DB>): Promise<void> {
   await db.schema.dropTable("products").execute();
   await db.schema.dropTable("categories").execute();
+  await sql`DROP SEQUENCE IF EXISTS categories_code_seq;`.execute(db);
 }

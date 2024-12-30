@@ -14,8 +14,8 @@
  * >;
  *
  * // type ModifiedType = {
- * //   foo: number;
- * //   bar: string;
+ * //   foo: string;
+ * //   bar: number;
  * //   baz: boolean;
  * // }
  */

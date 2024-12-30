@@ -4,19 +4,15 @@ import { DB } from "kysely-codegen";
 const categories = [
   {
     name: "Shirts",
-    code: "001",
   },
   {
     name: "T-Shirts",
-    code: "002",
   },
   {
     name: "Sweaters",
-    code: "003",
   },
   {
     name: "Jackets",
-    code: "004",
   },
 ];
 
@@ -28,7 +24,6 @@ export default async function categoriesSeeder(
       .insertInto("categories")
       .values({
         name: category.name,
-        code: category.code,
       })
       .executeTakeFirst(),
   );

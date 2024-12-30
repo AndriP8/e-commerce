@@ -12,6 +12,7 @@ export async function up(db: Kysely<DB>): Promise<void> {
     .createTable("sizes")
     .$call(PRIMARY_KEY_COLUMN)
     .addColumn("size", "varchar(3)", (col) => col.notNull().unique())
+    .addColumn("order", "integer", (col) => col.notNull())
     .$call(TIMESTAMPS_COLUMN)
     .execute();
 
