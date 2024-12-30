@@ -99,3 +99,31 @@ export function useProductImageMutation(session: string) {
   };
   return { uploadImage, deleteImage };
 }
+
+export type CreateProductBody = z.infer<typeof productSchema.create.body>;
+export type CreateProductResponse = z.infer<
+  typeof productSchema.create.response
+>;
+type CreateProductArgs = {
+  body: CreateProductBody;
+  session: string;
+};
+export async function createProduct({
+  session,
+  body,
+}: CreateProductArgs): Promise<CreateProductResponse> {
+  const response = await fetch("/api/products", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to create product: ${response.statusText}`);
+  }
+
+  return response.json();
+}

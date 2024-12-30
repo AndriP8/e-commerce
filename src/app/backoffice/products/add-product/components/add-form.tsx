@@ -1,6 +1,8 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -15,61 +17,80 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
 
+import { getCategories, getSizes } from "../data/data-fetching";
+import {
+  createProduct,
+  CreateProductBody,
+  CreateProductResponse,
+} from "../data/data-mutation";
 import { AddProductSchema, addProductSchema } from "../schema";
 import { UploadImageField } from "./upload-image-field";
-
-const sizes = [
-  {
-    label: "M",
-    value: "79ebc663-481a-49d8-9be6-6708ef39a0bm",
-  },
-  {
-    label: "L",
-    value: "79ebc663-481a-49d8-9be6-6708ef39a0bl",
-  },
-  {
-    label: "XL",
-    value: "79ebc663-481a-49d8-9be6-6708ef39a0bxl",
-  },
-];
-
-const categories = [
-  {
-    label: "Sweaters",
-    value: "72fd7d2f-9cc7-48c5-b868-a6526dd4c66sw",
-  },
-  {
-    label: "Jackets",
-    value: "72fd7d2f-9cc7-48c5-b868-a6526dd4c66j",
-  },
-  {
-    label: "Shirts",
-    value: "72fd7d2f-9cc7-48c5-b868-a6526dd4c66sh",
-  },
-  {
-    label: "T-Shirts",
-    value: "72fd7d2f-9cc7-48c5-b868-a6526dd4c66t",
-  },
-];
 
 export function AddForm({ session }: { session: string }) {
   const form = useForm<AddProductSchema>({
     resolver: zodResolver(addProductSchema),
     defaultValues: {
+      name: "",
+      description: "",
+      category_id: "",
+      sku: "",
       variants: [{ size_id: "", stock: 1 }],
       price: 0,
       discount: 0,
       images: [],
     },
   });
+  const router = useRouter();
 
   const variantFields = useFieldArray({
     name: "variants",
     control: form.control,
   });
 
-  async function onSubmit() {}
+  const { data: sizes } = useQuery({
+    queryFn: () => getSizes(session),
+    queryKey: ["sizes"],
+  });
+
+  const sizeOptions =
+    sizes?.data.map((data) => ({
+      label: data.size,
+      value: data.id,
+    })) || [];
+
+  const { data: categories } = useQuery({
+    queryFn: () => getCategories(session),
+    queryKey: ["categories"],
+  });
+
+  const categoryOptions =
+    categories?.data.map((data) => ({
+      label: data.name,
+      value: data.id,
+    })) || [];
+
+  const productMutation = useMutation<
+    CreateProductResponse,
+    unknown,
+    CreateProductBody
+  >({
+    mutationKey: ["products"],
+    mutationFn: (body) => createProduct({ session, body }),
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Product created successfully",
+        variant: "default",
+      });
+      router.push("/backoffice/products");
+      router.refresh();
+    },
+  });
+  async function onSubmit(values: AddProductSchema) {
+    productMutation.mutate(values);
+  }
 
   return (
     <Form {...form}>
@@ -119,7 +140,7 @@ export function AddForm({ session }: { session: string }) {
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent id="category">
-                  {categories.map((category) => (
+                  {categoryOptions.map((category) => (
                     <SelectItem value={category.value} key={category.value}>
                       {category.label}
                     </SelectItem>
@@ -247,7 +268,7 @@ export function AddForm({ session }: { session: string }) {
                         <SelectValue placeholder="Select size" />
                       </SelectTrigger>
                       <SelectContent id="size">
-                        {sizes.map((size) => (
+                        {sizeOptions.map((size) => (
                           <SelectItem value={size.value} key={size.value}>
                             {size.label}
                           </SelectItem>
