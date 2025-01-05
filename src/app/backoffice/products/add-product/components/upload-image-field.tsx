@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 
+import { initialState, uploadReducer } from "../../reducers/upload-reducer";
+import { FileWithPreview } from "../../reducers/upload-reducer";
 import { useProductImageMutation } from "../data/data-mutation";
-import { initialState, uploadReducer } from "../reducers/upload-reducer";
-import { FileWithPreview } from "../reducers/upload-reducer";
 import { AddProductSchema } from "../schema";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -34,7 +34,7 @@ export function UploadImageField({ session }: { session: string }) {
         if (file.size > MAX_FILE_SIZE) {
           errors = `Filename ${file.name} exceed the 10MB limit`;
         } else if (
-          state.files.some((f) => f.file.name === file.name && file.size > 0)
+          state.files.some((f) => f.file?.name === file.name && file.size > 0)
         ) {
           errors = `Filename ${file.name} already exists`;
         } else {
@@ -172,7 +172,7 @@ export function UploadImageField({ session }: { session: string }) {
           <div key={file.id} className="relative w-full h-32">
             <Image
               src={file.preview}
-              alt={file.file.name}
+              alt={file.file?.name || "Product Image"}
               fill
               style={{ objectFit: "cover" }}
               className="rounded-lg"

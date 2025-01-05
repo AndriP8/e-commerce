@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { productSchema } from "@/lib/schema/product.schema";
 
-import { FileWithPreview } from "../reducers/upload-reducer";
+import { FileWithPreview } from "../../reducers/upload-reducer";
 
 type UploadImageArgs = {
   onProgress: (id: string, progress: number) => void;
@@ -24,6 +24,7 @@ export function useProductImageMutation(session: string) {
     onComplete,
     onError,
   }: UploadImageArgs) => {
+    if (!file.file) return;
     const uploadBody: UploadBody = {
       id: file.id,
       filename: file.file.name,
