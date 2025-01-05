@@ -34,7 +34,7 @@ export const useColumns = (session: string) => {
     },
     {
       header: "Category",
-      accessorKey: "category_name",
+      accessorKey: "category.name",
     },
     {
       header: "sku",
