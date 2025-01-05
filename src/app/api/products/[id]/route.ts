@@ -3,7 +3,6 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/database/client";
-import { sizes } from "@/database/seeders/sizes.seed";
 import { handleApiData } from "@/lib/helpers/data-response";
 import { handleApiError, throwError } from "@/lib/helpers/error-response";
 import { s3ClientConfig } from "@/lib/helpers/s3";
@@ -40,17 +39,35 @@ export async function PUT(
         .executeTakeFirstOrThrow();
 
       const productSizeData = await Promise.all(
-        variants.map((variant) =>
-          db
-            .updateTable("product_sizes")
-            .set({
+        variants.map(async (variant) => {
+          const existingVariant = await db
+            .selectFrom("product_sizes")
+            .where("product_id", "=", productData.id)
+            .where("size_id", "=", variant.size_id)
+            .selectAll()
+            .executeTakeFirst();
+
+          if (existingVariant) {
+            return await db
+              .updateTable("product_sizes")
+              .set({
+                stock: variant.stock,
+              })
+              .where("id", "=", existingVariant.id)
+              .returningAll()
+              .executeTakeFirstOrThrow();
+          }
+
+          return await db
+            .insertInto("product_sizes")
+            .values({
               stock: variant.stock,
               size_id: variant.size_id,
+              product_id: productData.id,
             })
-            .where("product_id", "=", productData.id)
             .returningAll()
-            .executeTakeFirstOrThrow(),
-        ),
+            .executeTakeFirstOrThrow();
+        }),
       );
       return {
         ...productData,
@@ -81,7 +98,7 @@ export async function GET(
     await verifyToken(token);
     const product = await db
       .selectFrom("products")
-      .leftJoin("categories", "products.category_id", "categories.id")
+      .innerJoin("categories", "products.category_id", "categories.id")
       .where("products.id", "=", route.params.id)
       .where("products.deleted_at", "is", null)
       .selectAll("products")
@@ -92,20 +109,20 @@ export async function GET(
       .selectFrom("product_sizes")
       .where("product_sizes.product_id", "=", route.params.id)
       .where("product_sizes.deleted_at", "is", null)
-      .leftJoin("sizes", "product_sizes.size_id", "sizes.id")
-      .select(["product_sizes.stock", "sizes.size"])
+      .innerJoin("sizes", "product_sizes.size_id", "sizes.id")
+      .select(["product_sizes.stock", "sizes.size", "sizes.id as size_id"])
       .execute();
 
+    const { category_name, category_id, ...productValue } = product;
     const productData = {
-      ...product,
-      category_name: product.category_name || "",
+      ...productValue,
+      category: {
+        id: category_id,
+        name: category_name,
+      },
+      variants: sizeVariants,
       images: JSON.parse(JSON.stringify(product.images)),
-      variants: sizeVariants.map((variant) => ({
-        size: variant.size || sizes[0],
-        stock: variant.stock,
-      })),
     };
-
     return handleApiData<GetDetailProductResponse>(
       { data: productData },
       {

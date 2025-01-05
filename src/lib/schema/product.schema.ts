@@ -15,8 +15,11 @@ type CreateProduct = Omit<
 > & { variants: ProductSize[] };
 
 type GetProduct = Omit<Products, "category_id"> & {
-  variants: { size: string; stock: number }[];
-  category_name: string;
+  variants: { size_id: string; stock: number }[];
+  category: {
+    name: string;
+    id: string;
+  };
 };
 
 const createProductBody = z.object({
@@ -57,9 +60,13 @@ const productData = z.object({
   description: z.string(),
   discount: z.number().nullable(),
   images: z.array(z.string()),
-  category_name: z.string(),
+  category: z.object({
+    name: z.string(),
+    id: z.string(),
+  }),
   variants: z.array(
     z.object({
+      size_id: z.string(),
       size: z.string(),
       stock: z.number(),
     }),

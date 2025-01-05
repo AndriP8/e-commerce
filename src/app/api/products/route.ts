@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/database/client";
-import { sizes } from "@/database/seeders/sizes.seed";
 import { getPaginationInfo, paginate } from "@/database/utils/pagination";
 import { handleApiData } from "@/lib/helpers/data-response";
 import { handleApiError, throwError } from "@/lib/helpers/error-response";
@@ -81,18 +80,19 @@ export async function GET(request: NextRequest) {
 
     const baseQuery = db
       .selectFrom("products")
-      .leftJoin("categories", "products.category_id", "categories.id")
+      .innerJoin("categories", "products.category_id", "categories.id")
       .where("products.deleted_at", "is", null)
       .$if(!!search, (qb) => qb.where("products.name", "ilike", `%${search}%`));
 
     const sizeVariants = await db
       .selectFrom("product_sizes")
-      .leftJoin("sizes", "product_sizes.size_id", "sizes.id")
+      .innerJoin("sizes", "product_sizes.size_id", "sizes.id")
       .where("product_sizes.deleted_at", "is", null)
       .select([
         "product_sizes.id",
         "product_sizes.stock",
         "product_sizes.product_id",
+        "sizes.id as size_id",
         "sizes.size",
       ])
       .execute();
@@ -107,15 +107,15 @@ export async function GET(request: NextRequest) {
       const variants = sizeVariants.filter(
         (variant) => variant.product_id === product.id,
       );
-      const { category_id, ...productData } = product;
+      const { category_name, category_id, ...productData } = product;
       return {
         ...productData,
-        category_name: product.category_name || "",
+        category: {
+          id: product.category_id,
+          name: product.category_name,
+        },
+        variants,
         images: JSON.parse(JSON.stringify(product.images)),
-        variants: variants.map((variant) => ({
-          size: variant.size || sizes[0],
-          stock: variant.stock,
-        })),
       };
     });
 
