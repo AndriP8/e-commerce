@@ -1,11 +1,6 @@
-import { Users as GeneratedUsers } from "kysely-codegen";
+import { Insertable, Selectable, Updateable } from "kysely";
+import { Users as UsersTable } from "kysely-codegen";
 
-import { ManipulateGeneratedTypes } from "../manipulate-generated-types";
-
-export type Users = ManipulateGeneratedTypes<
-  GeneratedUsers,
-  [
-    ["id", GeneratedUsers["id"]["__select__"]],
-    ["created_at", GeneratedUsers["created_at"]["__select__"]],
-  ]
->;
+export type User = Selectable<UsersTable>;
+export type CreateUser = Insertable<UsersTable>;
+export type UpdateUser = Updateable<UsersTable>;

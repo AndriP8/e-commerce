@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { Sizes } from "@/lib/types/database/sizes-types";
+import { Size } from "@/lib/types/database/sizes-types";
 
 import { SchemaType } from "./schema-types";
 
@@ -11,7 +11,7 @@ const sizeData = z.object({
   created_at: z.string(),
   updated_at: z.string().nullable(),
 });
-sizeData._output satisfies Sizes;
+sizeData._output satisfies Size;
 
 export const sizeSchema = {
   path: "/sizes",

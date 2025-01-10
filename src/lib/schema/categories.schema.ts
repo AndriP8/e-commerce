@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { Categories } from "@/lib/types/database/categories-types";
+import { Category } from "@/lib/types/database/categories-types";
 
 import { SchemaType } from "./schema-types";
 
@@ -13,7 +13,7 @@ const categoryData = z.object({
 
   deleted_at: z.string().nullable(),
 });
-categoryData._output satisfies Categories;
+categoryData._output satisfies Category;
 
 export const CategorySchema = {
   path: "/categories",

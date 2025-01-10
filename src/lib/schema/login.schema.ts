@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { Users } from "@/lib/types/database/users-types";
+import { CreateUser } from "@/lib/types/database/users-types";
 
 import { SchemaType } from "./schema-types";
 
@@ -8,7 +8,7 @@ const registerUserBody = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
-registerUserBody._output satisfies Pick<Users, "email" | "password">;
+registerUserBody._output satisfies Omit<CreateUser, "name">;
 
 export const loginSchema = {
   path: "/login",

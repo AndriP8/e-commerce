@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { Products } from "@/lib/types/database/products-types";
+import { CreateProduct, Product } from "@/lib/types/database/products-types";
 
 import { paginationSchema } from "./pagination.schema";
 import { SchemaType } from "./schema-types";
@@ -9,12 +9,9 @@ type ProductSize = {
   size_id: string;
   stock: number;
 };
-type CreateProduct = Omit<
-  Products,
-  "id" | "created_at" | "updated_at" | "deleted_at"
-> & { variants: ProductSize[] };
+type CreateProducts = CreateProduct & { variants: ProductSize[] };
 
-type GetProduct = Omit<Products, "category_id"> & {
+type ProductType = Omit<Product, "category_id"> & {
   variants: { size_id: string; stock: number }[];
   category: {
     name: string;
@@ -50,7 +47,7 @@ const createProductBody = z.object({
       { message: "You can't add duplicate size" },
     ),
 });
-createProductBody._output satisfies CreateProduct;
+createProductBody._output satisfies CreateProducts;
 
 const productData = z.object({
   id: z.string(),
@@ -75,7 +72,7 @@ const productData = z.object({
   updated_at: z.string().nullable(),
   deleted_at: z.string().nullable(),
 });
-productData._output satisfies GetProduct;
+productData._output satisfies ProductType;
 
 const productQuery = z.object({
   page: z.number(),

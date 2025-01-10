@@ -1,11 +1,6 @@
-import { Sizes as GeneratedSizes } from "kysely-codegen";
+import { Insertable, Selectable, Updateable } from "kysely";
+import { Sizes as SizesTable } from "kysely-codegen";
 
-import { ManipulateGeneratedTypes } from "../manipulate-generated-types";
-
-export type Sizes = ManipulateGeneratedTypes<
-  GeneratedSizes,
-  [
-    ["id", GeneratedSizes["id"]["__select__"]],
-    ["created_at", GeneratedSizes["created_at"]["__select__"]],
-  ]
->;
+export type Size = Selectable<SizesTable>;
+export type CreateSize = Insertable<SizesTable>;
+export type UpdateSize = Updateable<SizesTable>;

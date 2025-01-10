@@ -1,11 +1,6 @@
-import { Products as GeneratedProducts } from "kysely-codegen";
+import { Insertable, Selectable, Updateable } from "kysely";
+import { Products as ProductsTable } from "kysely-codegen";
 
-import { ManipulateGeneratedTypes } from "../manipulate-generated-types";
-
-export type Products = ManipulateGeneratedTypes<
-  GeneratedProducts,
-  [
-    ["id", GeneratedProducts["id"]["__select__"]],
-    ["created_at", GeneratedProducts["created_at"]["__select__"]],
-  ]
->;
+export type Product = Selectable<ProductsTable>;
+export type CreateProduct = Insertable<ProductsTable>;
+export type UpdateProduct = Updateable<ProductsTable>;
