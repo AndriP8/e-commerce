@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       ])
       .$call((qb) => paginate(qb, { page, size }))
       .execute();
-    if (!orders) return throwError("Orders not found", { status: 404 });
+    if (!orders.length) return throwError("Orders not found", { status: 404 });
 
     const orderItems = await db
       .selectFrom("order_items")
