@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/database/client";
+import { defaultTimestamp } from "@/database/utils/common-column";
 import { handleApiData } from "@/lib/helpers/data-response";
 import { handleApiError, throwError } from "@/lib/helpers/error-response";
 import { s3ClientConfig } from "@/lib/helpers/s3";
@@ -33,6 +34,7 @@ export async function PUT(
         .set({
           ...product,
           images: JSON.stringify(product.images),
+          updated_at: defaultTimestamp,
         })
         .where("id", "=", route.params.id)
         .returningAll()
@@ -52,6 +54,7 @@ export async function PUT(
               .updateTable("product_sizes")
               .set({
                 stock: variant.stock,
+                updated_at: defaultTimestamp,
               })
               .where("id", "=", existingVariant.id)
               .returningAll()
@@ -148,14 +151,14 @@ export async function DELETE(
       const updatedProduct = await trx
         .updateTable("products")
         .where("id", "=", route.params.id)
-        .set({ deleted_at: Date() })
+        .set({ deleted_at: defaultTimestamp })
         .returningAll()
         .executeTakeFirstOrThrow();
 
       const updatedProductSizes = await trx
         .updateTable("product_sizes")
         .where("product_id", "=", route.params.id)
-        .set({ deleted_at: Date() })
+        .set({ deleted_at: defaultTimestamp })
         .returningAll()
         .execute();
 
