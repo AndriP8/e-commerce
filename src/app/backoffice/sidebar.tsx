@@ -1,4 +1,4 @@
-import { Home, Tag } from "lucide-react";
+import { Boxes, Home, Tag } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -20,9 +20,14 @@ const items = [
     icon: Home,
   },
   {
-    title: "Product",
+    title: "Products",
     url: "/backoffice/products",
     icon: Tag,
+  },
+  {
+    title: "Orders",
+    url: "/backoffice/orders",
+    icon: Boxes,
   },
 ];
 
