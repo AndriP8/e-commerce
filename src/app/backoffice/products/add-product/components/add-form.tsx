@@ -28,7 +28,7 @@ import {
 import { AddProductSchema, addProductSchema } from "../schema";
 import { UploadImageField } from "./upload-image-field";
 
-export function AddForm({ session }: { session: string }) {
+export function AddForm() {
   const form = useForm<AddProductSchema>({
     resolver: zodResolver(addProductSchema),
     defaultValues: {
@@ -50,7 +50,7 @@ export function AddForm({ session }: { session: string }) {
   });
 
   const { data: sizes } = useQuery({
-    queryFn: () => getSizes(session),
+    queryFn: () => getSizes(),
     queryKey: ["sizes"],
   });
 
@@ -61,7 +61,7 @@ export function AddForm({ session }: { session: string }) {
     })) || [];
 
   const { data: categories } = useQuery({
-    queryFn: () => getCategories(session),
+    queryFn: () => getCategories(),
     queryKey: ["categories"],
   });
 
@@ -77,7 +77,7 @@ export function AddForm({ session }: { session: string }) {
     CreateProductBody
   >({
     mutationKey: ["products"],
-    mutationFn: (body) => createProduct({ session, body }),
+    mutationFn: (body) => createProduct({ body }),
     onSuccess: () => {
       toast({
         title: "Success",
@@ -326,7 +326,7 @@ export function AddForm({ session }: { session: string }) {
           </Button>
         </div>
         {/* Product images */}
-        <UploadImageField session={session} />
+        <UploadImageField />
         <div>
           <Button type="submit">Submit</Button>
         </div>

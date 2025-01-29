@@ -1,4 +1,5 @@
 import { sql } from "kysely";
+import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -13,7 +14,7 @@ import { CreateOrderItem } from "@/lib/types/database/order-item-types";
 
 type CreateOrderResponse = z.infer<typeof publicOrderSchema.create.response>;
 export async function POST(request: NextRequest) {
-  const token = request.headers.get("Authorization") || "";
+  const token = cookies().get("session")?.value || "";
 
   try {
     const decodedToken = await verifyToken(token);
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
 
 type GetOrderResponse = z.infer<typeof publicOrderSchema.read.response>;
 export async function GET(request: NextRequest) {
-  const token = request.headers.get("Authorization") || "";
+  const token = cookies().get("session")?.value || "";
 
   try {
     await verifyToken(token);

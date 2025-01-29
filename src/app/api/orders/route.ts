@@ -1,4 +1,5 @@
 import { sql } from "kysely";
+import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -12,7 +13,7 @@ import { ordersSchema } from "@/lib/schema/orders.schema";
 type GetOrderResponse = z.infer<typeof ordersSchema.read.response>;
 
 export async function GET(request: NextRequest) {
-  const token = request.headers.get("Authorization") || "";
+  const token = cookies().get("session")?.value || "";
 
   try {
     await verifyToken(token);

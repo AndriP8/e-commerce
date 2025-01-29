@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -16,7 +17,7 @@ export async function PUT(
   request: NextRequest,
   route: { params: UpdateProductParams },
 ) {
-  const token = request.headers.get("Authorization") || "";
+  const token = cookies().get("session")?.value || "";
 
   try {
     await verifyToken(token);

@@ -8,6 +8,9 @@ export const registerUser = async (payload: LoginBody) => {
   const response = await fetch("/api/login", {
     method: "POST",
     body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
   if (!response.ok) {
     const data = await response.json();

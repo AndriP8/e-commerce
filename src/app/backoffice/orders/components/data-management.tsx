@@ -1,6 +1,5 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { getCookie } from "cookies-next";
 import {
   ChevronLeft,
   ChevronRight,
@@ -15,8 +14,6 @@ import { getOrders, Order } from "../data/data-fetching";
 import { OrderTable } from "./order-table";
 
 export function DataManagement() {
-  const session = getCookie("session") || "";
-
   const { pagination, setPagination, setPageData, pageCount, paginationQuery } =
     useTableInfo();
 
@@ -24,7 +21,6 @@ export function DataManagement() {
     queryFn: async () => {
       const products = await getOrders({
         ...paginationQuery,
-        session,
       });
 
       if ("data" in products && "pagination" in products) {
@@ -38,7 +34,6 @@ export function DataManagement() {
       return products;
     },
     queryKey: ["orders", paginationQuery.page],
-    enabled: !!session,
   });
 
   if (!data?.data) return null;

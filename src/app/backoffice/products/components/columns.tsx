@@ -9,11 +9,11 @@ import { formatPrice } from "@/lib/helpers/format-price";
 
 import { Product } from "../data/data-fetching";
 import { deleteProduct } from "../data/data-mutation";
-export const useColumns = (session: string) => {
+export const useColumns = () => {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteProduct({ params: id, session }),
+    mutationFn: (id: string) => deleteProduct(id),
     onSuccess: () =>
       queryClient.invalidateQueries({
         queryKey: ["products"],

@@ -24,7 +24,7 @@ import { EditProductSchema } from "../schema";
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = "image/jpeg, image/jpg, image/png, image/webp";
 
-export function UploadImageField({ session }: { session: string }) {
+export function UploadImageField() {
   const [state, dispatch] = useReducer(uploadReducer, initialState);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const form = useFormContext<EditProductSchema>();
@@ -36,7 +36,7 @@ export function UploadImageField({ session }: { session: string }) {
     id,
   ]);
 
-  const { uploadImage, deleteImage } = useProductImageMutation(session);
+  const { uploadImage, deleteImage } = useProductImageMutation();
 
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {

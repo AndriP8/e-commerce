@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 import { z } from "zod";
 
 import { db } from "@/database/client";
@@ -9,8 +9,8 @@ import { CategorySchema } from "@/lib/schema/categories.schema";
 
 type GetCategoriesResponse = z.infer<typeof CategorySchema.read.response>;
 
-export async function GET(request: NextRequest) {
-  const token = request.headers.get("Authorization") || "";
+export async function GET() {
+  const token = cookies().get("session")?.value || "";
 
   try {
     await verifyToken(token);

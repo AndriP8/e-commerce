@@ -1,5 +1,6 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -13,7 +14,8 @@ import { productSchema } from "@/lib/schema/product.schema";
 type UploadImageBody = z.infer<typeof productSchema.uploadImage.body>;
 type UploadImageResponse = z.infer<typeof productSchema.uploadImage.response>;
 export async function POST(request: NextRequest) {
-  const token = request.headers.get("Authorization") || "";
+  const token = cookies().get("session")?.value || "";
+
   try {
     await verifyToken(token);
 

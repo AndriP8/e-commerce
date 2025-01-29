@@ -1,6 +1,5 @@
 import { decrypt } from "./session";
 
-export async function verifyToken(token: string) {
-  const jwtToken = token.split("Bearer ")[1];
+export async function verifyToken(jwtToken: string) {
   return decrypt(jwtToken);
 }

@@ -14,7 +14,6 @@ import {
 import { Order } from "../data/data-fetching";
 
 type UseColumnArg = {
-  session: string;
   setExpandedOrders: Dispatch<string[]>;
   expandedOrders: string[];
 };

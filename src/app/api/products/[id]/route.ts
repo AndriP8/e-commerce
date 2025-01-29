@@ -1,4 +1,5 @@
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -95,7 +96,7 @@ export async function GET(
   request: NextRequest,
   route: { params: GetDetailProductParams },
 ) {
-  const token = request.headers.get("Authorization") || "";
+  const token = cookies().get("session")?.value || "";
 
   try {
     await verifyToken(token);
@@ -143,7 +144,7 @@ export async function DELETE(
   request: NextRequest,
   route: { params: DeleteProductParams },
 ) {
-  const token = request.headers.get("Authorization") || "";
+  const token = cookies().get("session")?.value || "";
 
   try {
     await verifyToken(token);

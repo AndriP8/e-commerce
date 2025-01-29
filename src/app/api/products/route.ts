@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -12,7 +13,7 @@ import { productSchema } from "@/lib/schema/product.schema";
 type CreateProductBody = z.infer<typeof productSchema.create.body>;
 type CreateProductResponse = z.infer<typeof productSchema.create.response>;
 export async function POST(request: NextRequest) {
-  const token = request.headers.get("Authorization") || "";
+  const token = cookies().get("session")?.value || "";
 
   try {
     await verifyToken(token);
@@ -68,8 +69,7 @@ export async function POST(request: NextRequest) {
 
 type GetProductResponse = z.infer<typeof productSchema.read.response>;
 export async function GET(request: NextRequest) {
-  const token = request.headers.get("Authorization") || "";
-
+  const token = cookies().get("session")?.value || "";
   try {
     await verifyToken(token);
 

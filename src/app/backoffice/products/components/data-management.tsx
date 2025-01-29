@@ -12,7 +12,7 @@ import { useTableInfo } from "@/hooks/use-table-info";
 import { getProducts, Product } from "../data/data-fetching";
 import { useColumns } from "./columns";
 
-export function DataManagement({ session }: { session: string }) {
+export function DataManagement() {
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query);
   const { pagination, setPagination, setPageData, pageCount, paginationQuery } =
@@ -23,7 +23,6 @@ export function DataManagement({ session }: { session: string }) {
       const products = await getProducts({
         ...paginationQuery,
         search: debouncedQuery,
-        session,
       });
 
       if ("data" in products && "pagination" in products) {
@@ -35,13 +34,13 @@ export function DataManagement({ session }: { session: string }) {
     queryKey: ["products", paginationQuery, debouncedQuery],
   });
 
-  const columns = useColumns(session);
+  const columns = useColumns();
 
   if (!data?.data) return null;
   if (isLoading) return <div className="mx-auto text-center">Loading...</div>;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4 w-full h-full">
       <div className="flex space-x-4">
         <Input
           className="max-w-xl"

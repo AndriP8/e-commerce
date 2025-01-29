@@ -17,7 +17,7 @@ type DeleteImageArgs = {
   id: string;
 };
 
-export function useProductImageMutation(session: string) {
+export function useProductImageMutation() {
   const uploadImage = async ({
     file,
     onProgress,
@@ -35,7 +35,6 @@ export function useProductImageMutation(session: string) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session}`,
         },
         body: JSON.stringify(uploadBody),
       });
@@ -52,7 +51,7 @@ export function useProductImageMutation(session: string) {
         method: "PUT",
         body: file.file,
         headers: {
-          contentType: file.file?.type || "",
+          "Content-Type": file.file?.type || "",
         },
       });
 
@@ -78,9 +77,6 @@ export function useProductImageMutation(session: string) {
     try {
       const response = await fetch(`/api/products/images/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${session}`,
-        },
       });
 
       if (!response.ok) {
@@ -103,11 +99,9 @@ export type CreateProductResponse = z.infer<
 >;
 type CreateProductArgs = {
   body: CreateProductBody;
-  session: string;
   params: string;
 };
 export async function updateProduct({
-  session,
   body,
   params,
 }: CreateProductArgs): Promise<CreateProductResponse> {
@@ -115,7 +109,6 @@ export async function updateProduct({
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${session}`,
     },
     body: JSON.stringify(body),
   });

@@ -1,4 +1,5 @@
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -14,7 +15,8 @@ export async function DELETE(
   request: NextRequest,
   route: { params: DeleteImageParams },
 ) {
-  const token = request.headers.get("Authorization") || "";
+  const token = cookies().get("session")?.value || "";
+
   try {
     await verifyToken(token);
 

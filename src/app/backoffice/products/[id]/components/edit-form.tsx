@@ -32,11 +32,11 @@ import {
 import { EditProductSchema, editProductSchema } from "../schema";
 import { UploadImageField } from "./upload-image-field";
 
-export function EditForm({ session }: { session: string }) {
+export function EditForm() {
   const { id } = useParams<{ id: string }>();
 
   const { data } = useQuery({
-    queryFn: () => getProductDetail({ session, id }),
+    queryFn: () => getProductDetail(id),
     queryKey: ["product-detail", id],
   });
 
@@ -62,7 +62,7 @@ export function EditForm({ session }: { session: string }) {
   });
 
   const { data: sizes } = useQuery({
-    queryFn: () => getSizes(session),
+    queryFn: () => getSizes(),
     queryKey: ["sizes"],
   });
   const sizeOptions =
@@ -72,7 +72,7 @@ export function EditForm({ session }: { session: string }) {
     })) || [];
 
   const { data: categories } = useQuery({
-    queryFn: () => getCategories(session),
+    queryFn: () => getCategories(),
     queryKey: ["categories"],
   });
   const categoryOptions =
@@ -87,7 +87,7 @@ export function EditForm({ session }: { session: string }) {
     CreateProductBody
   >({
     mutationKey: ["products"],
-    mutationFn: (body) => updateProduct({ session, body, params: id }),
+    mutationFn: (body) => updateProduct({ body, params: id }),
     onSuccess: () => {
       toast({
         title: "Success",
@@ -336,7 +336,7 @@ export function EditForm({ session }: { session: string }) {
           </Button>
         </div>
         {/* Product images */}
-        <UploadImageField session={session} />
+        <UploadImageField />
         <div>
           <Button type="submit">Submit</Button>
         </div>
