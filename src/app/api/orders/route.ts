@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -19,10 +20,39 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const page = Number(searchParams.get("page"));
     const size = Number(searchParams.get("size"));
+    // TODO: add search feature
 
     const baseQuery = db
       .selectFrom("orders")
-      .innerJoin("buyers", "orders.buyer_id", "buyers.id");
+      .innerJoin("buyers", "orders.buyer_id", "buyers.id")
+      .innerJoinLateral(
+        (eb) =>
+          eb
+            .selectFrom("order_items")
+            .whereRef("order_id", "=", "orders.id")
+            .innerJoin("categories", "categories.id", "order_items.category_id")
+            .innerJoin("sizes", "sizes.id", "order_items.size_id")
+            .select([
+              sql<
+                GetOrderResponse["data"][number]["items"]
+              >`json_agg(json_build_object(
+              'id', order_items.id,
+              'name', order_items.name,
+              'price', order_items.price,
+              'sku', order_items.sku,
+              'description', order_items.description,
+              'discount', order_items.discount,
+              'images', order_items.images::text::jsonb,
+              'category', categories.name,
+              'size', sizes.size,
+              'order_id', order_items.order_id,
+              'product_id', order_items.product_id,
+              'quantity', order_items.quantity
+            ))`.as("items"),
+            ])
+            .as("order_items"),
+        (join) => join.onTrue(),
+      );
 
     const orders = await baseQuery
       .select([
@@ -35,45 +65,12 @@ export async function GET(request: NextRequest) {
         "orders.created_at",
         "orders.updated_at",
         "buyers.name as buyer_name",
+        "order_items.items",
       ])
       .$call((qb) => paginate(qb, { page, size }))
       .execute();
+
     if (!orders.length) return throwError("Orders not found", { status: 404 });
-
-    const orderItems = await db
-      .selectFrom("order_items")
-      .where(
-        "order_id",
-        "in",
-        orders.map((order) => order.id),
-      )
-      .innerJoin("categories", "categories.id", "order_items.category_id")
-      .innerJoin("sizes", "sizes.id", "order_items.size_id")
-      .select((eb) => [
-        "order_items.id as id",
-        "order_items.name as name",
-        "order_items.price as price",
-        "order_items.sku as sku",
-        "order_items.description as description",
-        "order_items.discount as discount",
-        eb.cast<string[]>("order_items.images", "jsonb").as("images"),
-        "order_items.order_id as order_id",
-        "order_items.product_id as product_id",
-        "order_items.quantity as quantity",
-        "categories.name as category",
-        "sizes.size as size",
-      ])
-      .execute();
-
-    const formattedOrders = orders.map((order) => {
-      const filteredOrderItems = orderItems.filter(
-        (item) => item.order_id === order.id,
-      );
-      return {
-        ...order,
-        items: filteredOrderItems,
-      };
-    });
 
     const pagination = await getPaginationInfo(
       baseQuery,
@@ -82,7 +79,7 @@ export async function GET(request: NextRequest) {
     );
     return handleApiData<GetOrderResponse>(
       {
-        data: formattedOrders,
+        data: orders,
         pagination,
       },
       { status: 200 },

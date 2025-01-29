@@ -49,7 +49,6 @@ ordersData._output satisfies OrderData;
 const readOrderQuery = z.object({
   page: z.number(),
   size: z.number(),
-  search: z.string().nullable(),
 });
 
 export const ordersSchema = {
