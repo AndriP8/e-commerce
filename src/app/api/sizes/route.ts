@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 import { z } from "zod";
 
 import { db } from "@/database/client";
@@ -8,8 +8,8 @@ import { verifyToken } from "@/lib/helpers/verify-token";
 import { sizeSchema } from "@/lib/schema/sizes.schema";
 
 type GetSizesResponse = z.infer<typeof sizeSchema.read.response>;
-export async function GET(request: NextRequest) {
-  const token = request.headers.get("Authorization") || "";
+export async function GET() {
+  const token = cookies().get("session")?.value || "";
 
   try {
     await verifyToken(token);
