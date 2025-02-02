@@ -30,6 +30,53 @@ export async function PUT(
     if (error) return throwError(error, { status: 400 });
 
     const { status, receipt_number } = body;
+
+    const orderData = await db
+      .selectFrom("orders")
+      .where("id", "=", route.params.id)
+      .selectAll()
+      .executeTakeFirst();
+
+    switch (orderData?.status) {
+      case "pending":
+        if (
+          status !== "confirmed" &&
+          status !== "cancelled" &&
+          status !== "pending"
+        )
+          return throwError(
+            "Pending orders can only be confirmed or cancelled",
+            { status: 400 },
+          );
+        break;
+      case "confirmed":
+        if (status !== "processing" && status !== "confirmed")
+          return throwError("Confirmed orders can only be processed", {
+            status: 400,
+          });
+        break;
+      case "processing":
+        if (status !== "shipment" && status !== "processing")
+          return throwError("Processing orders can only be shipped", {
+            status: 400,
+          });
+        break;
+      case "shipment":
+        if (status !== "delivered" && status !== "shipment")
+          return throwError("Shipment orders can only be delivered", {
+            status: 400,
+          });
+        break;
+      case "delivered":
+        if (status !== "completed" && status !== "delivered")
+          return throwError("Delivered orders can only be completed", {
+            status: 400,
+          });
+        break;
+      default:
+        break;
+    }
+
     const order = await db
       .updateTable("orders")
       .set({ status, receipt_number, updated_at: defaultTimestamp })

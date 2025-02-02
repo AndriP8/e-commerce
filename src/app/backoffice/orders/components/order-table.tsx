@@ -1,4 +1,5 @@
 "use client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 import { Fragment, useState } from "react";
 import { z } from "zod";
@@ -20,9 +21,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "@/hooks/use-toast";
 import { orderStatus } from "@/lib/enums/order-status";
 import { formatPrice } from "@/lib/helpers/format-price";
 import { ordersSchema } from "@/lib/schema/orders.schema";
+
+import {
+  updateOrder,
+  UpdateOrderBody,
+  UpdateOrderResponse,
+} from "../data/data-mutation";
+import { UpdateReceiptModal } from "./update-receipt-modal";
+import { UpdateStatusModal } from "./update-status-modal";
 
 type OrderData = z.infer<typeof ordersSchema.read.response.shape.data>;
 type OrderTableProps = {
@@ -30,7 +40,15 @@ type OrderTableProps = {
 };
 
 export const OrderTable = ({ orders }: OrderTableProps) => {
+  const queryClient = useQueryClient();
+
   const [expandedOrders, setExpandedOrders] = useState<string[]>([]);
+  const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] = useState(false);
+  const [isUpdateReceiptModalOpen, setIsUpdateReceiptModalOpen] =
+    useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<(typeof orders)[0] | null>(
+    null,
+  );
 
   const toggleOrderExpansion = (orderId: string) => {
     setExpandedOrders((prev) =>
@@ -59,6 +77,59 @@ export const OrderTable = ({ orders }: OrderTableProps) => {
       default:
         return "bg-gray-500";
     }
+  };
+
+  const handleUpdateStatus = (orderId: string) => {
+    const orderToUpdate = orders.find((order) => order.id === orderId);
+    if (orderToUpdate) {
+      setSelectedOrder(orderToUpdate);
+      setIsUpdateStatusModalOpen(true);
+    }
+  };
+
+  const handleUpdateRecipt = (orderId: string) => {
+    const orderToUpdate = orders.find((order) => order.id === orderId);
+    if (orderToUpdate) {
+      setSelectedOrder(orderToUpdate);
+      setIsUpdateReceiptModalOpen(true);
+    }
+  };
+
+  const updateOrderMutation = useMutation<
+    UpdateOrderResponse,
+    Error,
+    UpdateOrderBody
+  >({
+    mutationFn: (body) =>
+      updateOrder({ body, params: selectedOrder?.id || "" }),
+    onSuccess: () => {
+      setIsUpdateStatusModalOpen(false);
+      setIsUpdateReceiptModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast({
+        title: "Success",
+        description: "Edit order successfully",
+        variant: "default",
+        duration: 3000,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  const updateOrderStatus = (newStatus: (typeof orderStatus)[number]) => {
+    updateOrderMutation.mutate({ status: newStatus });
+  };
+  const updateOrderReceipt = (newReceipt: string) => {
+    if (!selectedOrder) return;
+    updateOrderMutation.mutate({
+      receipt_number: newReceipt,
+      status: "shipment",
+    });
   };
 
   return (
@@ -123,8 +194,18 @@ export const OrderTable = ({ orders }: OrderTableProps) => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Update status</DropdownMenuItem>
-                        <DropdownMenuItem>Update receipt</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => handleUpdateStatus(order.id)}
+                        >
+                          Update status
+                        </DropdownMenuItem>
+                        {order.status === "processing" && (
+                          <DropdownMenuItem
+                            onSelect={() => handleUpdateRecipt(order.id)}
+                          >
+                            Update receipt
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -167,6 +248,24 @@ export const OrderTable = ({ orders }: OrderTableProps) => {
           </TableBody>
         </Table>
       </div>
+      {selectedOrder && (
+        <>
+          <UpdateStatusModal
+            isOpen={isUpdateStatusModalOpen}
+            onClose={() => setIsUpdateStatusModalOpen(false)}
+            onUpdateStatus={updateOrderStatus}
+            currentStatus={selectedOrder.status}
+            isSubmitting={updateOrderMutation.isPending}
+          />
+          <UpdateReceiptModal
+            isOpen={isUpdateReceiptModalOpen}
+            onClose={() => setIsUpdateReceiptModalOpen(false)}
+            onUpdateReceipt={updateOrderReceipt}
+            currentReceipt={selectedOrder.receipt_number || ""}
+            isSubmitting={false}
+          />
+        </>
+      )}
     </div>
   );
 };

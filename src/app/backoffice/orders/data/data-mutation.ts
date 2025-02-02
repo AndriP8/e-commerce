@@ -13,7 +13,7 @@ export async function updateOrder({
   params,
   body,
 }: UpdateOrderArgs): Promise<UpdateOrderResponse> {
-  const result = await fetch(
+  const response = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/orders/${params}`,
     {
       method: "PUT",
@@ -23,7 +23,10 @@ export async function updateOrder({
       body: JSON.stringify(body),
     },
   );
-  if (!result.ok) return result.json();
-  const data = await result.json();
+  if (!response.ok) {
+    const { error } = await response.json();
+    throw new Error(error);
+  }
+  const data = await response.json();
   return data;
 }
