@@ -37,7 +37,7 @@ export default function Header() {
             <User size={24} />
             <span className="sr-only">User Information</span>
           </Link>
-          <Link href="#" className="text-gray-600 hover:text-gray-800">
+          <Link href="/cart" className="text-gray-600 hover:text-gray-800">
             <ShoppingCart size={24} />
           </Link>
         </div>
