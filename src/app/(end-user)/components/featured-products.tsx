@@ -1,40 +1,21 @@
+"use client";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { formatPrice } from "@/lib/helpers/format-price";
 
-const products = [
-  {
-    id: 1,
-    name: "Classic White Shirt",
-    price: "$59.99",
-    image:
-      "https://images.unsplash.com/photo-1603252109303-2751441dd157?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-  },
-  {
-    id: 2,
-    name: "Navy Blazer",
-    price: "$129.99",
-    image:
-      "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-  },
-  {
-    id: 3,
-    name: "Leather Oxford Shoes",
-    price: "$89.99",
-    image:
-      "https://images.unsplash.com/photo-1614252369475-531eba835eb1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-  },
-  {
-    id: 4,
-    name: "Slim Fit Chinos",
-    price: "$69.99",
-    image:
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-  },
-];
+import {
+  FeaturedProductsResponse,
+  getFeaturedProducts,
+} from "../data/data-fetching";
 
 export default function FeaturedProducts() {
+  const { data } = useQuery<FeaturedProductsResponse>({
+    queryFn: () => getFeaturedProducts(),
+    queryKey: ["featured-products"],
+  });
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -42,24 +23,45 @@ export default function FeaturedProducts() {
           Featured Products
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <Card key={product.id}>
-              <CardContent className="p-4">
-                <Image
-                  src={product.image}
-                  alt={`${product.name} - Featured Product`}
-                  className="w-full h-64 object-cover mb-4"
-                  width={1000}
-                  height={800}
-                />
-                <h3 className="font-semibold text-lg">{product.name}</h3>
-                <p className="text-gray-600">{product.price}</p>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full">Add to Cart</Button>
-              </CardFooter>
-            </Card>
-          ))}
+          {data?.data.map((product) => {
+            const price = product.discount
+              ? product.price - (product.price * product.discount) / 100
+              : product.price;
+
+            const mainPrice = formatPrice(price);
+            const originalPrice = formatPrice(product.price);
+            return (
+              <Card
+                key={product.id}
+                className="flex flex-col justify-between h-[442px]"
+              >
+                <CardContent className="p-4">
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_BUCKET_URL}/${product.images[0]}`}
+                    alt={`${product.name} - Featured Product`}
+                    className="w-full h-64 object-cover mb-4"
+                    width={254}
+                    height={256}
+                  />
+                  <h3 className="font-semibold text-lg truncate">
+                    {product.name}
+                  </h3>
+                  <div>
+                    <p className="text-gray-600 font-bold">{mainPrice}</p>
+                    {product.discount ? (
+                      <div className="flex space-x-2 text-sm">
+                        <p className="text-red-500">{product.discount}%</p>
+                        <p className="line-through">{originalPrice}</p>
+                      </div>
+                    ) : null}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full">Add to Cart</Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </section>
