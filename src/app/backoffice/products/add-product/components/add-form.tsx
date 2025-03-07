@@ -32,10 +32,6 @@ export function AddForm() {
   const form = useForm<AddProductSchema>({
     resolver: zodResolver(addProductSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      category_id: "",
-      sku: "",
       variants: [{ size_id: "", stock: 1 }],
       price: 0,
       discount: 0,
@@ -73,11 +69,11 @@ export function AddForm() {
 
   const productMutation = useMutation<
     CreateProductResponse,
-    unknown,
+    Error,
     CreateProductBody
   >({
     mutationKey: ["products"],
-    mutationFn: (body) => createProduct({ body }),
+    mutationFn: (body) => createProduct(body),
     onSuccess: () => {
       toast({
         title: "Success",
@@ -86,6 +82,13 @@ export function AddForm() {
       });
       router.push("/backoffice/products");
       router.refresh();
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
   async function onSubmit(values: AddProductSchema) {

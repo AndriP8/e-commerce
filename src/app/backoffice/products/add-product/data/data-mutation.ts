@@ -101,11 +101,8 @@ export type CreateProductBody = z.infer<typeof productSchema.create.body>;
 export type CreateProductResponse = z.infer<
   typeof productSchema.create.response
 >;
-type CreateProductArgs = {
-  body: CreateProductBody;
-};
 export async function createProduct(
-  body: CreateProductArgs,
+  body: CreateProductBody,
 ): Promise<CreateProductResponse> {
   const response = await fetch("/api/products", {
     method: "POST",
@@ -116,7 +113,8 @@ export async function createProduct(
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to create product: ${response.statusText}`);
+    const { error } = await response.json();
+    throw new Error(error);
   }
 
   return response.json();
