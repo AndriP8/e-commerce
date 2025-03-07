@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { categories } from "@/lib/enums/categories";
+import { sizes } from "@/lib/enums/sizes";
 import { Product } from "@/lib/types/database/products-types";
 
 import { paginationSchema } from "../pagination.schema";
@@ -40,10 +42,12 @@ productData._output satisfies ProductType;
 
 const productQuery = z.object({
   page: z.number(),
-  size: z.number(),
-  search: z.string().nullable(),
-  sort_by: z.literal("price"),
-  sort_direction: z.literal("asc").or(z.literal("desc")),
+  size: z.number().optional(),
+  search: z.string().nullable().optional(),
+  categories: z.enum(categories).array().optional(),
+  sizes: z.enum(sizes).array().optional(),
+  sort_by: z.enum(["price", "created_at"]).optional(),
+  sort_direction: z.enum(["asc", "desc"]).optional(),
 });
 
 const productParams = z.object({
@@ -51,7 +55,7 @@ const productParams = z.object({
 });
 
 export const publicProductSchema = {
-  path: "/product",
+  path: "/public/products",
   read: {
     path: "/",
     query: productQuery,

@@ -1,20 +1,7 @@
 import { Kysely } from "kysely";
 import { DB } from "kysely-codegen";
 
-const categories = [
-  {
-    name: "Shirts",
-  },
-  {
-    name: "T-Shirts",
-  },
-  {
-    name: "Sweaters",
-  },
-  {
-    name: "Jackets",
-  },
-];
+import { categories } from "@/lib/enums/categories";
 
 export default async function categoriesSeeder(
   db: Kysely<DB>,
@@ -23,7 +10,7 @@ export default async function categoriesSeeder(
     db
       .insertInto("categories")
       .values({
-        name: category.name,
+        name: category,
       })
       .executeTakeFirst(),
   );
