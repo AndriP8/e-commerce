@@ -1,5 +1,6 @@
 import { Kysely } from "kysely";
-import { DB } from "kysely-codegen";
+
+import { DB } from "@/generated/db";
 
 import { hashPassword } from "../../lib/helpers/password";
 

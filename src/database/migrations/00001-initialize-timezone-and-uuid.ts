@@ -1,5 +1,6 @@
 import { Kysely, sql } from "kysely";
-import { DB } from "kysely-codegen";
+
+import { DB } from "@/generated/db";
 
 export async function up(db: Kysely<DB>): Promise<void> {
   await sql`set timezone to 'Asia/Jakarta'`.execute(db); // Set Postgres timezone

@@ -1,5 +1,6 @@
 import { Kysely, sql } from "kysely";
-import { DB } from "kysely-codegen";
+
+import { DB } from "@/generated/db";
 
 import {
   PRIMARY_KEY_COLUMN,

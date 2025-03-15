@@ -1,6 +1,6 @@
 import { Kysely, sql } from "kysely";
-import { DB } from "kysely-codegen";
 
+import { DB } from "@/generated/db";
 import { orderStatus } from "@/lib/enums/order-status";
 
 import { PRIMARY_KEY_COLUMN, TIMESTAMPS_COLUMN } from "../utils/common-column";

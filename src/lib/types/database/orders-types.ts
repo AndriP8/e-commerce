@@ -1,5 +1,6 @@
 import { Insertable, Selectable, Updateable } from "kysely";
-import { Orders as OrdersTable } from "kysely-codegen";
+
+import { Orders as OrdersTable } from "@/generated/db";
 
 export type Order = Selectable<OrdersTable>;
 export type CreateOrder = Insertable<OrdersTable>;

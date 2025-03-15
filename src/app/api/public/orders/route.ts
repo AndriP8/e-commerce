@@ -10,7 +10,6 @@ import { handleApiError, throwError } from "@/lib/helpers/error-response";
 import { validateBody } from "@/lib/helpers/validate-body";
 import { verifyToken } from "@/lib/helpers/verify-token";
 import { publicOrderSchema } from "@/lib/schema/public/orders.schema";
-import { CreateOrderItem } from "@/lib/types/database/order-item-types";
 
 type CreateOrderResponse = z.infer<typeof publicOrderSchema.create.response>;
 export async function POST(request: NextRequest) {
@@ -76,9 +75,10 @@ export async function POST(request: NextRequest) {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      const orderItems = validOrderItems.reduce((acc, orderItem) => {
-        if (orderItem) {
-          acc.push({
+      const orderItems = validOrderItems
+        .filter((orderItem) => orderItem !== null)
+        .map((orderItem) => {
+          return {
             order_id: createOrder.id,
             category_id: orderItem.category_id,
             size_id: orderItem.size_id,
@@ -90,10 +90,8 @@ export async function POST(request: NextRequest) {
             quantity: orderItem.quantity,
             images: JSON.stringify(orderItem.images),
             discount: orderItem.discount,
-          });
-        }
-        return acc;
-      }, [] as CreateOrderItem[]);
+          };
+        });
 
       const createOrderItems = await trx
         .insertInto("order_items")

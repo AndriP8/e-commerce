@@ -1,6 +1,6 @@
 import { Kysely } from "kysely";
-import { DB } from "kysely-codegen";
 
+import { DB } from "@/generated/db";
 import { categories } from "@/lib/enums/categories";
 
 export default async function categoriesSeeder(

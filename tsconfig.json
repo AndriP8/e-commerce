@@ -27,7 +27,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "next.config.js"
+    "next.config.js",
+    "src/generated",
+    "kysely-codegen.d.ts"
   ],
   "exclude": ["node_modules", ".next"]
 }

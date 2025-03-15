@@ -10,6 +10,7 @@
     "db:migrate": "tsx --env-file=.env src/database/migrate.ts migrate",
     "db:rollback": "tsx --env-file=.env src/database/migrate.ts rollback",
     "db:seed": "tsx --env-file=.env src/database/migrate.ts seed",
+    "db:codegen": "kysely-codegen --out-file=src/generated/db.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -68,5 +69,6 @@
     "tailwindcss": "^3.4.1",
     "tsx": "^4.19.2",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@8.15.8"
 }
