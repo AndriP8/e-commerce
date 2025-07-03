@@ -1,0 +1,239 @@
+erDiagram
+    %% User Management
+    USERS {
+        bigint id PK
+        varchar email UK
+        varchar password_hash
+        varchar first_name
+        varchar last_name
+        varchar phone
+        datetime created_at
+        datetime updated_at
+        boolean is_active
+        enum user_type "buyer, seller, admin"
+    }
+
+    USER_ADDRESSES {
+        bigint id PK
+        bigint user_id FK
+        varchar address_line1
+        varchar address_line2
+        varchar city
+        varchar state
+        varchar postal_code
+        varchar country
+        boolean is_default
+        enum address_type "shipping, billing"
+        datetime created_at
+    }
+
+    %% Category Management
+    CATEGORIES {
+        bigint id PK
+        varchar name
+        varchar description
+        bigint parent_category_id FK
+        varchar image_url
+        boolean is_active
+        datetime created_at
+    }
+
+    %% Product Management
+    PRODUCTS {
+        bigint id PK
+        bigint seller_id FK
+        bigint category_id FK
+        varchar name
+        text description
+        decimal base_price
+        varchar sku UK
+        varchar brand
+        decimal weight
+        varchar dimensions
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
+
+    PRODUCT_VARIANTS { 
+        bigint id PK
+        bigint product_id FK
+        varchar variant_name
+        decimal price
+        varchar sku UK
+        int stock_quantity
+        json variant_attributes
+        boolean is_active
+    }
+
+    PRODUCT_IMAGES {
+        bigint id PK
+        bigint product_id FK
+        varchar image_url
+        varchar alt_text
+        int sort_order
+        boolean is_primary
+    }
+
+    PRODUCT_ATTRIBUTES { 
+        bigint id PK
+        bigint product_id FK
+        varchar attribute_name
+        varchar attribute_value
+        varchar attribute_type
+    }
+
+    %% Shopping Cart
+    SHOPPING_CART { 
+        bigint id PK
+        bigint user_id FK
+        datetime created_at
+        datetime updated_at
+    }
+
+    CART_ITEMS { 
+        bigint cart_item_id PK
+        bigint cart_id FK
+        bigint product_variant_id FK
+        int quantity
+        decimal unit_price
+        datetime added_at
+    }
+
+    %% Order Management
+    ORDERS {
+        bigint id PK
+        bigint user_id FK
+        varchar order_number UK
+        decimal subtotal
+        decimal tax_amount
+        decimal shipping_amount
+        decimal discount_amount
+        decimal total_amount
+        enum order_status "pending, confirmed, processing, shipped, delivered, cancelled, refunded"
+        datetime order_date
+        datetime estimated_delivery
+        json shipping_address
+        json billing_address
+    }
+
+    ORDER_ITEMS {
+        bigint id PK
+        bigint order_id FK
+        bigint product_variant_id FK
+        bigint seller_id FK
+        int quantity
+        decimal unit_price
+        decimal total_price
+        enum item_status "pending, confirmed, shipped, delivered, cancelled, refunded"
+    }
+
+    %% Payment Management
+    PAYMENTS {
+        bigint id PK
+        bigint order_id FK
+        bigint user_id FK
+        decimal amount
+        varchar payment_method
+        varchar payment_provider
+        varchar transaction_id
+        enum payment_status "pending, completed, failed, refunded"
+        datetime payment_date
+        json payment_details
+    }
+
+    %% Shipping Management
+    SHIPPING_METHODS { 
+        bigint id PK
+        varchar name
+        varchar description
+        decimal base_cost
+        int estimated_days_min
+        int estimated_days_max
+        boolean is_active
+    }
+
+    SHIPMENTS { 
+        bigint id PK
+        bigint order_id FK
+        varchar tracking_number
+        varchar carrier
+        enum shipment_status "pending, picked_up, in_transit, delivered, returned"
+        datetime shipped_date
+        datetime delivered_date
+        json tracking_details
+    }
+
+
+    %% Seller Management
+    SELLERS { 
+        bigint id PK
+        bigint user_id FK
+        varchar business_name
+        varchar business_type
+        varchar tax_id
+        text description
+        varchar logo_url
+        decimal rating
+        int total_reviews
+        boolean is_verified
+        datetime created_at
+    }
+
+    SELLER_ADDRESSES { 
+        bigint id PK
+        bigint seller_id FK
+        varchar address_line1
+        varchar address_line2
+        varchar city
+        varchar state
+        varchar postal_code
+        varchar country
+        enum address_type "business, warehouse, return"
+    }
+
+    %% Notifications
+    NOTIFICATIONS {
+        bigint id PK
+        bigint user_id FK
+        varchar title
+        text message
+        enum notification_type "order_update, promotion, system"
+        boolean is_read
+        datetime created_at
+    }
+
+    %% Relationships
+    USERS ||--o{ USER_ADDRESSES : "has"
+    USERS ||--o{ ORDERS : "places"
+    USERS ||--o{ SHOPPING_CART : "has"
+    USERS ||--o{ REVIEWS : "writes"
+    USERS ||--o{ SELLERS : "becomes"
+    USERS ||--o{ PAYMENT_METHODS : "has"
+    USERS ||--o{ NOTIFICATIONS : "receives"
+
+    CATEGORIES ||--o{ CATEGORIES : "parent_child"
+    CATEGORIES ||--o{ PRODUCTS : "contains"
+
+    SELLERS ||--o{ PRODUCTS : "sells"
+    SELLERS ||--o{ SELLER_ADDRESSES : "has"
+    SELLERS ||--o{ ORDER_ITEMS : "fulfills"
+
+    PRODUCTS ||--o{ PRODUCT_VARIANTS : "has"
+    PRODUCTS ||--o{ PRODUCT_IMAGES : "has"
+    PRODUCTS ||--o{ PRODUCT_ATTRIBUTES : "has"
+    PRODUCTS ||--o{ REVIEWS : "receives"
+
+    PRODUCT_VARIANTS ||--o{ INVENTORY : "tracked_in"
+    PRODUCT_VARIANTS ||--o{ CART_ITEMS : "added_to"
+    PRODUCT_VARIANTS ||--o{ ORDER_ITEMS : "ordered_as"
+
+    SHOPPING_CART ||--o{ CART_ITEMS : "contains"
+
+    ORDERS ||--o{ ORDER_ITEMS : "contains"
+    ORDERS ||--o{ PAYMENTS : "paid_by"
+    ORDERS ||--o{ SHIPMENTS : "shipped_as"
+
+    REVIEWS ||--o{ REVIEW_IMAGES : "has"
+    REVIEWS ||--|| ORDER_ITEMS : "reviews"
+
