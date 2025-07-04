@@ -14,3 +14,8 @@ CREATE TABLE order_items (
 
 CREATE INDEX idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX idx_order_items_product_variant_id ON order_items(product_variant_id);
+
+INSERT INTO order_items (id, order_id, product_variant_id, seller_id, quantity, unit_price, total_price, item_status) VALUES
+(1, 1, 1, 1, 1, 999.99, 999.99, 'confirmed'),
+(2, 1, 3, 2, 2, 29.99, 59.98, 'confirmed'),
+(3, 2, 2, 1, 1, 1099.99, 1099.99, 'processing');
