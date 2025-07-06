@@ -2,6 +2,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { ProductsResponse } from "@/app/types/product-types";
 import { toast } from "sonner";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function ProductCart({
   product,
@@ -9,7 +11,17 @@ export default function ProductCart({
   product: ProductsResponse["data"][number];
 }) {
   const [isAdding, setIsAdding] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
   const addToCart = async (productId: string) => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast.error("Please login to add items to your cart");
+      router.push("/login");
+      return;
+    }
+
     setIsAdding(true);
     const response = await fetch("/api/cart/products", {
       method: "POST",

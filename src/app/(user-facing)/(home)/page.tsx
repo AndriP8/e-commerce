@@ -24,7 +24,6 @@ export default async function Page({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams;
-  console.log(params);
   const products = await getProducts({ search: params.search });
 
   return (
