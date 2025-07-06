@@ -48,6 +48,8 @@ Users can purchase as a guest without being signed in.
 
 ## Architecture / high-level design
 
+![high level design](./high-level-design.png)
+
 ### Component responsibilities
 
 - **Server**: Provides HTTP APIs to fetch products data, cart items, modify the carts and create orders.

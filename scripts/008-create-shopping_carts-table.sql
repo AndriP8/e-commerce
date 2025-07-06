@@ -7,3 +7,7 @@ CREATE TABLE shopping_carts (
 );
 
 CREATE INDEX idx_shopping_carts_user_id ON shopping_carts(user_id);
+
+CREATE SEQUENCE shopping_carts_id_seq START 1;
+
+select * from shopping_carts;
