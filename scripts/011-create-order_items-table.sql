@@ -19,3 +19,8 @@ INSERT INTO order_items (id, order_id, product_variant_id, seller_id, quantity, 
 (1, 1, 1, 1, 1, 999.99, 999.99, 'confirmed'),
 (2, 1, 3, 2, 2, 29.99, 59.98, 'confirmed'),
 (3, 2, 2, 1, 1, 1099.99, 1099.99, 'processing');
+
+CREATE SEQUENCE order_items_id_seq START 3;
+ALTER TABLE order_items ALTER COLUMN id SET DEFAULT nextval('order_items_id_seq');
+
+

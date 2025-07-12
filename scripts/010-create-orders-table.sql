@@ -11,7 +11,6 @@ CREATE TABLE orders (
     total_amount DECIMAL(10,2) NOT NULL,
     order_status order_status_enum NOT NULL,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    status VARCHAR(50) NOT NULL,
     estimated_delivery TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     shipping_address JSON NOT NULL,
     billing_address JSON NOT NULL,
@@ -23,3 +22,8 @@ CREATE TABLE orders (
 CREATE INDEX idx_orders_user_id ON orders(user_id);
 CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_orders_order_date ON orders(order_date);
+
+CREATE SEQUENCE orders_id_seq START 1;
+ALTER TABLE orders ALTER COLUMN id SET DEFAULT nextval('orders_id_seq');
+
+ALTER TABLE orders DROP COLUMN status;

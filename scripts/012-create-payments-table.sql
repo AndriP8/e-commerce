@@ -17,3 +17,9 @@ CREATE TABLE payments (
 CREATE INDEX idx_payments_order_id ON payments(order_id);
 CREATE INDEX idx_payments_transaction_id ON payments(transaction_id);
 CREATE INDEX idx_payments_status ON payments(payment_status);
+
+CREATE SEQUENCE payment_id_seq START 1;
+ALTER TABLE payments ALTER COLUMN id SET DEFAULT nextval('payment_id_seq');
+
+ALTER TABLE payments ALTER COLUMN transaction_id TYPE VARCHAR(255);
+ALTER TABLE payments ALTER COLUMN transaction_id DROP NOT NULL;

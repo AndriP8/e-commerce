@@ -10,3 +10,6 @@ CREATE TABLE shipments (
     tracking_details JSON NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );
+
+CREATE SEQUENCE shipments_id_seq START 1;
+ALTER TABLE shipments ALTER COLUMN id SET DEFAULT nextval('shipments_id_seq');
