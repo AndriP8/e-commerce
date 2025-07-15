@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
 import { pool } from "@/app/db/client";
+import { calculateTax } from "@/app/utils/tax-utils";
 
 export async function POST(request: NextRequest) {
   const client = await pool.connect();
@@ -86,8 +87,9 @@ export async function POST(request: NextRequest) {
     const shippingMethod = shippingMethodResult.rows[0];
     const shippingAmount = parseFloat(shippingMethod.base_costs);
 
-    // For simplicity, we're using fixed values for tax and discount
-    const taxAmount = subtotal * 0.1; // 10% tax
+    // Calculate tax amount based on subtotal
+    const taxAmount = calculateTax(subtotal);
+
     const discountAmount = 0; // No discount for now
 
     const totalAmount = subtotal + taxAmount + shippingAmount - discountAmount;
