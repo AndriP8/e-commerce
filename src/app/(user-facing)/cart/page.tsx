@@ -76,7 +76,7 @@ export default async function CartPage() {
     );
 
   const subtotal = cartItems?.reduce(
-    (sum, item) => sum + parseFloat(item.total_price) * item.quantity,
+    (sum, item) => sum + parseFloat(item.total_price),
     0,
   );
 
@@ -124,9 +124,12 @@ export default async function CartPage() {
               <span>Total</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
-            <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+            <Link
+              href="/checkout"
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-center block"
+            >
               Checkout
-            </button>
+            </Link>
           </div>
         </div>
       </div>
