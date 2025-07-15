@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const client = await pool.connect();
-  const orderId = await params;
+  const { id: orderId } = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
@@ -39,7 +39,7 @@ export async function GET(
     );
 
     if (orderResult.rows.length === 0) {
-      return null;
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
     const order = orderResult.rows[0];
