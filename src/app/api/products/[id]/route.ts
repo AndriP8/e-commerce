@@ -1,15 +1,15 @@
-import { NextResponse } from 'next/server';
-import { pool } from '../../../db/client';
-import { transformProductData } from '../../../utils/product-utils';
+import { NextResponse } from "next/server";
+import { pool } from "../../../db/client";
+import { transformProductData } from "../../../utils/product-utils";
 
 /**
  * GET /api/products/[id]
- * 
+ *
  * Retrieves detailed information about a specific product
- * 
+ *
  * Path Parameters:
  * - id: Product ID
- * 
+ *
  * @returns JSON response with product details including:
  * - Basic product information
  * - Category information
@@ -22,21 +22,18 @@ import { transformProductData } from '../../../utils/product-utils';
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const id = params.id;
-  
+
   // Validate ID
   if (!id || isNaN(Number(id))) {
-    return NextResponse.json(
-      { error: 'Invalid product ID' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
   }
-  
+
   try {
     const client = await pool.connect();
-    
+
     try {
       // Query to get product with seller, category, rating, and stock information
       const query = `
@@ -108,7 +105,7 @@ export async function GET(
           s.total_reviews,
           s.is_verified
       `;
-      
+
       // Get product variants
       const variantsQuery = `
         SELECT 
@@ -122,7 +119,7 @@ export async function GET(
         FROM product_variants
         WHERE product_id = $1 AND is_active = true
       `;
-      
+
       // Get product reviews
       const reviewsQuery = `
         SELECT 
@@ -142,58 +139,64 @@ export async function GET(
         ORDER BY r.created_at DESC
         LIMIT 10
       `;
-      
+
       // Get product images
       const imagesQuery = `
         SELECT 
           id,
           image_url,
+          alt_text,
           is_primary,
           sort_order
         FROM product_images
         WHERE product_id = $1
         ORDER BY is_primary DESC, sort_order ASC
       `;
-      
-      const [productResult, variantsResult, reviewsResult, imagesResult] = await Promise.all([
-        client.query(query, [id]),
-        client.query(variantsQuery, [id]),
-        client.query(reviewsQuery, [id]),
-        client.query(imagesQuery, [id])
-      ]);
-      
+
+      const [productResult, variantsResult, reviewsResult, imagesResult] =
+        await Promise.all([
+          client.query(query, [id]),
+          client.query(variantsQuery, [id]),
+          client.query(reviewsQuery, [id]),
+          client.query(imagesQuery, [id]),
+        ]);
+
       if (productResult.rows.length === 0) {
         return NextResponse.json(
-          { error: 'Product not found' },
-          { status: 404 }
+          { error: "Product not found" },
+          { status: 404 },
         );
       }
-      
+
       // Transform the product data
       const product = transformProductData(productResult.rows[0]);
-      
+
       // Add variants, reviews, and images to the product
-      return NextResponse.json({
-        ...product,
-        variants: variantsResult.rows,
-        reviews: reviewsResult.rows,
-        images: imagesResult.rows
-      }, { status: 200 });
-      
-    } catch (error) {
-      console.error('Database query error:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch product' },
-        { status: 500 }
+        {
+          data: {
+            ...product,
+            variants: variantsResult.rows,
+            reviews: reviewsResult.rows,
+            images: imagesResult.rows,
+          },
+        },
+        { status: 200 },
+      );
+    } catch (error) {
+      console.error("Database query error:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch product" },
+        { status: 500 },
       );
     } finally {
       client.release();
     }
   } catch (error) {
-    console.error('Database connection error:', error);
+    console.error("Database connection error:", error);
     return NextResponse.json(
-      { error: 'Database connection failed' },
-      { status: 500 }
+      { error: "Database connection failed" },
+      { status: 500 },
     );
   }
 }
