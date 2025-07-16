@@ -1,24 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# E-Commerce Application
+
+This is a full-featured e-commerce application built with Next.js, PostgreSQL, and Stripe for payment processing.
+
+## Features
+
+- User authentication (login/register)
+- Product browsing and searching
+- Shopping cart functionality
+- Checkout process with Stripe integration
+- Order management and tracking
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18.x or higher
+- PostgreSQL database
+- Stripe account for payment processing
+
+### Setup
+
+1. Clone the repository
+2. Install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Set up environment variables:
+   - Copy `.env.local.example` to `.env.local`
+   - Add your Stripe API keys (get them from [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys))
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. Run the development server:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3001](http://localhost:3001) with your browser to see the application.
 
 ## Learn More
 

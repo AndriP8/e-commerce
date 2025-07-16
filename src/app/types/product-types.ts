@@ -44,8 +44,8 @@ export type ProductDetailResponse = {
       variant_count: number;
     };
     variants: Omit<ProductVariants, "product_id">[];
-    reviews: Omit<Reviews, "product_id" | "order_item_id"> &
-      Pick<Users, "first_name" | "last_name">[];
+    reviews: (Omit<Reviews, "product_id" | "order_item_id"> &
+      Pick<Users, "first_name" | "last_name">)[];
     images: Omit<ProductImages, "product_id" | "created_at">[];
   };
 };

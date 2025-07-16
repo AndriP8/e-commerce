@@ -4,6 +4,7 @@ import { ProductsResponse } from "@/app/types/product-types";
 import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function ProductCart({
   product,
@@ -43,17 +44,21 @@ export default function ProductCart({
   };
   return (
     <div className="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-      <div className="relative h-48">
-        <Image
-          src={product.category?.image_url || "/placeholder-product.jpg"}
-          alt={product.name}
-          fill
-          className="object-cover"
-        />
-      </div>
-      <div className="p-4">
-        <h2 className="font-semibold text-lg mb-2">{product.name}</h2>
-        <p className="text-gray-700 mb-4">${product.base_price}</p>
+      <Link href={`/products/${product.id}`}>
+        <div className="relative h-48">
+          <Image
+            src={product.category?.image_url || "/placeholder-product.jpg"}
+            alt={product.name}
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="p-4">
+          <h2 className="font-semibold text-lg mb-2">{product.name}</h2>
+          <p className="text-gray-700 mb-4">${product.base_price}</p>
+        </div>
+      </Link>
+      <div className="px-4 pb-4">
         <button
           onClick={() => addToCart(product.id)}
           disabled={isAdding}
