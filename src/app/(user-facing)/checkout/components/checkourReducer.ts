@@ -7,6 +7,8 @@ export type AddressDetail = {
   postal_code: string;
   country: string;
   address_type: "shipping" | "billing";
+  receiver_name?: string;
+  receiver_phone?: string;
 };
 
 export type ShippingDetail = {
@@ -52,6 +54,8 @@ export const initialState: CheckoutState = {
     postal_code: "",
     country: "",
     address_type: "shipping",
+    receiver_name: "",
+    receiver_phone: "",
   },
   shippingDetail: {
     shipping_method_id: 0,
@@ -73,6 +77,8 @@ export const initialState: CheckoutState = {
     postal_code: "",
     country: "",
     address_type: "billing",
+    receiver_name: "",
+    receiver_phone: "",
   },
 };
 

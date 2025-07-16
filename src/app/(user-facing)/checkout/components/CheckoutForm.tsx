@@ -206,6 +206,48 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             <div className="col-span-2">
               <label
                 className="block text-sm font-medium mb-1"
+                htmlFor="receiver_name"
+              >
+                Receiver Name *
+              </label>
+              <input
+                type="text"
+                id="receiver_name"
+                className="w-full border rounded-md px-3 py-2"
+                value={state.addressDetail.receiver_name}
+                onChange={(e) =>
+                  dispatch({
+                    type: "UPDATE_ADDRESS",
+                    payload: { receiver_name: e.target.value },
+                  })
+                }
+                required
+              />
+            </div>
+            <div className="col-span-2">
+              <label
+                className="block text-sm font-medium mb-1"
+                htmlFor="receiver_phone"
+              >
+                Receiver Phone *
+              </label>
+              <input
+                type="tel"
+                id="receiver_phone"
+                className="w-full border rounded-md px-3 py-2"
+                value={state.addressDetail.receiver_phone}
+                onChange={(e) =>
+                  dispatch({
+                    type: "UPDATE_ADDRESS",
+                    payload: { receiver_phone: e.target.value },
+                  })
+                }
+                required
+              />
+            </div>
+            <div className="col-span-2">
+              <label
+                className="block text-sm font-medium mb-1"
                 htmlFor="address_line1"
               >
                 Address Line 1 *
@@ -391,6 +433,48 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
 
             {!state.useSameForBilling && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    htmlFor="billing_receiver_name"
+                  >
+                    Receiver Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="billing_receiver_name"
+                    className="w-full border rounded-md px-3 py-2"
+                    value={state.billingAddress.receiver_name}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "UPDATE_BILLING_ADDRESS",
+                        payload: { receiver_name: e.target.value },
+                      })
+                    }
+                    required
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    htmlFor="billing_receiver_phone"
+                  >
+                    Receiver Phone *
+                  </label>
+                  <input
+                    type="tel"
+                    id="billing_receiver_phone"
+                    className="w-full border rounded-md px-3 py-2"
+                    value={state.billingAddress.receiver_phone}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "UPDATE_BILLING_ADDRESS",
+                        payload: { receiver_phone: e.target.value },
+                      })
+                    }
+                    required
+                  />
+                </div>
                 <div className="col-span-2">
                   <label
                     className="block text-sm font-medium mb-1"

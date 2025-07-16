@@ -37,7 +37,14 @@ export async function POST(request: NextRequest) {
       payment_detail,
     } = body;
 
-    if (!cart_id || !address_detail || !shipping_detail || !payment_detail) {
+    if (
+      !cart_id ||
+      !address_detail ||
+      !shipping_detail ||
+      !payment_detail ||
+      !shipping_address.receiver_name ||
+      !shipping_address.receiver_phone
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
