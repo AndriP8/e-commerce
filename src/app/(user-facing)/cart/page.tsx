@@ -75,11 +75,6 @@ export default async function CartPage() {
       </div>
     );
 
-  const subtotal = cartItems?.reduce(
-    (sum, item) => sum + parseFloat(item.total_price),
-    0,
-  );
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
@@ -114,15 +109,7 @@ export default async function CartPage() {
           <div className="space-y-4">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>Free</span>
-            </div>
-            <div className="border-t pt-4 flex justify-between font-bold">
-              <span>Total</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>${cart.data.total_price}</span>
             </div>
             <Link
               href="/checkout"
