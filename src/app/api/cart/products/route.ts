@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { pool } from "@/app/db/client";
 import {
   handleApiError,
@@ -7,6 +7,9 @@ import {
 } from "@/app/utils/api-error-handler";
 import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
+import { getPreferenceCurrency } from "@/middleware/currency";
+import { convertCartPrices } from "@/app/utils/server-currency-utils";
+import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 
 /**
  * GET /api/cart/products
@@ -15,7 +18,7 @@ import { cookies } from "next/headers";
  *
  * @returns JSON response with cart information
  */
-export async function GET(request: Request) {
+export async function GET(_request: NextRequest) {
   try {
     // Get the token from cookies
     const cookieStore = await cookies();
@@ -96,9 +99,23 @@ export async function GET(request: Request) {
         cart_id,
       ]);
 
+      // Get the user's preferred currency from the request
+      const currencyCode = await getPreferenceCurrency();
+
+      // Get the cart data
+      let cartData = cartWithItemsResult.rows[0];
+
+      // Convert cart prices to the user's preferred currency
+      if (currencyCode && currencyCode !== "USD" && cartData.items.length > 0) {
+        cartData = await convertCartPrices(cartData, currencyCode, "USD");
+      }
+
+      const currency = await getUserPreferredCurrency(user_id);
+
       return NextResponse.json(
         {
-          data: cartWithItemsResult.rows[0],
+          data: cartData,
+          currency,
         },
         { status: 200 },
       );
@@ -130,7 +147,7 @@ export async function GET(request: Request) {
  *
  * @returns JSON response with updated cart information
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
@@ -300,10 +317,30 @@ export async function POST(request: Request) {
       // Commit the transaction
       await client.query("COMMIT");
 
+      // Get the user's preferred currency from the request
+      const currencyCode = await getPreferenceCurrency();
+
+      // Get the updated cart data
+      let updatedCartData = updatedCartResult.rows[0];
+
+      // Convert cart prices to the user's preferred currency
+      if (
+        currencyCode &&
+        currencyCode !== "USD" &&
+        updatedCartData.items.length > 0
+      ) {
+        updatedCartData = await convertCartPrices(
+          updatedCartData,
+          currencyCode,
+          "USD",
+        );
+      }
+
       return NextResponse.json(
         {
           message: "Product added to cart successfully",
-          data: updatedCartResult.rows[0],
+          data: updatedCartData,
+          currency: currencyCode,
         },
         { status: 200 },
       );

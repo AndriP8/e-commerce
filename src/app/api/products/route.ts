@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 import {
   ProductFilters,
@@ -7,6 +7,9 @@ import {
 } from "@/app/utils/product-utils";
 import { pool } from "@/app/db/client";
 import { handleApiError, BadRequestError } from "@/app/utils/api-error-handler";
+import { getPreferenceCurrency } from "@/middleware/currency";
+import { convertProductPrices } from "@/app/utils/server-currency-utils";
+import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 
 /**
  * GET /api/products
@@ -28,7 +31,7 @@ import { handleApiError, BadRequestError } from "@/app/utils/api-error-handler";
  *
  * @returns JSON response with products array and pagination metadata
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
@@ -189,11 +192,22 @@ export async function GET(request: Request) {
       const totalPages = Math.ceil(totalProducts / size);
 
       // Transform the data to a more structured format
-      const products = productsResult.rows.map(transformProductData);
+      let products = productsResult.rows.map(transformProductData);
+
+      // Get the user's preferred currency from the request
+      const currencyCode = await getPreferenceCurrency();
+
+      // Convert product prices to the user's preferred currency
+      if (currencyCode && currencyCode !== "USD") {
+        products = await convertProductPrices(products, currencyCode, "USD");
+      }
+
+      const currency = await getUserPreferredCurrency();
 
       return NextResponse.json(
         {
           data: products,
+          currency,
           pagination: {
             total: totalProducts,
             page,

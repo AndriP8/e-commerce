@@ -46,3 +46,34 @@ INSERT INTO currencies (id, code, name, symbol, decimal_places, is_active) VALUE
 (24, 'MYR', 'Malaysian Ringgit', 'RM', 2, true),
 (25, 'PHP', 'Philippine Peso', '₱', 2, true),
 (26, 'IDR', 'Indonesian Rupiah', 'Rp', 2, true);
+
+ALTER TABLE currencies ADD COLUMN locales VARCHAR(20) NOT NULL;
+
+-- Update locales column
+-- Update locales for existing currencies
+UPDATE currencies SET locales = 'en-US' WHERE code = 'USD';
+UPDATE currencies SET locales = 'en-EU' WHERE code = 'EUR';
+UPDATE currencies SET locales = 'en-GB' WHERE code = 'GBP';
+UPDATE currencies SET locales = 'ja-JP' WHERE code = 'JPY';
+UPDATE currencies SET locales = 'en-CA' WHERE code = 'CAD';
+UPDATE currencies SET locales = 'en-AU' WHERE code = 'AUD';
+UPDATE currencies SET locales = 'de-CH' WHERE code = 'CHF';
+UPDATE currencies SET locales = 'zh-CN' WHERE code = 'CNY';
+UPDATE currencies SET locales = 'sv-SE' WHERE code = 'SEK';
+UPDATE currencies SET locales = 'en-NZ' WHERE code = 'NZD';
+UPDATE currencies SET locales = 'nb-NO' WHERE code = 'NOK';
+UPDATE currencies SET locales = 'da-DK' WHERE code = 'DKK';
+UPDATE currencies SET locales = 'pl-PL' WHERE code = 'PLN';
+UPDATE currencies SET locales = 'cs-CZ' WHERE code = 'CZK';
+UPDATE currencies SET locales = 'hu-HU' WHERE code = 'HUF';
+UPDATE currencies SET locales = 'ru-RU' WHERE code = 'RUB';
+UPDATE currencies SET locales = 'pt-BR' WHERE code = 'BRL';
+UPDATE currencies SET locales = 'es-MX' WHERE code = 'MXN';
+UPDATE currencies SET locales = 'en-IN' WHERE code = 'INR';
+UPDATE currencies SET locales = 'ko-KR' WHERE code = 'KRW';
+UPDATE currencies SET locales = 'en-SG' WHERE code = 'SGD';
+UPDATE currencies SET locales = 'zh-HK' WHERE code = 'HKD';
+UPDATE currencies SET locales = 'th-TH' WHERE code = 'THB';
+UPDATE currencies SET locales = 'ms-MY' WHERE code = 'MYR';
+UPDATE currencies SET locales = 'en-PH' WHERE code = 'PHP';
+UPDATE currencies SET locales = 'id-ID' WHERE code = 'IDR';

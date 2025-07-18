@@ -1,5 +1,6 @@
 import CartItems from "@/schemas/public/CartItems";
 import Categories from "@/schemas/public/Categories";
+import Currencies from "@/schemas/public/Currencies";
 import Products from "@/schemas/public/Products";
 import ProductVariants from "@/schemas/public/ProductVariants";
 import ShoppingCarts from "@/schemas/public/ShoppingCarts";
@@ -29,4 +30,5 @@ export type GetCartResponse = {
     total_price: number;
     item_count: number;
   };
+  currency: Currencies;
 };

@@ -5,6 +5,9 @@ import handleApiError, {
 import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { getPreferenceCurrency } from "@/middleware/currency";
+import { convertOrderPrices } from "@/app/utils/server-currency-utils";
+import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 
 export async function GET(
   _request: NextRequest,
@@ -26,7 +29,7 @@ export async function GET(
     try {
       const decoded = await verifyToken(token);
       userId = decoded.userId.toString();
-    } catch (error) {
+    } catch (_error) {
       throw new UnauthorizedError("Invalid authentication token");
     }
     // Get order details
@@ -64,12 +67,33 @@ export async function GET(
     );
 
     const shipment = shipmentResult.rows[0] || null;
-    return NextResponse.json({
-      data: {
+    // Get the user's preferred currency from the request
+    const currencyCode = await getPreferenceCurrency();
+
+    // Convert order prices to the user's preferred currency
+    let orderData = { order, items };
+
+    if (currencyCode && currencyCode !== "USD") {
+      const convertedData = await convertOrderPrices(
         order,
         items,
+        currencyCode,
+        "USD",
+      );
+      orderData = {
+        order: convertedData.order,
+        items: convertedData.items,
+      };
+    }
+
+    const currency = await getUserPreferredCurrency(userId);
+
+    return NextResponse.json({
+      data: {
+        ...orderData,
         shipment,
       },
+      currency,
     });
   } catch (error) {
     console.error("Login error:", error);

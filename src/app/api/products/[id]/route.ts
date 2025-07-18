@@ -1,6 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { pool } from "../../../db/client";
 import { transformProductData } from "../../../utils/product-utils";
+import { getPreferenceCurrency } from "@/middleware/currency";
+import { convertProductPrices } from "@/app/utils/server-currency-utils";
+import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 
 /**
  * GET /api/products/[id]
@@ -21,10 +24,10 @@ import { transformProductData } from "../../../utils/product-utils";
  * - Product images
  */
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } },
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const id = params.id;
+  const { id } = await params;
 
   // Validate ID
   if (!id || isNaN(Number(id))) {
@@ -169,7 +172,21 @@ export async function GET(
       }
 
       // Transform the product data
-      const product = transformProductData(productResult.rows[0]);
+      let product = transformProductData(productResult.rows[0]);
+
+      // Get the user's preferred currency from the request
+      const currencyCode = await getPreferenceCurrency();
+      // Convert product prices to the user's preferred currency
+      if (currencyCode && currencyCode !== "USD") {
+        const convertedProduct = await convertProductPrices(
+          [product],
+          currencyCode,
+          "USD",
+        );
+        product = convertedProduct[0];
+      }
+
+      const currency = await getUserPreferredCurrency();
 
       // Add variants, reviews, and images to the product
       return NextResponse.json(
@@ -180,6 +197,7 @@ export async function GET(
             reviews: reviewsResult.rows,
             images: imagesResult.rows,
           },
+          currency,
         },
         { status: 200 },
       );

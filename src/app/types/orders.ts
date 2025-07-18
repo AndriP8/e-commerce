@@ -2,6 +2,7 @@ import Orders from "@/schemas/public/Orders";
 import OrderItems from "@/schemas/public/OrderItems";
 import Shipments from "@/schemas/public/Shipments";
 import Payments from "@/schemas/public/Payments";
+import Currencies from "@/schemas/public/Currencies";
 
 export type OrderDetail = Omit<
   Orders,
@@ -47,4 +48,5 @@ export type OrderDetailResponse = {
     items: OrderItemDetail[];
     shipment: ShipmentDetail | null;
   };
+  currency: Currencies;
 };

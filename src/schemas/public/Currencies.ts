@@ -21,6 +21,8 @@ export default interface Currencies {
   created_at: Date;
 
   updated_at: Date | null;
+
+  locales: string;
 }
 
 /** Represents the initializer for the table public.currencies */
@@ -44,6 +46,8 @@ export interface CurrenciesInitializer {
   created_at?: Date;
 
   updated_at?: Date | null;
+
+  locales: string;
 }
 
 /** Represents the mutator for the table public.currencies */
@@ -63,4 +67,6 @@ export interface CurrenciesMutator {
   created_at?: Date;
 
   updated_at?: Date | null;
+
+  locales?: string;
 }

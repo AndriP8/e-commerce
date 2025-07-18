@@ -6,6 +6,7 @@ import Reviews from "@/schemas/public/Reviews";
 import Users from "@/schemas/public/Users";
 import ProductImages from "@/schemas/public/ProductImages";
 import Sellers from "@/schemas/public/Sellers";
+import Currencies from "@/schemas/public/Currencies";
 
 export type Product = Omit<Products, "seller_id" | "category_id"> & {
   category?: Omit<
@@ -21,6 +22,7 @@ export type Product = Omit<Products, "seller_id" | "category_id"> & {
 
 export type ProductsResponse = {
   data: Product[];
+  currency: Currencies;
   pagination: {
     total: number;
     page: number;
@@ -48,4 +50,5 @@ export type ProductDetailResponse = {
       Pick<Users, "first_name" | "last_name">)[];
     images: Omit<ProductImages, "product_id" | "created_at">[];
   };
+  currency: Currencies;
 };
