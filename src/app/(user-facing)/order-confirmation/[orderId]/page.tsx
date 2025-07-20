@@ -2,16 +2,25 @@ import { cookies } from "next/headers";
 import { verifyToken } from "@/app/utils/auth-utils";
 import Link from "next/link";
 import { OrderDetailResponse } from "@/app/types/orders";
+import Image from "next/image";
+import { formatPrice } from "@/app/utils/format-price-currency";
 
-async function getOrderDetails(orderId: string, userId: string) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+async function getOrderDetails({
+  payload,
+  cookies,
+}: {
+  payload: { orderId: string; userId: string };
+  cookies: { token: string; cookieCurrency: string };
+}) {
+  const { orderId, userId } = payload;
+  const { token, cookieCurrency } = cookies;
+
   const response = await fetch(
     `http://localhost:3001/api/orders/${orderId}?user_id=${userId}`,
     {
       method: "GET",
       headers: {
-        Cookie: `token=${token}`,
+        Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
       },
     },
   );
@@ -29,7 +38,8 @@ export default async function OrderConfirmationPage({
 }) {
   const { orderId } = await params;
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = cookieStore.get("token")?.value || "";
+  const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
   let isAuthenticated = false;
   let userId = "";
 
@@ -69,7 +79,16 @@ export default async function OrderConfirmationPage({
     );
   }
 
-  const { data: orderDetails } = await getOrderDetails(orderId, userId);
+  const { data: orderDetails, currency } = await getOrderDetails({
+    payload: {
+      orderId,
+      userId,
+    },
+    cookies: {
+      token,
+      cookieCurrency,
+    },
+  });
 
   if (!orderDetails) {
     return (
@@ -131,7 +150,7 @@ export default async function OrderConfirmationPage({
           <div className="mb-4">
             <h2 className="text-sm font-medium text-gray-500">Total</h2>
             <p className="text-lg font-medium">
-              ${parseFloat(order.total_amount).toFixed(2)}
+              {formatPrice(parseFloat(order.total_amount), currency)}
             </p>
           </div>
           <div className="mb-4">
@@ -215,12 +234,13 @@ export default async function OrderConfirmationPage({
             <div className="space-y-6">
               {items.map((item) => (
                 <div key={item.id} className="flex border-b pb-4">
-                  <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden mr-4">
+                  <div className="relative w-20 h-20 bg-gray-100 rounded overflow-hidden mr-4">
                     {item.image_url && (
-                      <img
-                        src={item.image_url}
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_CDN_URL}/${item.image_url}`}
                         alt={item.product_name}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     )}
                   </div>
@@ -228,12 +248,12 @@ export default async function OrderConfirmationPage({
                     <h3 className="font-medium">{item.product_name}</h3>
                     <p className="text-gray-500">Quantity: {item.quantity}</p>
                     <p className="font-medium mt-1">
-                      ${parseFloat(item.unit_price).toFixed(2)} each
+                      {formatPrice(parseFloat(item.unit_price), currency)} each
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      ${parseFloat(item.total_price).toFixed(2)}
+                      {formatPrice(parseFloat(item.total_price), currency)}
                     </p>
                   </div>
                 </div>
@@ -248,25 +268,33 @@ export default async function OrderConfirmationPage({
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${parseFloat(order.subtotal).toFixed(2)}</span>
+                <span>{formatPrice(parseFloat(order.subtotal), currency)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>${parseFloat(order.shipping_amount).toFixed(2)}</span>
+                <span>
+                  {formatPrice(parseFloat(order.shipping_amount), currency)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Tax</span>
-                <span>${parseFloat(order.tax_amount).toFixed(2)}</span>
+                <span>
+                  {formatPrice(parseFloat(order.tax_amount), currency)}
+                </span>
               </div>
               {parseFloat(order.discount_amount) > 0 && (
                 <div className="flex justify-between text-green-600">
                   <span>Discount</span>
-                  <span>-${parseFloat(order.discount_amount).toFixed(2)}</span>
+                  <span>
+                    {formatPrice(parseFloat(order.discount_amount), currency)}
+                  </span>
                 </div>
               )}
               <div className="border-t pt-3 mt-3 flex justify-between font-bold">
                 <span>Total</span>
-                <span>${parseFloat(order.total_amount).toFixed(2)}</span>
+                <span>
+                  {formatPrice(parseFloat(order.total_amount), currency)}
+                </span>
               </div>
             </div>
           </div>

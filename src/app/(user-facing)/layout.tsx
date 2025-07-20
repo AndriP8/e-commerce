@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { AuthProvider } from "../contexts/AuthContext";
+import { CurrencyProvider } from "../contexts/CurrencyContext";
 import Navbar from "./components/Navbar";
 import { Toaster } from "sonner";
 import { cookies } from "next/headers";
@@ -65,12 +66,14 @@ export default async function RootLayout({
       >
         <Toaster />
         <AuthProvider initialUser={response?.data.user || null}>
-          <NuqsAdapter>
-            <div className="min-h-screen flex flex-col">
-              <Navbar />
-              <main className="flex-grow">{children}</main>
-            </div>
-          </NuqsAdapter>
+          <CurrencyProvider>
+            <NuqsAdapter>
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-grow">{children}</main>
+              </div>
+            </NuqsAdapter>
+          </CurrencyProvider>
         </AuthProvider>
       </body>
     </html>
