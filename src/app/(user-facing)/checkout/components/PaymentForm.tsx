@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
+import { formatPrice } from "@/app/utils/format-price-currency";
 
 interface PaymentFormProps {
   cart: GetCartResponse;
@@ -148,7 +149,7 @@ export default function PaymentForm({
             Processing...
           </span>
         ) : (
-          `Pay $${total.toFixed(2)}`
+          `Pay ${formatPrice(total, cart.currency)}`
         )}
       </button>
     </form>

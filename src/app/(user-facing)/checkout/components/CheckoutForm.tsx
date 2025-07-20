@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { GetCartResponse } from "@/app/types/cart";
 import { Elements } from "@stripe/react-stripe-js";
 import { toast } from "sonner";
@@ -8,8 +8,26 @@ import { initialState, checkoutReducer } from "./checkourReducer";
 import PaymentForm from "./PaymentForm";
 import { getStripe } from "@/app/utils/stripe";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
+import { CurrencyConversion } from "@/app/types/currency";
+import { formatPrice } from "@/app/utils/format-price-currency";
 
 const stripePromise = getStripe();
+
+const getConversion = async ({
+  amount,
+  from,
+  to,
+}: {
+  amount: number;
+  from: string;
+  to: string;
+}): Promise<CurrencyConversion> => {
+  const response = await fetch(
+    `http://localhost:3001/api/currency/convert?amount=${amount}&from=${from}&to=${to}`,
+  );
+  const data = await response.json();
+  return data;
+};
 
 type ShippingMethod = {
   id: number;
@@ -44,6 +62,7 @@ interface CheckoutFormProps {
 }
 
 function CheckoutForm({ cart }: CheckoutFormProps) {
+  const [shippingCostConversion, setShippingCostConversion] = useState(0);
   const [state, dispatch] = useReducer(checkoutReducer, initialState);
   const { updateShippingCost, shippingCost, tax } = useCheckoutCost();
 
@@ -118,7 +137,8 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
         },
         body: JSON.stringify({
           cart_id: cart.data.cart_id,
-          amount: total * 100,
+          amount: total,
+          currency: cart.currency.code,
         }),
       });
 
@@ -147,6 +167,18 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
       return;
     }
   };
+
+  useEffect(() => {
+    getConversion({
+      amount: parseFloat(
+        shippingMethods[shippingMethods.length - 1].base_costs,
+      ),
+      from: "USD",
+      to: cart.currency.code,
+    }).then((data) => {
+      setShippingCostConversion(data.convertedAmount);
+    });
+  }, []);
 
   return (
     <div className="bg-white rounded-lg p-6 border">
@@ -397,7 +429,11 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   });
 
                   // Update shipping cost in context
-                  updateShippingCost(parseFloat(method.base_costs));
+                  updateShippingCost(
+                    method.base_costs === "0"
+                      ? parseFloat(method.base_costs)
+                      : shippingCostConversion,
+                  );
                 }}
               >
                 <div className="flex items-center justify-between">
@@ -410,7 +446,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   <div className="font-medium">
                     {parseFloat(method.base_costs) === 0
                       ? "Free"
-                      : `$${parseFloat(method.base_costs).toFixed(2)}`}
+                      : formatPrice(shippingCostConversion, cart.currency)}
                   </div>
                 </div>
               </div>

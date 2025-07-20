@@ -3,6 +3,7 @@
 import { GetCartResponse } from "@/app/types/cart";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
 import { useEffect, useMemo } from "react";
+import { formatPrice } from "@/app/utils/format-price-currency";
 
 interface OrderSummaryProps {
   cart: GetCartResponse;
@@ -39,28 +40,32 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
               <span className="font-medium">{item.product_name}</span>
               <span className="text-gray-500 ml-2">x{item.quantity}</span>
             </div>
-            <span>${parseFloat(item.total_price).toFixed(2)}</span>
+            <span>
+              {formatPrice(parseFloat(item.total_price), cart.currency)}
+            </span>
           </div>
         ))}
       </div>
       <div className="border-t pt-4 space-y-4">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
+          <span>{formatPrice(subtotal, cart.currency)}</span>
         </div>
         <div className="flex justify-between">
           <span>Shipping</span>
           <span>
-            {shippingCost === 0 ? "Free" : `$${shippingCost.toFixed(2)}`}
+            {shippingCost === 0
+              ? "Free"
+              : formatPrice(shippingCost, cart.currency)}
           </span>
         </div>
         <div className="flex justify-between">
           <span>Tax</span>
-          <span>${tax.toFixed(2)}</span>
+          <span>{formatPrice(tax, cart.currency)}</span>
         </div>
         <div className="border-t pt-4 flex justify-between font-bold">
           <span>Total</span>
-          <span>${total.toFixed(2)}</span>
+          <span>{formatPrice(total, cart.currency)}</span>
         </div>
       </div>
     </div>

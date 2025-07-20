@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { cart_id, amount } = body;
+    const { cart_id, amount, currency } = body;
 
-    if (!cart_id || !amount) {
+    if (!cart_id || !amount || !currency) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount),
-      currency: "usd",
+      currency: currency.toLowerCase(),
       automatic_payment_methods: {
         enabled: true,
       },

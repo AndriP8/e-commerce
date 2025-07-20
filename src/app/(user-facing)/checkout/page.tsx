@@ -5,12 +5,16 @@ import Link from "next/link";
 import CheckoutForm from "./components/CheckoutForm";
 import DynamicOrderSummary from "./components/DynamicOrderSummary";
 
-async function getCart() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+async function getCart({
+  cookieCurrency,
+  token,
+}: {
+  cookieCurrency: string;
+  token: string;
+}) {
   const response = await fetch("http://localhost:3001/api/cart/products", {
     headers: {
-      Cookie: `token=${token}`,
+      Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
     },
   });
   if (!response.ok) {
@@ -22,14 +26,16 @@ async function getCart() {
 
 export default async function CheckoutPage() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = cookieStore.get("token")?.value || "";
+  const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
+
   let isAuthenticated = false;
 
   if (token) {
     try {
       await verifyToken(token);
       isAuthenticated = true;
-    } catch (error) {
+    } catch (_error) {
       isAuthenticated = false;
     }
   }
@@ -58,7 +64,10 @@ export default async function CheckoutPage() {
     );
   }
 
-  const cart = await getCart();
+  const cart = await getCart({
+    cookieCurrency,
+    token,
+  });
   const cartItems = cart.data.items;
 
   if (!cartItems || cartItems.length === 0) {

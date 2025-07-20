@@ -3,13 +3,18 @@ import Link from "next/link";
 import CartItem from "./components/cartItem";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/app/utils/auth-utils";
+import { formatPrice } from "@/app/utils/format-price-currency";
 
-async function getCart() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+async function getCart({
+  token,
+  cookieCurrency,
+}: {
+  token: string;
+  cookieCurrency: string;
+}) {
   const response = await fetch("http://localhost:3001/api/cart/products", {
     headers: {
-      Cookie: `token=${token}`,
+      Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
     },
   });
   if (!response.ok) {
@@ -21,14 +26,15 @@ async function getCart() {
 
 export default async function CartPage() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = cookieStore.get("token")?.value || "";
+  const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
   let isAuthenticated = false;
 
   if (token) {
     try {
       await verifyToken(token);
       isAuthenticated = true;
-    } catch (error) {
+    } catch (_error) {
       isAuthenticated = false;
     }
   }
@@ -59,7 +65,7 @@ export default async function CartPage() {
     );
   }
 
-  const cart = await getCart();
+  const cart = await getCart({ token, cookieCurrency });
   const cartItems = cart.data.items;
 
   if (!cartItems || cartItems.length === 0)
@@ -99,7 +105,7 @@ export default async function CartPage() {
         <div className="md:col-span-2">
           <div className="space-y-4">
             {cartItems.map((item) => (
-              <CartItem key={item.id} item={item} />
+              <CartItem key={item.id} item={item} currency={cart.currency} />
             ))}
           </div>
         </div>
@@ -109,7 +115,9 @@ export default async function CartPage() {
           <div className="space-y-4">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${cart.data.total_price}</span>
+              <span className="font-bold">
+                {formatPrice(cart.data.total_price, cart.currency)}
+              </span>
             </div>
             <Link
               href="/checkout"

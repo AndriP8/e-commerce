@@ -2,8 +2,10 @@
 import { GetCartResponse } from "@/app/types/cart";
 import { debounce } from "@/app/utils/debounce";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import Image from "next/image";
+import { formatPrice } from "@/app/utils/format-price-currency";
 
 const updateCartQuantity = async ({
   cartItemId,
@@ -42,8 +44,10 @@ const deleteCartItem = async (cartItemId: string) => {
 
 export default function CartItem({
   item,
+  currency,
 }: {
   item: GetCartResponse["data"]["items"][number];
+  currency: GetCartResponse["currency"];
 }) {
   const [quantity, setQuantity] = useState(item.quantity.toString());
   const [debouncedQuantity, setQuantityDebounce] = useState(
@@ -74,7 +78,7 @@ export default function CartItem({
       });
       setQuantity(debouncedQuantity);
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to update cart quantity");
     }
   }, [item.id, debouncedQuantity]);
@@ -84,7 +88,7 @@ export default function CartItem({
       deleteCartItem(item.id);
       toast.success("Product removed from cart");
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to remove product from cart");
     }
   };
@@ -95,16 +99,19 @@ export default function CartItem({
 
   return (
     <div className="border rounded-lg p-4 flex gap-4 items-center">
-      <div className="w-24 h-24 bg-gray-100 rounded flex items-center justify-center">
-        <img
-          src={item.image_url || "/placeholder.jpg"}
+      <div className="w-24 h-24 bg-gray-100 rounded relative">
+        <Image
+          src={`${process.env.NEXT_PUBLIC_CDN_URL}/${item.image_url}`}
           alt={item.product_name}
-          className="max-w-full max-h-full"
+          fill
+          className="object-cover"
         />
       </div>
       <div className="flex-1">
         <h3 className="font-medium">{item.product_name}</h3>
-        <p className="text-gray-600">${item.total_price}</p>
+        <p className="text-gray-600">
+          {formatPrice(parseFloat(item.total_price), currency)}
+        </p>
         <div className="mt-2 flex items-center gap-2">
           <button
             className="px-2 py-1 border rounded"
