@@ -18,7 +18,7 @@ CREATE INDEX idx_currencies_active ON currencies(is_active);
 CREATE SEQUENCE currencies_id_seq START 1;
 ALTER TABLE currencies ALTER COLUMN id SET DEFAULT nextval('currencies_id_seq');
 
--- Insert supported currencies
+-- Insert supported currencies (removing RUB as it's not supported by Stripe)
 INSERT INTO currencies (id, code, name, symbol, decimal_places, is_active) VALUES
 (1, 'USD', 'US Dollar', '$', 2, true),
 (2, 'EUR', 'Euro', '€', 2, true),
@@ -33,26 +33,28 @@ INSERT INTO currencies (id, code, name, symbol, decimal_places, is_active) VALUE
 (11, 'NOK', 'Norwegian Krone', 'kr', 2, true),
 (12, 'DKK', 'Danish Krone', 'kr', 2, true),
 (13, 'PLN', 'Polish Złoty', 'zł', 2, true),
-(14, 'CZK', 'Czech Koruna', 'Kč', 2, true),
+-- CZK (Czech Koruna) removed as it's not supported by Stripe
 (15, 'HUF', 'Hungarian Forint', 'Ft', 0, true), -- HUF typically has no decimal places
-(16, 'RUB', 'Russian Ruble', '₽', 2, true),
-(17, 'BRL', 'Brazilian Real', 'R$', 2, true),
-(18, 'MXN', 'Mexican Peso', '$', 2, true),
-(19, 'INR', 'Indian Rupee', '₹', 2, true),
-(20, 'KRW', 'South Korean Won', '₩', 0, true), -- KRW typically has no decimal places
-(21, 'SGD', 'Singapore Dollar', 'S$', 2, true),
-(22, 'HKD', 'Hong Kong Dollar', 'HK$', 2, true),
-(23, 'THB', 'Thai Baht', '฿', 2, true),
-(24, 'MYR', 'Malaysian Ringgit', 'RM', 2, true),
-(25, 'PHP', 'Philippine Peso', '₱', 2, true),
-(26, 'IDR', 'Indonesian Rupiah', 'Rp', 2, true);
+-- RUB (Russian Ruble) removed as it's not supported by Stripe
+(16, 'BRL', 'Brazilian Real', 'R$', 2, true),
+
+(18, 'INR', 'Indian Rupee', '₹', 2, true),
+(19, 'KRW', 'South Korean Won', '₩', 0, true), -- KRW typically has no decimal places
+(20, 'SGD', 'Singapore Dollar', 'S$', 2, true),
+(21, 'HKD', 'Hong Kong Dollar', 'HK$', 2, true),
+(22, 'THB', 'Thai Baht', '฿', 2, true),
+(23, 'MYR', 'Malaysian Ringgit', 'RM', 2, true),
+(24, 'PHP', 'Philippine Peso', '₱', 2, true),
+(25, 'IDR', 'Indonesian Rupiah', 'Rp', 2, true);
+
+delete from currencies where code = 'CZK' and code = 'RUB';
 
 ALTER TABLE currencies ADD COLUMN locales VARCHAR(20) NOT NULL;
 
 -- Update locales column
--- Update locales for existing currencies
+-- Update locales for each currency (excluding RUB which is not supported by Stripe)
 UPDATE currencies SET locales = 'en-US' WHERE code = 'USD';
-UPDATE currencies SET locales = 'en-EU' WHERE code = 'EUR';
+UPDATE currencies SET locales = 'de-DE' WHERE code = 'EUR';
 UPDATE currencies SET locales = 'en-GB' WHERE code = 'GBP';
 UPDATE currencies SET locales = 'ja-JP' WHERE code = 'JPY';
 UPDATE currencies SET locales = 'en-CA' WHERE code = 'CAD';
@@ -64,16 +66,16 @@ UPDATE currencies SET locales = 'en-NZ' WHERE code = 'NZD';
 UPDATE currencies SET locales = 'nb-NO' WHERE code = 'NOK';
 UPDATE currencies SET locales = 'da-DK' WHERE code = 'DKK';
 UPDATE currencies SET locales = 'pl-PL' WHERE code = 'PLN';
-UPDATE currencies SET locales = 'cs-CZ' WHERE code = 'CZK';
+-- CZK locale update removed as currency is not supported by Stripe
 UPDATE currencies SET locales = 'hu-HU' WHERE code = 'HUF';
-UPDATE currencies SET locales = 'ru-RU' WHERE code = 'RUB';
+-- RUB locale update removed as currency is not supported by Stripe
 UPDATE currencies SET locales = 'pt-BR' WHERE code = 'BRL';
 UPDATE currencies SET locales = 'es-MX' WHERE code = 'MXN';
-UPDATE currencies SET locales = 'en-IN' WHERE code = 'INR';
+UPDATE currencies SET locales = 'hi-IN' WHERE code = 'INR';
 UPDATE currencies SET locales = 'ko-KR' WHERE code = 'KRW';
 UPDATE currencies SET locales = 'en-SG' WHERE code = 'SGD';
 UPDATE currencies SET locales = 'zh-HK' WHERE code = 'HKD';
 UPDATE currencies SET locales = 'th-TH' WHERE code = 'THB';
 UPDATE currencies SET locales = 'ms-MY' WHERE code = 'MYR';
-UPDATE currencies SET locales = 'en-PH' WHERE code = 'PHP';
+UPDATE currencies SET locales = 'fil-PH' WHERE code = 'PHP';
 UPDATE currencies SET locales = 'id-ID' WHERE code = 'IDR';
