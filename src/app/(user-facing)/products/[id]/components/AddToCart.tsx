@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -38,7 +37,7 @@ export default function AddToCart({ productId }: { productId: string }) {
       } else {
         toast.success("Product added to cart");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("An error occurred. Please try again.");
     } finally {
       setIsAdding(false);

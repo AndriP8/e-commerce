@@ -1,5 +1,6 @@
 import { pool } from "@/app/db/client";
 import Currencies from "@/schemas/public/Currencies";
+import { cookies } from "next/headers";
 
 /**
  * Get all active currencies
@@ -99,35 +100,21 @@ export async function convertPrice(
 }
 
 /**
- * Format price with currency symbol and proper decimal places
- */
-export function formatPrice(
-  amount: number,
-  currency: Currencies,
-  locale: string = "en-US",
-): string {
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: currency.code,
-    minimumFractionDigits: currency.decimal_places,
-    maximumFractionDigits: currency.decimal_places,
-  }).format(amount);
-}
-
-/**
  * Get user's preferred currency
  */
 export async function getUserPreferredCurrency(
-  userId: string,
+  userId?: string,
 ): Promise<Currencies> {
+  const cookieStore = await cookies();
+  const prefered_currency = cookieStore.get("preferred_currency")?.value;
   const client = await pool.connect();
   try {
     const result = await client.query(
-      `SELECT c.id, c.code, c.name, c.symbol, c.decimal_places, c.is_active
+      `SELECT c.id, c.code, c.name, c.symbol, c.decimal_places, c.locales, c.is_active
        FROM user_preferences up
        JOIN currencies c ON up.preferred_currency_id = c.id
-       WHERE up.user_id = $1`,
-      [userId],
+       WHERE up.user_id = $1 OR c.code = $2`,
+      [userId, prefered_currency],
     );
 
     if (result.rows.length > 0) {

@@ -1,16 +1,25 @@
+import { cookies } from "next/headers";
 import { ProductsResponse } from "../../types/product-types";
 import ProductList from "./components/ProductList";
 
 async function getProducts({
   search,
+  cookieCurrency,
 }: {
   search?: string | string[] | undefined;
+  cookieCurrency?: string | undefined;
 }): Promise<ProductsResponse> {
-  const url = new URL("http://localhost:3001/api/products?in_stock=true");
+  const baseUrl = new URL("http://localhost:3001/api/products");
+  baseUrl.searchParams.set("in_stock", "true");
   if (search && typeof search === "string") {
-    url.searchParams.set("search", search);
+    baseUrl.searchParams.set("search", search);
   }
-  const response = await fetch(url.toString());
+
+  const response = await fetch(baseUrl, {
+    headers: {
+      Cookie: `preferred_currency=${cookieCurrency}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch products");
@@ -23,8 +32,10 @@ export default async function Page({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const cookieStore = await cookies();
+  const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
   const params = await searchParams;
-  const products = await getProducts({ search: params.search });
+  const products = await getProducts({ search: params.search, cookieCurrency });
 
   return (
     <main className="container mx-auto px-4 py-8">

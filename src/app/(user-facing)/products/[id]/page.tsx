@@ -1,9 +1,17 @@
 import { ProductDetailResponse } from "@/app/types/product-types";
 import Image from "next/image";
 import AddToCart from "./components/AddToCart";
+import { cookies } from "next/headers";
+import { formatPrice } from "@/app/utils/format-price-currency";
 
 async function getProduct(id: string): Promise<ProductDetailResponse> {
-  const response = await fetch(`http://localhost:3001/api/products/${id}`);
+  const cookieStore = await cookies();
+  const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
+  const response = await fetch(`http://localhost:3001/api/products/${id}`, {
+    headers: {
+      Cookie: `preferred_currency=${cookieCurrency}`,
+    },
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch product");
   }
@@ -28,16 +36,14 @@ export default async function ProductDetail({
             <div className="relative h-96 w-full mb-4 rounded-lg overflow-hidden">
               {product.images && product.images.length > 0 ? (
                 <Image
-                  src={
-                    product.images[0].image_url || "/placeholder-product.jpg"
-                  }
+                  src={`${process.env.NEXT_PUBLIC_CDN_URL}/${product.images[0].image_url}`}
                   alt={product.name}
                   fill
                   className="object-cover"
                 />
               ) : (
                 <Image
-                  src="/placeholder-product.jpg"
+                  src={`${process.env.NEXT_PUBLIC_CDN_URL}/400x500.webp}`}
                   alt={product.name}
                   fill
                   className="object-cover"
@@ -54,7 +60,7 @@ export default async function ProductDetail({
                     className="relative h-20 rounded-md overflow-hidden cursor-pointer border hover:border-blue-500"
                   >
                     <Image
-                      src={image.image_url || "/placeholder-product.jpg"}
+                      src={`${process.env.NEXT_PUBLIC_CDN_URL}/${image.image_url}`}
                       alt={image.alt_text || product.name}
                       fill
                       className="object-cover"
@@ -101,7 +107,12 @@ export default async function ProductDetail({
 
           {/* Price */}
           <div className="mb-6">
-            <span className="text-2xl font-bold">${product.base_price}</span>
+            <span className="text-2xl font-bold">
+              {formatPrice(
+                parseFloat(product.base_price),
+                productData.currency,
+              )}
+            </span>
           </div>
 
           {/* Description */}
@@ -122,7 +133,10 @@ export default async function ProductDetail({
                   >
                     <div className="font-medium">{variant.variant_name}</div>
                     <div className="text-sm text-gray-600">
-                      ${Number(variant.price).toFixed(2)}
+                      {formatPrice(
+                        parseFloat(variant.price),
+                        productData.currency,
+                      )}
                     </div>
                   </div>
                 ))}

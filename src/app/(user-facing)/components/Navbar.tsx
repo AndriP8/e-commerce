@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/app/contexts/AuthContext";
+import CurrencySelector from "@/app/components/CurrencySelector";
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -14,13 +15,17 @@ export default function Navbar() {
             E-Commerce
           </Link>
 
-          <div className="flex items-center space-x-4">
-            <Link href="/" className="text-gray-700 hover:text-blue-600">
-              Home
-            </Link>
-            <Link href="/cart" className="text-gray-700 hover:text-blue-600">
-              Cart
-            </Link>
+          <div className="flex items-center space-x-6">
+            <CurrencySelector className="w-48" showLabel={false} />
+            
+            <div className="flex items-center space-x-4">
+              <Link href="/" className="text-gray-700 hover:text-blue-600">
+                Home
+              </Link>
+              <Link href="/cart" className="text-gray-700 hover:text-blue-600">
+                Cart
+              </Link>
+            </div>
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">

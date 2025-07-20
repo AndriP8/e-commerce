@@ -10,14 +10,14 @@ const JWT_EXPIRES_IN = "24h"; // Token expiration time
 
 // Interface for user data
 export interface UserData {
-  id: number;
+  id: string;
   email: string;
   user_type: string;
 }
 
 // Interface for JWT payload
 export interface JwtPayload {
-  userId: number;
+  userId: string;
   email: string;
   userType: string;
 }

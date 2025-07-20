@@ -5,11 +5,15 @@ import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Currencies from "@/schemas/public/Currencies";
+import { formatPrice } from "@/app/utils/format-price-currency";
 
 export default function ProductCart({
   product,
+  currency,
 }: {
   product: ProductsResponse["data"][number];
+  currency: ProductsResponse["currency"];
 }) {
   const [isAdding, setIsAdding] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -42,12 +46,13 @@ export default function ProductCart({
     }
     setIsAdding(false);
   };
+
   return (
     <div className="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
       <Link href={`/products/${product.id}`}>
         <div className="relative h-48">
           <Image
-            src={product.category?.image_url || "/placeholder-product.jpg"}
+            src={`${process.env.NEXT_PUBLIC_CDN_URL}/${product.category?.image_url}`}
             alt={product.name}
             fill
             className="object-cover"
@@ -55,7 +60,9 @@ export default function ProductCart({
         </div>
         <div className="p-4">
           <h2 className="font-semibold text-lg mb-2">{product.name}</h2>
-          <p className="text-gray-700 mb-4">${product.base_price}</p>
+          <p className="text-gray-700 mb-4 font-bold">
+            {formatPrice(parseFloat(product.base_price), currency)}
+          </p>
         </div>
       </Link>
       <div className="px-4 pb-4">
