@@ -1,43 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { addToCartAction, redirectToLogin } from "@/app/actions/cart-actions";
 
 export default function AddToCart({ productId }: { productId: string }) {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const { isAuthenticated } = useAuth();
-  const router = useRouter();
 
   const addToCart = async () => {
     if (!isAuthenticated) {
       toast.error("Please login to add items to your cart");
-      router.push("/login");
+      await redirectToLogin();
       return;
     }
 
     setIsAdding(true);
     try {
-      const response = await fetch("/api/cart/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          product_id: productId,
-          quantity,
-        }),
-      });
+      const result = await addToCartAction(productId, quantity);
 
-      const data = await response.json();
-      if (!response.ok) {
-        toast.error(data.error || "Failed to add product to cart");
+      if (result.success) {
+        toast.success(result.message || "Product added to cart");
       } else {
-        toast.success("Product added to cart");
+        toast.error(result.error || "Failed to add product to cart");
+
+        // If authentication error, redirect to login
+        if (result.error?.includes("Authentication required")) {
+          await redirectToLogin();
+        }
       }
-    } catch (_error) {
+    } catch (error) {
+      console.error("Error adding to cart:", error);
       toast.error("An error occurred. Please try again.");
     } finally {
       setIsAdding(false);

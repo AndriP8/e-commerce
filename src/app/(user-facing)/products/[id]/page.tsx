@@ -3,6 +3,7 @@ import Image from "next/image";
 import AddToCart from "./components/AddToCart";
 import { cookies } from "next/headers";
 import { formatPrice } from "@/app/utils/format-price-currency";
+import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/app/constants/images";
 
 async function getProduct(id: string): Promise<ProductDetailResponse> {
   const cookieStore = await cookies();
@@ -40,6 +41,10 @@ export default async function ProductDetail({
                   alt={product.name}
                   fill
                   className="object-cover"
+                  sizes={IMAGE_SIZES.PRODUCT_DETAIL}
+                  priority
+                  placeholder="blur"
+                  blurDataURL={DEFAULT_BLUR_DATA_URL}
                 />
               ) : (
                 <Image
@@ -47,6 +52,10 @@ export default async function ProductDetail({
                   alt={product.name}
                   fill
                   className="object-cover"
+                  sizes={IMAGE_SIZES.PRODUCT_DETAIL}
+                  priority
+                  placeholder="blur"
+                  blurDataURL={DEFAULT_BLUR_DATA_URL}
                 />
               )}
             </div>
@@ -54,7 +63,7 @@ export default async function ProductDetail({
             {/* Thumbnail Images */}
             {product.images && product.images.length > 1 && (
               <div className="grid grid-cols-5 gap-2">
-                {product.images.map((image) => (
+                {product.images.map((image, index) => (
                   <div
                     key={image.id}
                     className="relative h-20 rounded-md overflow-hidden cursor-pointer border hover:border-blue-500"
@@ -64,6 +73,10 @@ export default async function ProductDetail({
                       alt={image.alt_text || product.name}
                       fill
                       className="object-cover"
+                      sizes="80px"
+                      loading={index < 3 ? "eager" : "lazy"}
+                      placeholder="blur"
+                      blurDataURL={DEFAULT_BLUR_DATA_URL}
                     />
                   </div>
                 ))}
@@ -158,6 +171,10 @@ export default async function ProductDetail({
                     alt={product.seller.business_name}
                     fill
                     className="object-cover rounded-full"
+                    sizes="48px"
+                    loading="lazy"
+                    placeholder="blur"
+                    blurDataURL={DEFAULT_BLUR_DATA_URL}
                   />
                 </div>
               )}

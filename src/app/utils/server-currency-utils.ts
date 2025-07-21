@@ -76,6 +76,43 @@ export async function convertProductPrices<
 }
 
 /**
+ * Convert product variant prices from base currency to target currency
+ * @param products Array of product objects with variant price fields
+ * @param targetCurrency The currency code to convert to
+ * @param baseCurrency The currency code to convert from (default: 'USD')
+ * @returns Products with converted variant prices
+ */
+
+export async function convertProductVariantPrices<
+  T extends {
+    price: number;
+  },
+>(
+  variants: T[],
+  targetCurrency: string,
+  baseCurrency: string = "USD",
+): Promise<T[]> {
+  // If currencies are the same, no conversion needed
+  if (baseCurrency === targetCurrency) {
+    return variants;
+  }
+
+  // Get the target currency details
+  const currency = await getCurrencyByCode(targetCurrency);
+  if (!currency) {
+    throw new Error(`Invalid currency code: ${targetCurrency}`);
+  }
+
+  // Get the exchange rate
+  const rate = await getExchangeRate(baseCurrency, targetCurrency);
+
+  return variants.map((variant) => ({
+    ...variant,
+    price: Number((variant.price * rate).toFixed(2)),
+  }));
+}
+
+/**
  * Convert cart prices from base currency to target currency
  * @param cart Cart object with items that have price fields
  * @param targetCurrency The currency code to convert to

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "../../../db/client";
 import { transformProductData } from "../../../utils/product-utils";
 import { getPreferenceCurrency } from "@/middleware/currency";
-import { convertProductPrices } from "@/app/utils/server-currency-utils";
+import {
+  convertProductPrices,
+  convertProductVariantPrices,
+} from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 
 /**
@@ -173,6 +176,7 @@ export async function GET(
 
       // Transform the product data
       let product = transformProductData(productResult.rows[0]);
+      let variants = variantsResult.rows;
 
       // Get the user's preferred currency from the request
       const currencyCode = await getPreferenceCurrency();
@@ -184,6 +188,12 @@ export async function GET(
           "USD",
         );
         product = convertedProduct[0];
+        const convertedVariants = await convertProductVariantPrices(
+          variants,
+          currencyCode,
+          "USD",
+        );
+        variants = convertedVariants;
       }
 
       const currency = await getUserPreferredCurrency();
@@ -193,7 +203,7 @@ export async function GET(
         {
           data: {
             ...product,
-            variants: variantsResult.rows,
+            variants,
             reviews: reviewsResult.rows,
             images: imagesResult.rows,
           },

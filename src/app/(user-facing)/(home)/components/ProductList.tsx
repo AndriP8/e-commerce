@@ -5,6 +5,9 @@ import { ProductsResponse } from "@/app/types/product-types";
 import { useQueryState } from "nuqs";
 import ProductCart from "./ProductCart";
 import { debounce } from "@/app/utils/debounce";
+import { Suspense } from "react";
+import { ProductListSkeleton } from "@/app/components/Skeleton";
+import { Frown, ShoppingCart } from "lucide-react";
 
 export default function ProductList({
   products,
@@ -33,32 +36,28 @@ export default function ProductList({
           />
         </div>
         <Link href="/cart" className="flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-          </svg>
+          <ShoppingCart className="size-6" />
           <span>Cart</span>
         </Link>
       </header>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.data.map((product) => (
-          <ProductCart
-            key={product.id}
-            product={product}
-            currency={products.currency}
-          />
-        ))}
+      <div>
+        {products.data.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Frown className="size-16 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900">
+              No products found
+            </h3>
+            <p className="text-gray-500">Try adjusting your search criteria</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products.data.map((product) => (
+              <Suspense key={product.id} fallback={<ProductListSkeleton />}>
+                <ProductCart product={product} currency={products.currency} />
+              </Suspense>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
