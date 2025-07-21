@@ -1,46 +1,16 @@
 "use client";
 import { GetCartResponse } from "@/app/types/cart";
 import { debounce } from "@/app/utils/debounce";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import { toast } from "sonner";
 import Image from "next/image";
 import { formatPrice } from "@/app/utils/format-price-currency";
-
-const updateCartQuantity = async ({
-  cartItemId,
-  newQuantity,
-}: {
-  cartItemId: string;
-  newQuantity: number;
-}) => {
-  const response = await fetch(`/api/cart/products/${cartItemId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      quantity: newQuantity,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to update cart quantity");
-  }
-
-  return response.json();
-};
-const deleteCartItem = async (cartItemId: string) => {
-  const response = await fetch(`/api/cart/products/${cartItemId}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete cart item");
-  }
-
-  return response.json();
-};
+import { DEFAULT_BLUR_DATA_URL } from "@/app/constants/images";
+import {
+  updateCartQuantityAction,
+  removeFromCartAction,
+} from "@/app/actions/cart-actions";
+import { cartItemReducer, createInitialCartItemState } from "./cartItemReducer";
 
 export default function CartItem({
   item,
@@ -49,53 +19,88 @@ export default function CartItem({
   item: GetCartResponse["data"]["items"][number];
   currency: GetCartResponse["currency"];
 }) {
-  const [quantity, setQuantity] = useState(item.quantity.toString());
-  const [debouncedQuantity, setQuantityDebounce] = useState(
-    item.quantity.toString(),
+  const [state, dispatch] = useReducer(
+    cartItemReducer,
+    createInitialCartItemState(item.quantity),
   );
+  const { quantity, debouncedQuantity, isUpdating } = state;
 
-  const router = useRouter();
+  // Use ref to track if we need to update
+  const shouldUpdateRef = useRef(false);
 
+  // Debounced quantity change handler
   const handleQuantityChange = useCallback(
     debounce((newQuantity: string) => {
       const num = Number(newQuantity);
       if (isNaN(num) || num < 1) {
-        setQuantity("1");
-        setQuantityDebounce("1");
+        dispatch({ type: "SET_QUANTITY", payload: "1" });
+        dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: "1" });
       } else {
-        setQuantityDebounce(newQuantity);
+        dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: newQuantity });
+        shouldUpdateRef.current = true;
       }
     }, 200),
     [],
   );
 
+  // Handle quantity update
   const handleUpdateQuantity = useCallback(async () => {
-    try {
-      if (item.quantity.toString() === debouncedQuantity) return;
-      await updateCartQuantity({
-        cartItemId: item.id,
-        newQuantity: Number(debouncedQuantity),
-      });
-      setQuantity(debouncedQuantity);
-      router.refresh();
-    } catch (_error) {
-      toast.error("Failed to update cart quantity");
-    }
-  }, [item.id, debouncedQuantity]);
+    // Reset the flag
+    shouldUpdateRef.current = false;
 
+    try {
+      if (item.quantity.toString() === debouncedQuantity || isUpdating) return;
+
+      dispatch({ type: "SET_UPDATING", payload: true });
+
+      const result = await updateCartQuantityAction(
+        item.id,
+        Number(debouncedQuantity),
+      );
+
+      if (result.success) {
+        dispatch({ type: "SET_QUANTITY", payload: debouncedQuantity });
+      } else {
+        toast.error(result.error || "Failed to update cart quantity");
+        dispatch({
+          type: "RESET_TO_ORIGINAL",
+          payload: item.quantity.toString(),
+        });
+      }
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+      toast.error("Failed to update cart quantity");
+      dispatch({
+        type: "RESET_TO_ORIGINAL",
+        payload: item.quantity.toString(),
+      });
+    } finally {
+      dispatch({ type: "SET_UPDATING", payload: false });
+    }
+  }, [item.id, item.quantity, debouncedQuantity, isUpdating]);
+
+  // Handle item deletion
   const handleDeleteItem = async () => {
     try {
-      deleteCartItem(item.id);
-      toast.success("Product removed from cart");
-      router.refresh();
-    } catch (_error) {
+      const result = await removeFromCartAction(item.id);
+
+      if (result.success) {
+        toast.success(result.message || "Product removed from cart");
+      } else {
+        toast.error(result.error || "Failed to remove product from cart");
+      }
+    } catch (error) {
+      console.error("Error removing item:", error);
       toast.error("Failed to remove product from cart");
     }
   };
 
+  // Effect to trigger update when debounced quantity changes
   useEffect(() => {
-    handleUpdateQuantity();
-  }, [handleUpdateQuantity]);
+    if (shouldUpdateRef.current) {
+      handleUpdateQuantity();
+    }
+  }, [debouncedQuantity, handleUpdateQuantity]);
 
   return (
     <div className="border rounded-lg p-4 flex gap-4 items-center">
@@ -104,7 +109,11 @@ export default function CartItem({
           src={`${process.env.NEXT_PUBLIC_CDN_URL}/${item.image_url}`}
           alt={item.product_name}
           fill
-          className="object-cover"
+          className="object-cover rounded"
+          sizes="96px"
+          loading="lazy"
+          placeholder="blur"
+          blurDataURL={DEFAULT_BLUR_DATA_URL}
         />
       </div>
       <div className="flex-1">
@@ -117,8 +126,13 @@ export default function CartItem({
             className="px-2 py-1 border rounded"
             onClick={() => {
               const newQuantity = Number(quantity) - 1;
-              setQuantity(newQuantity.toString());
-              handleQuantityChange(newQuantity.toString());
+              if (newQuantity >= 1) {
+                dispatch({
+                  type: "SET_QUANTITY",
+                  payload: newQuantity.toString(),
+                });
+                handleQuantityChange(newQuantity.toString());
+              }
             }}
           >
             -
@@ -128,13 +142,13 @@ export default function CartItem({
             value={quantity}
             onChange={(e) => {
               const value = e.target.value;
-              setQuantity(value);
+              dispatch({ type: "SET_QUANTITY", payload: value });
               handleQuantityChange(value || "1");
             }}
             onBlur={(e) => {
               const value = e.target.value;
               if (!value || Number(value) < 1) {
-                setQuantity("1");
+                dispatch({ type: "SET_QUANTITY", payload: "1" });
                 handleQuantityChange("1");
               }
             }}
@@ -146,7 +160,10 @@ export default function CartItem({
             className="px-2 py-1 border rounded"
             onClick={() => {
               const newQuantity = Number(quantity) + 1;
-              setQuantity(newQuantity.toString());
+              dispatch({
+                type: "SET_QUANTITY",
+                payload: newQuantity.toString(),
+              });
               handleQuantityChange(newQuantity.toString());
             }}
           >

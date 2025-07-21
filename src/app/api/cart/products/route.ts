@@ -305,7 +305,7 @@ export async function POST(request: NextRequest) {
           SUM(ci.quantity * ci.unit_price) as total_price,
           COUNT(ci.id) as item_count
         FROM shopping_carts sc
-        JOIN cart_items ci ON sc.id = ci.id
+        JOIN cart_items ci ON sc.id = ci.cart_id
         JOIN product_variants pv ON ci.product_variant_id = pv.id
         JOIN products p ON pv.product_id = p.id
         WHERE sc.id = $1

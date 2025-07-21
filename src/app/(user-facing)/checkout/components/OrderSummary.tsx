@@ -31,7 +31,7 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
   }, [subtotal, shippingCost, tax]);
 
   return (
-    <div className="border rounded-lg p-6 h-fit">
+    <div className="border p-6 h-fit bg-gray-50 border-gray-200 rounded-lg">
       <h2 className="text-xl font-bold mb-4">Order Summary</h2>
       <div className="space-y-4 mb-6">
         {cartItems.map((item) => (
@@ -46,7 +46,7 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
           </div>
         ))}
       </div>
-      <div className="border-t pt-4 space-y-4">
+      <div className="border-t border-gray-200 pt-4 space-y-4">
         <div className="flex justify-between">
           <span>Subtotal</span>
           <span>{formatPrice(subtotal, cart.currency)}</span>
@@ -63,7 +63,7 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
           <span>Tax</span>
           <span>{formatPrice(tax, cart.currency)}</span>
         </div>
-        <div className="border-t pt-4 flex justify-between font-bold">
+        <div className="border-t border-gray-200 pt-4 flex justify-between font-bold">
           <span>Total</span>
           <span>{formatPrice(total, cart.currency)}</span>
         </div>
