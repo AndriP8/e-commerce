@@ -9,6 +9,11 @@ This is a full-featured e-commerce application built with Next.js, PostgreSQL, a
 - Shopping cart functionality
 - Checkout process with Stripe integration
 - Order management and tracking
+- SEO optimizations:
+  - Page-specific meta tags (title, description, keywords)
+  - Canonical URLs to prevent duplicate content
+  - Dynamic sitemap.xml generation
+  - Robots.txt configuration
 
 ## Getting Started
 

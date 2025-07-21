@@ -4,6 +4,22 @@ import { verifyToken } from "@/app/utils/auth-utils";
 import Link from "next/link";
 import CheckoutForm from "./components/CheckoutForm";
 import DynamicOrderSummary from "./components/DynamicOrderSummary";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Checkout | E-Commerce Store",
+  description: "Complete your purchase securely",
+  keywords: "checkout, payment, order, e-commerce, secure payment",
+  alternates: {
+    canonical: `${
+      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
+    }/checkout`,
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 async function getCart({
   cookieCurrency,

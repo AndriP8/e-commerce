@@ -4,6 +4,11 @@ import AddToCart from "./components/AddToCart";
 import { cookies } from "next/headers";
 import { formatPrice } from "@/app/utils/format-price-currency";
 import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/app/constants/images";
+import { Metadata } from "next";
+
+type Props = {
+  params: Promise<{ id: string }>;
+};
 
 async function getProduct(id: string): Promise<ProductDetailResponse> {
   const cookieStore = await cookies();
@@ -17,6 +22,39 @@ async function getProduct(id: string): Promise<ProductDetailResponse> {
     throw new Error("Failed to fetch product");
   }
   return response.json();
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const productData = await getProduct(id);
+  const product = productData.data;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001";
+
+  // Get the first image URL if available
+  const imageUrl =
+    product.images && product.images.length > 0
+      ? `${process.env.NEXT_PUBLIC_CDN_URL}/${product.images[0].image_url}`
+      : null;
+
+  return {
+    title: `${product.name} | E-Commerce Store`,
+    description:
+      product.description || `Buy ${product.name} at our E-Commerce Store`,
+    keywords: `${product.name}, ${
+      product.category?.name || "product"
+    }, e-commerce, shopping`,
+    openGraph: {
+      title: product.name,
+      description:
+        product.description || `Buy ${product.name} at our E-Commerce Store`,
+      type: "website",
+      url: `${baseUrl}/products/${id}`,
+      images: imageUrl ? [{ url: imageUrl }] : [],
+    },
+    alternates: {
+      canonical: `${baseUrl}/products/${id}`,
+    },
+  };
 }
 
 export default async function ProductDetail({

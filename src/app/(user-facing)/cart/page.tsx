@@ -7,6 +7,16 @@ import { formatPrice } from "@/app/utils/format-price-currency";
 import { ShoppingCart, ArrowLeft } from "lucide-react";
 import { Suspense } from "react";
 import { CartItemSkeleton } from "@/app/components/Skeleton";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Your Shopping Cart | E-Commerce Store",
+  description: "View and manage items in your shopping cart",
+  keywords: "shopping cart, checkout, e-commerce, purchase",
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'}/cart`,
+  },
+};
 
 async function getCart({
   token,

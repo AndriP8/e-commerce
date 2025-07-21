@@ -1,6 +1,36 @@
 import { cookies } from "next/headers";
 import { ProductsResponse } from "../../types/product-types";
 import ProductList from "./components/ProductList";
+import { Metadata } from "next";
+
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001";
+  const { search } = await searchParams;
+
+  // Create canonical URL - if search param exists, don't include it in canonical
+  const canonicalUrl = baseUrl;
+
+  return {
+    title: search
+      ? `Search results for "${search}" | E-Commerce Store`
+      : "E-Commerce Store - Fast & Reliable Shopping",
+    description: search
+      ? `Browse our products matching "${search}" - High-performance e-commerce platform`
+      : "High-performance e-commerce platform with optimized loading times and excellent user experience",
+    keywords: search
+      ? `${search}, search results, e-commerce, shopping`
+      : "e-commerce, shopping, fast loading, performance",
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
 
 async function getProducts({
   search,
