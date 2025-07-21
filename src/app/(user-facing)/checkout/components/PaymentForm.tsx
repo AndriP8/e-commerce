@@ -117,20 +117,36 @@ export default function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <PaymentElement />
-      {error && <div className="text-red-600 mt-4">{error}</div>}
+      <h2 className="text-xl font-semibold mb-4" id="payment-section-title">Payment Information</h2>
+      <div aria-labelledby="payment-section-title">
+        <PaymentElement />  
+      </div>
+      {error && (
+        <div 
+          className="text-red-600 mt-4" 
+          role="alert" 
+          aria-live="assertive"
+        >
+          {error}
+        </div>
+      )}
       <button
         type="submit"
         disabled={!stripe || loading}
         className="w-full mt-6 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+        aria-label={`Pay ${formatPrice(total, cart.currency)}`}
+        aria-busy={loading}
+        aria-disabled={!stripe || loading}
       >
         {loading ? (
-          <span className="flex items-center justify-center">
+          <span className="flex items-center justify-center" aria-hidden="true">
             <svg
               className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
+              role="img"
+              aria-label="Loading indicator"
             >
               <circle
                 className="opacity-25"

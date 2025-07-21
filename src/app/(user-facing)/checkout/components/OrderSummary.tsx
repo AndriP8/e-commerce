@@ -31,43 +31,66 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
   }, [subtotal, shippingCost, tax]);
 
   return (
-    <div className="border p-6 h-fit bg-gray-50 border-gray-200 rounded-lg">
-      <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+    <div
+      className="border p-6 h-fit bg-gray-50 border-gray-200 rounded-lg"
+      aria-labelledby="order-summary-heading"
+      role="region"
+    >
+      <h2 id="order-summary-heading" className="text-xl font-bold mb-4">
+        Order Summary
+      </h2>
       <div className="space-y-4 mb-6">
-        {cartItems.map((item) => (
-          <div key={item.id} className="flex justify-between items-center">
-            <div className="flex items-center">
-              <span className="font-medium">{item.product_name}</span>
-              <span className="text-gray-500 ml-2">x{item.quantity}</span>
-            </div>
-            <span>
-              {formatPrice(parseFloat(item.total_price), cart.currency)}
-            </span>
-          </div>
-        ))}
+        <ul className="list-none p-0 m-0 space-y-4">
+          {cartItems.map((item) => (
+            <li key={item.id} className="flex justify-between items-center">
+              <div className="flex items-center">
+                <span className="font-medium">{item.product_name}</span>
+                <span
+                  className="text-gray-500 ml-2"
+                  aria-label={`Quantity: ${item.quantity}`}
+                >
+                  x{item.quantity}
+                </span>
+              </div>
+              <span
+                aria-label={`Price: ${formatPrice(
+                  parseFloat(item.total_price),
+                  cart.currency,
+                )}`}
+              >
+                {formatPrice(parseFloat(item.total_price), cart.currency)}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <div className="border-t border-gray-200 pt-4 space-y-4">
+      <dl className="border-t border-gray-200 pt-4 space-y-4">
         <div className="flex justify-between">
-          <span>Subtotal</span>
-          <span>{formatPrice(subtotal, cart.currency)}</span>
+          <dt>Subtotal</dt>
+          <dd>{formatPrice(subtotal, cart.currency)}</dd>
         </div>
         <div className="flex justify-between">
-          <span>Shipping</span>
-          <span>
+          <dt>Shipping</dt>
+          <dd>
             {shippingCost === 0
               ? "Free"
               : formatPrice(shippingCost, cart.currency)}
-          </span>
+          </dd>
         </div>
         <div className="flex justify-between">
-          <span>Tax</span>
-          <span>{formatPrice(tax, cart.currency)}</span>
+          <dt>Tax</dt>
+          <dd>{formatPrice(tax, cart.currency)}</dd>
         </div>
-        <div className="border-t border-gray-200 pt-4 flex justify-between font-bold">
-          <span>Total</span>
-          <span>{formatPrice(total, cart.currency)}</span>
+        <div
+          className="border-t border-gray-200 pt-4 flex justify-between font-bold"
+          aria-live="polite"
+        >
+          <dt>Total</dt>
+          <dd aria-label={`Total: ${formatPrice(total, cart.currency)}`}>
+            {formatPrice(total, cart.currency)}
+          </dd>
         </div>
-      </div>
+      </dl>
     </div>
   );
 }

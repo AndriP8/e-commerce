@@ -239,6 +239,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
               <label
                 className="block text-sm font-medium mb-1"
                 htmlFor="receiver_name"
+                id="receiver_name_label"
               >
                 Receiver Name *
               </label>
@@ -253,6 +254,16 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     payload: { receiver_name: e.target.value },
                   })
                 }
+                autoComplete="shipping name"
+                autoCorrect="off"
+                spellCheck="false"
+                aria-required="true"
+                aria-labelledby="receiver_name_label"
+                aria-invalid={
+                  !state.addressDetail.receiver_name && state.step > 1
+                    ? "true"
+                    : "false"
+                }
                 required
               />
             </div>
@@ -260,6 +271,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
               <label
                 className="block text-sm font-medium mb-1"
                 htmlFor="receiver_phone"
+                id="receiver_phone_label"
               >
                 Receiver Phone *
               </label>
@@ -274,6 +286,17 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     payload: { receiver_phone: e.target.value },
                   })
                 }
+                autoComplete="shipping tel"
+                autoCorrect="off"
+                spellCheck="false"
+                inputMode="tel"
+                aria-required="true"
+                aria-labelledby="receiver_phone_label"
+                aria-invalid={
+                  !state.addressDetail.receiver_phone && state.step > 1
+                    ? "true"
+                    : "false"
+                }
                 required
               />
             </div>
@@ -281,6 +304,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
               <label
                 className="block text-sm font-medium mb-1"
                 htmlFor="address_line1"
+                id="address_line1_label"
               >
                 Address Line 1 *
               </label>
@@ -295,6 +319,16 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     payload: { address_line1: e.target.value },
                   })
                 }
+                autoComplete="shipping address-line1"
+                autoCorrect="off"
+                spellCheck="false"
+                aria-required="true"
+                aria-labelledby="address_line1_label"
+                aria-invalid={
+                  !state.addressDetail.address_line1 && state.step > 1
+                    ? "true"
+                    : "false"
+                }
                 required
               />
             </div>
@@ -302,6 +336,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
               <label
                 className="block text-sm font-medium mb-1"
                 htmlFor="address_line2"
+                id="address_line2_label"
               >
                 Address Line 2
               </label>
@@ -316,10 +351,18 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     payload: { address_line2: e.target.value },
                   })
                 }
+                autoComplete="shipping address-line2"
+                autoCorrect="off"
+                spellCheck="false"
+                aria-labelledby="address_line2_label"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="city">
+              <label
+                className="block text-sm font-medium mb-1"
+                htmlFor="city"
+                id="city_label"
+              >
                 City *
               </label>
               <input
@@ -333,11 +376,23 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     payload: { city: e.target.value },
                   })
                 }
+                autoComplete="shipping address-level2"
+                autoCorrect="off"
+                spellCheck="false"
+                aria-required="true"
+                aria-labelledby="city_label"
+                aria-invalid={
+                  !state.addressDetail.city && state.step > 1 ? "true" : "false"
+                }
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="state">
+              <label
+                className="block text-sm font-medium mb-1"
+                htmlFor="state"
+                id="state_label"
+              >
                 State/Province *
               </label>
               <input
@@ -351,6 +406,14 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     payload: { state: e.target.value },
                   })
                 }
+                autoComplete="shipping address-level1"
+                aria-required="true"
+                aria-labelledby="state_label"
+                aria-invalid={
+                  !state.addressDetail.state && state.step > 1
+                    ? "true"
+                    : "false"
+                }
                 required
               />
             </div>
@@ -358,6 +421,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
               <label
                 className="block text-sm font-medium mb-1"
                 htmlFor="postal_code"
+                id="postal_code_label"
               >
                 Postal Code *
               </label>
@@ -372,6 +436,17 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     payload: { postal_code: e.target.value },
                   })
                 }
+                autoComplete="shipping postal-code"
+                autoCorrect="off"
+                spellCheck="false"
+                inputMode="numeric"
+                aria-required="true"
+                aria-labelledby="postal_code_label"
+                aria-invalid={
+                  !state.addressDetail.postal_code && state.step > 1
+                    ? "true"
+                    : "false"
+                }
                 required
               />
             </div>
@@ -379,6 +454,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
               <label
                 className="block text-sm font-medium mb-1"
                 htmlFor="country"
+                id="country_label"
               >
                 Country *
               </label>
@@ -393,6 +469,14 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     payload: { country: e.target.value },
                   })
                 }
+                autoComplete="shipping country"
+                aria-required="true"
+                aria-labelledby="country_label"
+                aria-invalid={
+                  !state.addressDetail.country && state.step > 1
+                    ? "true"
+                    : "false"
+                }
                 required
               />
             </div>
@@ -403,7 +487,8 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
       {state.step === 2 && (
         <div className="space-y-6">
           <h2 className="text-xl font-bold mb-4">Shipping Method</h2>
-          <div className="space-y-4">
+          <fieldset className="space-y-4">
+            <legend className="sr-only">Shipping Method Options</legend>
             {shippingMethods.map((method) => (
               <div
                 key={method.id}
@@ -435,15 +520,56 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                       : shippingCostConversion,
                   );
                 }}
+                role="radio"
+                aria-checked={
+                  state.shippingDetail.shipping_method_id === method.id
+                }
+                aria-labelledby={`shipping_method_${method.id}_name shipping_method_${method.id}_price`}
+                aria-describedby={`shipping_method_${method.id}_description`}
+                tabIndex={0}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    const today = new Date();
+                    const deliveryDate = new Date(today);
+                    deliveryDate.setDate(
+                      today.getDate() + method.estimated_days_max,
+                    );
+
+                    dispatch({
+                      type: "UPDATE_SHIPPING",
+                      payload: {
+                        shipping_method_id: method.id,
+                        estimated_delivery: deliveryDate.toISOString(),
+                      },
+                    });
+
+                    updateShippingCost(
+                      method.base_costs === "0"
+                        ? parseFloat(method.base_costs)
+                        : shippingCostConversion,
+                    );
+                  }
+                }}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-medium">{method.name}</h3>
-                    <p className="text-sm text-gray-600">
+                    <h3
+                      className="font-medium"
+                      id={`shipping_method_${method.id}_name`}
+                    >
+                      {method.name}
+                    </h3>
+                    <p
+                      className="text-sm text-gray-600"
+                      id={`shipping_method_${method.id}_description`}
+                    >
                       {method.description}
                     </p>
                   </div>
-                  <div className="font-medium">
+                  <div
+                    className="font-medium"
+                    id={`shipping_method_${method.id}_price`}
+                  >
                     {parseFloat(method.base_costs) === 0
                       ? "Free"
                       : formatPrice(shippingCostConversion, cart.currency)}
@@ -451,20 +577,28 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 </div>
               </div>
             ))}
-          </div>
+          </fieldset>
 
           <div className="mt-8">
             <h2 className="text-xl font-bold mb-4">Billing Address</h2>
             <div className="mb-4">
-              <label className="flex items-center">
+              <div className="flex items-center">
                 <input
                   type="checkbox"
+                  id="same_billing_address"
                   className="mr-2"
                   checked={state.useSameForBilling}
                   onChange={() => dispatch({ type: "TOGGLE_SAME_BILLING" })}
+                  aria-labelledby="same_billing_address_label"
                 />
-                <span>Same as shipping address</span>
-              </label>
+                <label
+                  htmlFor="same_billing_address"
+                  id="same_billing_address_label"
+                  className="cursor-pointer"
+                >
+                  Same as shipping address
+                </label>
+              </div>
             </div>
 
             {!state.useSameForBilling && (
@@ -550,12 +684,17 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                         payload: { address_line2: e.target.value },
                       })
                     }
+                    autoComplete="billing address-line2"
+                    autoCorrect="off"
+                    spellCheck="false"
+                    aria-labelledby="billing_address_line2_label"
                   />
                 </div>
                 <div>
                   <label
                     className="block text-sm font-medium mb-1"
                     htmlFor="billing_city"
+                    id="billing_city_label"
                   >
                     City *
                   </label>
@@ -570,6 +709,18 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                         payload: { city: e.target.value },
                       })
                     }
+                    autoComplete="billing address-level2"
+                    autoCorrect="off"
+                    spellCheck="false"
+                    aria-required="true"
+                    aria-labelledby="billing_city_label"
+                    aria-invalid={
+                      !state.billingAddress.city &&
+                      !state.useSameForBilling &&
+                      state.step > 2
+                        ? "true"
+                        : "false"
+                    }
                     required
                   />
                 </div>
@@ -577,6 +728,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   <label
                     className="block text-sm font-medium mb-1"
                     htmlFor="billing_state"
+                    id="billing_state_label"
                   >
                     State/Province *
                   </label>
@@ -591,6 +743,16 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                         payload: { state: e.target.value },
                       })
                     }
+                    autoComplete="billing address-level1"
+                    aria-required="true"
+                    aria-labelledby="billing_state_label"
+                    aria-invalid={
+                      !state.billingAddress.state &&
+                      !state.useSameForBilling &&
+                      state.step > 2
+                        ? "true"
+                        : "false"
+                    }
                     required
                   />
                 </div>
@@ -598,6 +760,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   <label
                     className="block text-sm font-medium mb-1"
                     htmlFor="billing_postal_code"
+                    id="billing_postal_code_label"
                   >
                     Postal Code *
                   </label>
@@ -612,6 +775,19 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                         payload: { postal_code: e.target.value },
                       })
                     }
+                    autoComplete="billing postal-code"
+                    autoCorrect="off"
+                    spellCheck="false"
+                    inputMode="numeric"
+                    aria-required="true"
+                    aria-labelledby="billing_postal_code_label"
+                    aria-invalid={
+                      !state.billingAddress.postal_code &&
+                      !state.useSameForBilling &&
+                      state.step > 2
+                        ? "true"
+                        : "false"
+                    }
                     required
                   />
                 </div>
@@ -619,6 +795,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   <label
                     className="block text-sm font-medium mb-1"
                     htmlFor="billing_country"
+                    id="billing_country_label"
                   >
                     Country *
                   </label>
@@ -632,6 +809,16 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                         type: "UPDATE_BILLING_ADDRESS",
                         payload: { country: e.target.value },
                       })
+                    }
+                    autoComplete="billing country"
+                    aria-required="true"
+                    aria-labelledby="billing_country_label"
+                    aria-invalid={
+                      !state.billingAddress.country &&
+                      !state.useSameForBilling &&
+                      state.step > 2
+                        ? "true"
+                        : "false"
                     }
                     required
                   />
