@@ -44,7 +44,7 @@ Design an e-commerce website that allows users to browse products and purchase t
 All possible devices: laptop, tablets, mobile, etc.
 
 Do users have to be signed in to purchase?
-Users can purchase as a guest without being signed in.
+Users should sign in to purchase
 
 ## Architecture / high-level design
 
@@ -80,21 +80,21 @@ All these e-commerce sites use SSR! This suggests the importance of using SSR fo
 
 ## Data model
 
-| Entity           | Source              | Belongs To                                 | Fields                                                                         |
-| ---------------- | ------------------- | ------------------------------------------ | ------------------------------------------------------------------------------ |
-| `ProductList`    | Server              | Product Listing Page                       | `products` (list of Products), `pagination` (pagination metadata)              |
-| `Product`        | Server              | Product Listing Page, Product Details Page | `name`, `description`, `unit_price`, `currency`, `primary_image`, `image_urls` |
-| `Cart`           | Server              | Client Store                               | `items` (list of `CartItems`), `total_price`, `currency`                       |
-| `CartItem`       | Server              | Client Store                               | `quantity`, `product`, `price`, `currency`                                     |
-| `AddressDetails` | User input (Client) | Checkout Page                              | `name`, `country`, `street`, `city`, etc.                                      |
-| `PaymentDetails` | User input (Client) | Checkout Page                              | `card_number`, `card_expiry`, `card_cvv`                                       |
+| Entity           | Source              | Belongs To                                 | Fields                                                            |
+| ---------------- | ------------------- | ------------------------------------------ | ----------------------------------------------------------------- |
+| `ProductList`    | Server              | Product Listing Page                       | `products` (list of Products), `pagination` (pagination metadata) |
+| `Product`        | Server              | Product Listing Page, Product Details Page | `name`, `description`, `base_price`, `image_url`,                 |
+| `Cart`           | Server              | Client Store                               | `items` (list of `CartItems`), `total_price`,                     |
+| `CartItem`       | Server              | Client Store                               | `quantity`, `product_name`, `unit_price`, `currency`, `image_url` |
+| `AddressDetails` | User input (Client) | Checkout Page                              | `name`, `country`, `street`, `city`, etc.                         |
+| `PaymentDetails` | User input (Client) | Checkout Page                              | `card_number`, `card_expiry`, `card_cvv`                          |
 
 - Few points for discussion:
 
   - The `Cart` entity belongs to the Client Store because some websites might want to show the number of cart items in the navbar or have a popup to allow users to quickly access the cart items and make modifications. If there's no such need then it's acceptable for the cart to belong to the Cart page.
 
   - `Cart` and `CartItem` have `total_price` and `price` fields respectively fetched as part of the server response instead of having the client compute the price (multiply the quantity by the `unit_price`) to give the flexibility of applying discounts due to bulk purchase or use of promo codes. The price computation logic is defined on the server, so the final price should be computed on the server and the client should rely on the server to calculate the total price instead of making its own calculations.
-
+  <!-- TODO: Update currency -->
   - Since our website has an international audience, we should have localized prices in the user's `currency`, hence the currency field.
 
 ## Interface definition (API)
@@ -138,7 +138,7 @@ We can also assume that a user only has a maximum of one cart and the user's cur
     "total_pages": 4,
     "total": 20
   },
-  "results": [
+  "data": [
     {
       "id": 123, // Product ID.
       "name": "Cotton T-shirt",
@@ -211,7 +211,7 @@ The updated cart object is returned.
 
 ```json
 {
-  "id": 789, // Cart ID.
+  "cart_id": 789,
   "total_price": 24,
   "currency": "USD",
   "items": [
@@ -299,7 +299,7 @@ The updated cart object is returned.
 | Field       | Value                       |
 | ----------- | --------------------------- |
 | HTTP Method | `POST`                      |
-| Path        | `/order`                    |
+| Path        | `/checkout/order`           |
 | Description | Create an order from a cart |
 
 **Parameters**
