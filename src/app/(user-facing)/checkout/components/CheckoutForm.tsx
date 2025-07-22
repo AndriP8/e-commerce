@@ -178,7 +178,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
     }).then((data) => {
       setShippingCostConversion(data.convertedAmount);
     });
-  }, []);
+  }, [cart.currency.code]);
 
   return (
     <div className="bg-white rounded-lg p-6 border">

@@ -29,7 +29,7 @@ export async function GET(
     try {
       const decoded = await verifyToken(token);
       userId = decoded.userId.toString();
-    } catch (_error) {
+    } catch {
       throw new UnauthorizedError("Invalid authentication token");
     }
     // Get order details

@@ -41,7 +41,7 @@ export const transformProductData = (row: any) => ({
  * @returns Object with whereConditions array and queryParams array
  */
 export const buildProductFilterConditions = (filters: ProductFilters) => {
-  let whereConditions = ["p.is_active = true"];
+  const whereConditions = ["p.is_active = true"];
   const queryParams: any[] = [];
   let paramCounter = 1;
 

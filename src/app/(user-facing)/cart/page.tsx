@@ -14,7 +14,9 @@ export const metadata: Metadata = {
   description: "View and manage items in your shopping cart",
   keywords: "shopping cart, checkout, e-commerce, purchase",
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'}/cart`,
+    canonical: `${
+      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
+    }/cart`,
   },
 };
 
@@ -51,7 +53,7 @@ export default async function CartPage() {
     try {
       await verifyToken(token);
       isAuthenticated = true;
-    } catch (_error) {
+    } catch {
       isAuthenticated = false;
     }
   }
@@ -103,7 +105,7 @@ export default async function CartPage() {
             Your cart is empty
           </h2>
           <p className="text-lg mb-6 text-gray-600">
-            Looks like you haven't added anything to your cart yet
+            Looks like you haven&apos;t added anything to your cart yet
           </p>
           <Link
             href="/"

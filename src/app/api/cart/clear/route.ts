@@ -14,7 +14,7 @@ import { cookies } from "next/headers";
  *
  * @returns JSON response with success message
  */
-export async function DELETE(request: Request) {
+export async function DELETE() {
   try {
     // Get the token from cookies
     const cookieStore = await cookies();

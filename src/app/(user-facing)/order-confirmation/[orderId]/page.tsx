@@ -48,7 +48,7 @@ export default async function OrderConfirmationPage({
       const decoded = await verifyToken(token);
       isAuthenticated = true;
       userId = decoded.userId.toString();
-    } catch (error) {
+    } catch {
       isAuthenticated = false;
     }
   }
@@ -95,7 +95,7 @@ export default async function OrderConfirmationPage({
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold mb-4">Order Not Found</h2>
         <p className="text-lg mb-6">
-          We couldn't find the order you're looking for
+          We couldn&apos;t find the order you&apos;re looking for
         </p>
         <Link
           href="/"

@@ -1,6 +1,6 @@
 import type Products from "@/schemas/public/Products";
 import type Categories from "@/schemas/public/Categories";
-import type { SellersId, SellersInitializer } from "@/schemas/public/Sellers";
+import type { SellersInitializer } from "@/schemas/public/Sellers";
 import ProductVariants from "@/schemas/public/ProductVariants";
 import Reviews from "@/schemas/public/Reviews";
 import Users from "@/schemas/public/Users";

@@ -23,7 +23,7 @@ export async function POST(
     try {
       const decoded = await verifyToken(token);
       userId = decoded.userId.toString();
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: "Invalid authentication token" },
         { status: 401 },

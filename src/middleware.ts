@@ -40,9 +40,7 @@ async function handleCurrencyMiddleware() {
 }
 
 // Modified to be Edge-compatible
-export async function getPreferenceCurrency(
-  request?: NextRequest,
-): Promise<string> {
+export async function getPreferenceCurrency(): Promise<string> {
   // If request is provided, get from request cookies
   const cookieStore = await cookies();
   const currencyCode = cookieStore.get("preferred_currency")?.value;
@@ -53,8 +51,6 @@ export async function getPreferenceCurrency(
 }
 
 export async function middleware(request: NextRequest) {
-  const cookieStore = await cookies();
-
   const path = request.nextUrl.pathname;
 
   // API routes for currency conversion

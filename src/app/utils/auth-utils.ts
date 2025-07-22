@@ -113,7 +113,7 @@ export async function getCurrentUser(token: string) {
     } finally {
       client.release();
     }
-  } catch (error) {
+  } catch {
     throw new UnauthorizedError("Invalid authentication");
   }
 }

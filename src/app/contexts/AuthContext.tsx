@@ -56,7 +56,7 @@ export const AuthProvider = ({
 
     setUser(userData);
     setLoading(false);
-  }, [user, initialUser]);
+  }, [user]);
 
   useEffect(() => {
     checkUser();

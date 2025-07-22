@@ -18,7 +18,7 @@ import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
  *
  * @returns JSON response with cart information
  */
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     // Get the token from cookies
     const cookieStore = await cookies();

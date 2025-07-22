@@ -73,10 +73,7 @@ export async function PUT(
         RETURNING id, cart_id, product_variant_id, quantity, unit_price, added_at
       `;
 
-      const updateResult = await client.query(updateCartItemQuery, [
-        quantity,
-        cartItemId,
-      ]);
+      await client.query(updateCartItemQuery, [quantity, cartItemId]);
 
       // Get the updated cart with items
       const updatedCartQuery = `

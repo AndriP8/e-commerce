@@ -51,7 +51,7 @@ export default async function CheckoutPage() {
     try {
       await verifyToken(token);
       isAuthenticated = true;
-    } catch (_error) {
+    } catch {
       isAuthenticated = false;
     }
   }
