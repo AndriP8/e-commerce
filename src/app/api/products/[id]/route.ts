@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { pool } from "../../../db/client";
-import { transformProductData } from "../../../utils/product-utils";
-import { getPreferenceCurrency } from "@/middleware/currency";
+import { pool } from "@/app/db/client";
+import { transformProductData } from "@/app/utils/product-utils";
+import { getPreferenceCurrency } from "@/middleware";
 import {
   convertProductPrices,
   convertProductVariantPrices,

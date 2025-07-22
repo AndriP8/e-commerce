@@ -5,7 +5,7 @@ import handleApiError, {
 import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getPreferenceCurrency } from "@/middleware/currency";
+import { getPreferenceCurrency } from "@/middleware";
 import { convertOrderPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 

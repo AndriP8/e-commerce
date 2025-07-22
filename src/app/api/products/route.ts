@@ -7,7 +7,7 @@ import {
 } from "@/app/utils/product-utils";
 import { pool } from "@/app/db/client";
 import { handleApiError, BadRequestError } from "@/app/utils/api-error-handler";
-import { getPreferenceCurrency } from "@/middleware/currency";
+import { getPreferenceCurrency } from "@/middleware";
 import { convertProductPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 

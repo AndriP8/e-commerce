@@ -7,7 +7,7 @@ import {
 } from "@/app/utils/api-error-handler";
 import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
-import { getPreferenceCurrency } from "@/middleware/currency";
+import { getPreferenceCurrency } from "@/middleware";
 import { convertCartPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 
