@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { CurrencyPreferenceResponse } from "../types/currency-preference";
 import Currencies, { CurrenciesId } from "@/schemas/public/Currencies";
+import { useRouter } from "next/navigation";
 
 export type SelectedCurrency = CurrencyPreferenceResponse["currency"];
 
@@ -72,8 +73,6 @@ function currencyReducer(
 
 interface CurrencyContextType extends CurrencyState {
   changeCurrency: (currency: SelectedCurrency) => Promise<void>;
-  convertPrice: (amount: number, fromCurrency?: string) => Promise<number>;
-  formatPrice: (amount: number, currency?: SelectedCurrency) => string;
   refreshCurrencies: () => Promise<void>;
 }
 
@@ -87,6 +86,7 @@ interface CurrencyProviderProps {
 
 export function CurrencyProvider({ children }: CurrencyProviderProps) {
   const [state, dispatch] = useReducer(currencyReducer, initialState);
+  const router = useRouter();
 
   // Load currencies and user preference on mount
   useEffect(() => {
@@ -140,47 +140,11 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
       if (!response.ok) {
         console.warn("Failed to save currency preference to server");
       }
+      router.refresh();
     } catch (error) {
       console.error("Error changing currency:", error);
       dispatch({ type: "SET_ERROR", payload: "Failed to change currency" });
     }
-  };
-
-  // const convertPrice = async (
-  //   amount: number,
-  //   fromCurrency: string = "USD",
-  // ): Promise<number> => {
-  //   if (fromCurrency === state.selectedCurrency.code) {
-  //     return amount;
-  //   }
-
-  //   try {
-  //     const response = await fetch(
-  //       `/api/currency/convert?amount=${amount}&from=${fromCurrency}&to=${state.selectedCurrency.code}`,
-  //     );
-
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       return data.convertedAmount;
-  //     } else {
-  //       throw new Error("Conversion failed");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error converting price:", error);
-  //     return amount; // Return original amount if conversion fails
-  //   }
-  // };
-
-  const formatPrice = (
-    amount: number,
-    currency: SelectedCurrency = state.selectedCurrency,
-  ): string => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency.code,
-      minimumFractionDigits: currency.decimal_places,
-      maximumFractionDigits: currency.decimal_places,
-    }).format(amount);
   };
 
   const refreshCurrencies = async () => {
@@ -190,8 +154,6 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
   const contextValue: CurrencyContextType = {
     ...state,
     changeCurrency,
-    convertPrice: async (amount: number, fromCurrency?: string) => 0,
-    formatPrice,
     refreshCurrencies,
   };
 

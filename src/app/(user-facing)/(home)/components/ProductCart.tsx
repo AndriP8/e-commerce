@@ -71,30 +71,28 @@ export default function ProductCart({
         </div>
       </Link>
 
-      <div className="p-4">
+      <div className="p-4 space-y-4">
         <Link href={`/products/${product.id}`}>
           <h3 className="font-semibold text-lg mb-2transition-colors line-clamp-2">
             {product.name}
           </h3>
         </Link>
 
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+        <p className="text-gray-600 text-sm mb-3 line-clamp-1">
           {product.description}
         </p>
-
-        <div className="flex items-center justify-between">
+        <div>
           <span className="text-xl font-bold ">
             {formatPrice(parseFloat(product.base_price), currency)}
           </span>
-
-          <button
-            onClick={() => addToCart(product.id)}
-            disabled={isAdding}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isAdding ? "Adding..." : "Add to Cart"}
-          </button>
         </div>
+        <button
+          onClick={() => addToCart(product.id)}
+          disabled={isAdding}
+          className="bg-blue-600 text-white px-4 w-full py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isAdding ? "Adding..." : "Add to Cart"}
+        </button>
       </div>
     </div>
   );
