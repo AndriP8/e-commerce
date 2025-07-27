@@ -1,4 +1,4 @@
-CREATE TYPE address_type_enum as ENUM('business', 'warehouse', 'return');
+CREATE TYPE seller_address_type as ENUM('business', 'warehouse', 'return');
 
 CREATE TABLE seller_addresses (
     id BIGINT PRIMARY KEY,
@@ -9,6 +9,6 @@ CREATE TABLE seller_addresses (
     state VARCHAR(100) NOT NULL,
     postal_code VARCHAR(20) NOT NULL,
     country VARCHAR(100) NOT NULL,
-    address_type address_type_enum  NOT NULL,
+    address_type seller_address_type NOT NULL,
     FOREIGN KEY (seller_id) REFERENCES sellers(id) ON DELETE CASCADE
 );

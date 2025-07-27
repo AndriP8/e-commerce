@@ -106,7 +106,8 @@ export async function getUserPreferredCurrency(
   userId?: string,
 ): Promise<Currencies> {
   const cookieStore = await cookies();
-  const prefered_currency = cookieStore.get("preferred_currency")?.value;
+  const prefered_currency =
+    cookieStore.get("preferred_currency")?.value || "USD";
   const client = await pool.connect();
   try {
     const result = await client.query(
@@ -122,7 +123,7 @@ export async function getUserPreferredCurrency(
     }
 
     // Return USD as default if no preference found
-    return (await getCurrencyByCode("USD")) as Currencies;
+    return (await getCurrencyByCode(prefered_currency)) as Currencies;
   } finally {
     client.release();
   }

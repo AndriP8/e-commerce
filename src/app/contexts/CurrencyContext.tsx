@@ -73,7 +73,6 @@ function currencyReducer(
 
 interface CurrencyContextType extends CurrencyState {
   changeCurrency: (currency: SelectedCurrency) => Promise<void>;
-  refreshCurrencies: () => Promise<void>;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(
@@ -121,6 +120,10 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
     }
   };
 
+  const refreshCurrencies = async () => {
+    await loadInitialData();
+  };
+
   const changeCurrency = async (currency: SelectedCurrency) => {
     try {
       dispatch({ type: "SET_SELECTED_CURRENCY", payload: currency });
@@ -140,6 +143,7 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
       if (!response.ok) {
         console.warn("Failed to save currency preference to server");
       }
+      await refreshCurrencies();
       router.refresh();
     } catch (error) {
       console.error("Error changing currency:", error);
@@ -147,14 +151,9 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
     }
   };
 
-  const refreshCurrencies = async () => {
-    await loadInitialData();
-  };
-
   const contextValue: CurrencyContextType = {
     ...state,
     changeCurrency,
-    refreshCurrencies,
   };
 
   return (

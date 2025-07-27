@@ -1,3 +1,5 @@
+create sequence products_id_seq;
+
 CREATE TABLE products (
     id BIGINT PRIMARY KEY,
     seller_id BIGINT NOT NULL,
@@ -19,7 +21,7 @@ CREATE TABLE products (
 CREATE INDEX idx_products_category_id ON products(category_id);
 CREATE INDEX idx_products_sku ON products(sku);
 
-INSERT INTO PRODUCTS (id, seller_id, category_id, name, description, base_price, sku, brand, weight, dimensions, is_active, created_at, updated_at) VALUES
+INSERT INTO products (id, seller_id, category_id, name, description, base_price, sku, brand, weight, dimensions, is_active, created_at, updated_at) VALUES
 (1, 1, 2, 'iPhone 15 Pro', 'Latest Apple smartphone with A17 Pro chip', 999.99, 'APPL-IP15PRO', 'Apple', 0.187, '5.77 x 2.78 x 0.32 inches', true, '2024-01-20 10:00:00', '2024-01-20 10:00:00'),
 (2, 1, 2, 'Samsung Galaxy S24', 'Flagship Android smartphone with AI features', 899.99, 'SAMS-GS24', 'Samsung', 0.168, '5.79 x 2.70 x 0.30 inches', true, '2024-01-21 10:00:00', '2024-01-21 10:00:00'),
 (3, 1, 1, 'MacBook Pro 14"', 'Professional laptop with M3 chip', 1999.99, 'APPL-MBP14', 'Apple', 1.6, '12.31 x 8.71 x 0.61 inches', true, '2024-01-22 10:00:00', '2024-01-22 10:00:00'),
@@ -35,3 +37,5 @@ INSERT INTO PRODUCTS (id, seller_id, category_id, name, description, base_price,
 (13, 2, 3, 'Running Shoes', 'Professional athletic running shoes', 149.99, 'FASH-SHOES-001', 'Nike', 0.9, '12 x 8 x 5 inches', true, '2024-02-01 10:00:00', '2024-02-01 10:00:00'),
 (14, 1, 1, 'Canon EOS R6', 'Professional mirrorless camera', 2399.99, 'CANON-R6', 'Canon', 0.68, '5.4 x 3.9 x 2.8 inches', true, '2024-02-02 10:00:00', '2024-02-02 10:00:00'),
 (15, 3, 1, 'Ninja Blender', 'High-power blender with multiple cups', 199.99, 'NINJA-BLEND-001', 'Ninja', 5.2, '15.7 x 8.4 x 17.8 inches', true, '2024-02-03 10:00:00', '2024-02-03 10:00:00');
+
+ALTER TABLE products ALTER COLUMN id SET DEFAULT nextval('products_id_seq');

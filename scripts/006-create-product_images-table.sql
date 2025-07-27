@@ -13,7 +13,7 @@ CREATE INDEX idx_product_images_product ON product_images(product_id);
 CREATE INDEX idx_product_images_primary ON product_images(is_primary);
 CREATE INDEX idx_product_images_order ON product_images(sort_order);
 
-INSERT INTO PRODUCT_IMAGES (id, product_id, image_url, alt_text, sort_order, is_primary) VALUES
+INSERT INTO product_images (id, product_id, image_url, alt_text, sort_order, is_primary) VALUES
 (1, 1, 'https://example.com/iphone15pro-front.jpg', 'iPhone 15 Pro front view', 1, true),
 (2, 1, 'https://example.com/iphone15pro-back.jpg', 'iPhone 15 Pro back view', 2, false),
 (3, 4, 'https://example.com/tshirt-black-front.jpg', 'Black cotton t-shirt front view', 1, true);
