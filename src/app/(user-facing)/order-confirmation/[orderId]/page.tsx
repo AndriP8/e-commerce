@@ -16,7 +16,7 @@ async function getOrderDetails({
   const { token, cookieCurrency } = cookies;
 
   const response = await fetch(
-    `http://localhost:3001/api/orders/${orderId}?user_id=${userId}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/orders/${orderId}?user_id=${userId}`,
     {
       method: "GET",
       headers: {

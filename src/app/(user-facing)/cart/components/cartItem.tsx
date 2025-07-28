@@ -29,19 +29,16 @@ export default function CartItem({
   const shouldUpdateRef = useRef(false);
 
   // Debounced quantity change handler
-  const handleQuantityChange = useCallback(
-    debounce((newQuantity: string) => {
-      const num = Number(newQuantity);
-      if (isNaN(num) || num < 1) {
-        dispatch({ type: "SET_QUANTITY", payload: "1" });
-        dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: "1" });
-      } else {
-        dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: newQuantity });
-        shouldUpdateRef.current = true;
-      }
-    }, 200),
-    [],
-  );
+  const handleQuantityChange = debounce((newQuantity: string) => {
+    const num = Number(newQuantity);
+    if (isNaN(num) || num < 1) {
+      dispatch({ type: "SET_QUANTITY", payload: "1" });
+      dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: "1" });
+    } else {
+      dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: newQuantity });
+      shouldUpdateRef.current = true;
+    }
+  }, 200);
 
   // Handle quantity update
   const handleUpdateQuantity = useCallback(async () => {

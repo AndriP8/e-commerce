@@ -13,11 +13,14 @@ type Props = {
 async function getProduct(id: string): Promise<ProductDetailResponse> {
   const cookieStore = await cookies();
   const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
-  const response = await fetch(`http://localhost:3001/api/products/${id}`, {
-    headers: {
-      Cookie: `preferred_currency=${cookieCurrency}`,
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`,
+    {
+      headers: {
+        Cookie: `preferred_currency=${cookieCurrency}`,
+      },
     },
-  });
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch product");
   }
@@ -28,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const productData = await getProduct(id);
   const product = productData.data;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   // Get the first image URL if available
   const imageUrl =

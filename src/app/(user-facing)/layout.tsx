@@ -55,11 +55,14 @@ const fetchUser = async (): Promise<{ data: { user: User } } | null> => {
     if (!token) {
       return null;
     }
-    const response = await fetch("http://localhost:3001/api/auth/me", {
-      headers: {
-        Cookie: `token=${token}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/me`,
+      {
+        headers: {
+          Cookie: `token=${token}`,
+        },
       },
-    });
+    );
     if (!response.ok) {
       return null;
     }

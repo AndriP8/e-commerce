@@ -3,7 +3,7 @@ import { ProductsResponse } from "./types/product-types";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Base URL for the site
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   // Static routes
   const staticRoutes = ["", "/login", "/register", "/cart", "/checkout"].map(

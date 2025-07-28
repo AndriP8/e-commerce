@@ -11,9 +11,7 @@ export const metadata: Metadata = {
   description: "Complete your purchase securely",
   keywords: "checkout, payment, order, e-commerce, secure payment",
   alternates: {
-    canonical: `${
-      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
-    }/checkout`,
+    canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout`,
   },
   robots: {
     index: false,
@@ -28,11 +26,14 @@ async function getCart({
   cookieCurrency: string;
   token: string;
 }) {
-  const response = await fetch("http://localhost:3001/api/cart/products", {
-    headers: {
-      Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart/products`,
+    {
+      headers: {
+        Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
+      },
     },
-  });
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch cart items");
   }

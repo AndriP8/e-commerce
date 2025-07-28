@@ -14,9 +14,7 @@ export const metadata: Metadata = {
   description: "View and manage items in your shopping cart",
   keywords: "shopping cart, checkout, e-commerce, purchase",
   alternates: {
-    canonical: `${
-      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
-    }/cart`,
+    canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
   },
 };
 
@@ -27,15 +25,18 @@ async function getCart({
   token: string;
   cookieCurrency: string;
 }) {
-  const response = await fetch("http://localhost:3001/api/cart/products", {
-    headers: {
-      Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart/products`,
+    {
+      headers: {
+        Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
+      },
+      next: {
+        revalidate: 60, // 1 minute
+        tags: ["cart"], // Add cache tag for targeted invalidation
+      },
     },
-    next: {
-      revalidate: 60, // 1 minute
-      tags: ["cart"], // Add cache tag for targeted invalidation
-    },
-  });
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch cart");
   }

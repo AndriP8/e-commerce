@@ -26,17 +26,20 @@ export async function addToCartAction(
       };
     }
 
-    const response = await fetch("http://localhost:3001/api/cart/products", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: `token=${token}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart/products`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `token=${token}`,
+        },
+        body: JSON.stringify({
+          product_id: productId,
+          quantity,
+        }),
       },
-      body: JSON.stringify({
-        product_id: productId,
-        quantity,
-      }),
-    });
+    );
 
     const data = await response.json();
 
@@ -79,7 +82,7 @@ export async function updateCartQuantityAction(
     }
 
     const response = await fetch(
-      `http://localhost:3001/api/cart/products/${cartItemId}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart/products/${cartItemId}`,
       {
         method: "PUT",
         headers: {
@@ -132,7 +135,7 @@ export async function removeFromCartAction(
     }
 
     const response = await fetch(
-      `http://localhost:3001/api/cart/products/${cartItemId}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart/products/${cartItemId}`,
       {
         method: "DELETE",
         headers: {

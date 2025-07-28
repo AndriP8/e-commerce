@@ -10,7 +10,7 @@ type Props = {
 export async function generateMetadata({
   searchParams,
 }: Props): Promise<Metadata> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const { search } = await searchParams;
 
   // Create canonical URL - if search param exists, don't include it in canonical
@@ -39,7 +39,7 @@ async function getProducts({
   search?: string | string[] | undefined;
   cookieCurrency?: string | undefined;
 }): Promise<ProductsResponse> {
-  const baseUrl = new URL("http://localhost:3001/api/products");
+  const baseUrl = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
   baseUrl.searchParams.set("in_stock", "true");
   if (search && typeof search === "string") {
     baseUrl.searchParams.set("search", search);

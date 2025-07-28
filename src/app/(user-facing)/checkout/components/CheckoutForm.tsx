@@ -23,7 +23,7 @@ const getConversion = async ({
   to: string;
 }): Promise<CurrencyConversion> => {
   const response = await fetch(
-    `http://localhost:3001/api/currency/convert?amount=${amount}&from=${from}&to=${to}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/currency/convert?amount=${amount}&from=${from}&to=${to}`,
   );
   const data = await response.json();
   return data;
