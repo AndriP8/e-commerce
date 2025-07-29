@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const transformProductData = (row: any) => ({
   id: row.id,
   name: row.name,

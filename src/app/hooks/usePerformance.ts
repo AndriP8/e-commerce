@@ -98,8 +98,10 @@ export function usePerformance({
     // Monitor FID
     const fidObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
-      entries.forEach((entry: any) => {
-        handleMetric("FID", entry.processingStart - entry.startTime);
+      entries.forEach((entry) => {
+        if (entry instanceof PerformanceEventTiming) {
+          handleMetric("FID", entry.processingStart - entry.startTime);
+        }
       });
     });
 
@@ -107,6 +109,7 @@ export function usePerformance({
     let clsValue = 0;
     const clsObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       entries.forEach((entry: any) => {
         if (!entry.hadRecentInput) {
           clsValue += entry.value;
@@ -128,9 +131,10 @@ export function usePerformance({
     // Monitor Navigation Timing for TTFB
     const navigationObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
-      entries.forEach((entry: any) => {
-        if (entry.responseStart && entry.requestStart) {
-          handleMetric("TTFB", entry.responseStart - entry.requestStart);
+      entries.forEach((entry) => {
+        const navEntry = entry as PerformanceNavigationTiming;
+        if (navEntry.responseStart && navEntry.requestStart) {
+          handleMetric("TTFB", navEntry.responseStart - navEntry.requestStart);
         }
       });
     });

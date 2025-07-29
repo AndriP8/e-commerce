@@ -148,10 +148,11 @@ export async function PUT(
  */
 export async function DELETE(
   _request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const cartItemId = parseInt(params.id);
+    const searchParams = await params;
+    const cartItemId = parseInt(searchParams.id);
 
     if (isNaN(cartItemId)) {
       throw new BadRequestError("Invalid cart item ID");
