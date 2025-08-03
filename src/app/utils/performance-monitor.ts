@@ -10,7 +10,7 @@ interface PerformanceMetrics {
   timestamp: number;
   operation: PerformanceOperation;
   duration: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface DetailedMetrics {
@@ -36,7 +36,7 @@ class PerformanceMonitor {
 
   end(
     operation: PerformanceOperation = "total",
-    metadata?: Record<string, any>,
+    metadata?: Record<string, unknown>,
   ): number {
     const endTime = performance.now();
     const startTime = this.timers.get(operation);
@@ -169,23 +169,6 @@ class PerformanceMonitor {
     console.log("📋 Full Breakdown:", metrics.breakdown);
     console.groupEnd();
   }
-
-  // For production analytics
-  sendToAnalytics(context: string): void {
-    const metrics = this.getDetailedMetrics();
-    const bottlenecks = this.identifyBottlenecks();
-
-    // In production, you would send this to your analytics service
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", "performance_metrics", {
-        custom_parameter_context: context,
-        custom_parameter_total_time: metrics.totalTime,
-        custom_parameter_api_time: metrics.apiResponseTime || 0,
-        custom_parameter_db_time: metrics.dbQueryTime || 0,
-        custom_parameter_bottlenecks: bottlenecks.length,
-      });
-    }
-  }
 }
 
 // Singleton instance for global use
@@ -195,7 +178,7 @@ export const performanceMonitor = new PerformanceMonitor();
 export async function measureAsync<T>(
   operation: PerformanceOperation,
   asyncFn: () => Promise<T>,
-  metadata?: Record<string, any>,
+  metadata?: Record<string, unknown>,
 ): Promise<T> {
   performanceMonitor.start(operation);
   try {
@@ -212,7 +195,7 @@ export async function measureAsync<T>(
 export function measureSync<T>(
   operation: PerformanceOperation,
   syncFn: () => T,
-  metadata?: Record<string, any>,
+  metadata?: Record<string, unknown>,
 ): T {
   performanceMonitor.start(operation);
   try {
