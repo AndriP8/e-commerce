@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { ProductsResponse } from "../../types/product-types";
+import { ProductsResponse } from "@/app/types/product-types";
 import ProductList from "./components/ProductList";
 import { Metadata } from "next";
 

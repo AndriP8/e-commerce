@@ -21,7 +21,7 @@ export type Product = Omit<Products, "seller_id" | "category_id"> & {
 };
 
 export type ProductsResponse = {
-  data: Product[];
+  data: Omit<Product, "product_rating" | "product_review_count" | "seller">[];
   currency: Currencies;
   pagination: {
     total: number;

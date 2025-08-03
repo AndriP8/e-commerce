@@ -9,7 +9,6 @@ import Navbar from "./components/Navbar";
 import { Toaster } from "sonner";
 import { cookies } from "next/headers";
 import { WebVitals } from "../components/WebVitals";
-import PerformanceDashboard from "../components/PerformanceDashboard";
 
 export type User = {
   id: string;
@@ -83,8 +82,8 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://cdn.andripurnomo.com" />
-        <link rel="dns-prefetch" href="https://cdn.andripurnomo.com" />
+        <link rel="preconnect" href={process.env.NEXT_PUBLIC_CDN_URL} />
+        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_CDN_URL} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -101,7 +100,6 @@ export default async function RootLayout({
             </NuqsAdapter>
           </CurrencyProvider>
         </AuthProvider>
-        <PerformanceDashboard />
       </body>
     </html>
   );
