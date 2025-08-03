@@ -81,27 +81,30 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(
 
 interface CurrencyProviderProps {
   children: ReactNode;
+  initialCurrencies?: Currencies[];
+  initialSelectedCurrency?: SelectedCurrency;
 }
 
-export function CurrencyProvider({ children }: CurrencyProviderProps) {
-  const [state, dispatch] = useReducer(currencyReducer, initialState);
+export function CurrencyProvider({ 
+  children, 
+  initialCurrencies = [], 
+  initialSelectedCurrency 
+}: CurrencyProviderProps) {
+  const [state, dispatch] = useReducer(currencyReducer, {
+    ...initialState,
+    availableCurrencies: initialCurrencies,
+    selectedCurrency: initialSelectedCurrency || initialState.selectedCurrency,
+  });
   const router = useRouter();
 
-  // Load currencies and user preference on mount
+  // Load user preference on mount (currencies are now server-side)
   useEffect(() => {
-    loadInitialData();
+    loadUserPreference();
   }, []);
 
-  const loadInitialData = async () => {
+  const loadUserPreference = async () => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      // Load available currencies
-      const currenciesResponse = await fetch("/api/currencies");
-      if (currenciesResponse.ok) {
-        const currencies = await currenciesResponse.json();
-        dispatch({ type: "SET_AVAILABLE_CURRENCIES", payload: currencies });
-      }
-
       // Load user's preferred currency (if authenticated)
       const userCurrencyResponse = await fetch("/api/user/currency-preference");
       if (userCurrencyResponse.ok) {
@@ -113,15 +116,15 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
         });
       }
     } catch (error) {
-      dispatch({ type: "SET_ERROR", payload: "Failed to load currency data" });
-      console.error("Error loading currency data:", error);
+      dispatch({ type: "SET_ERROR", payload: "Failed to load currency preference" });
+      console.error("Error loading currency preference:", error);
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
   };
 
   const refreshCurrencies = async () => {
-    await loadInitialData();
+    await loadUserPreference();
   };
 
   const changeCurrency = async (currency: SelectedCurrency) => {

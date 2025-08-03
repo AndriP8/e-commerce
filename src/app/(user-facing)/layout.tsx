@@ -47,10 +47,10 @@ export const metadata: Metadata = {
   },
 };
 
-const fetchUser = async (): Promise<{ data: { user: User } } | null> => {
+const fetchUser = async (
+  token: string,
+): Promise<{ data: { user: User } } | null> => {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
     if (!token) {
       return null;
     }
@@ -73,12 +73,64 @@ const fetchUser = async (): Promise<{ data: { user: User } } | null> => {
   }
 };
 
+const fetchCurrencies = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/currencies`,
+      {
+        cache: "force-cache",
+        next: { revalidate: 3600 }, // Revalidate every hour
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch currencies");
+    }
+    const currencies = await response.json();
+    return currencies;
+  } catch (error) {
+    console.error("Failed to fetch currencies:", error);
+    return [];
+  }
+};
+
+const fetchUserCurrencyPreference = async (token?: string) => {
+  try {
+    if (!token) {
+      return null;
+    }
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/currency-preference`,
+      {
+        headers: {
+          Cookie: `token=${token}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user currency preference");
+    }
+
+    const data = await response.json();
+    return data.currency;
+  } catch (error) {
+    console.error("Failed to fetch user currency preference:", error);
+    return null;
+  }
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const response = await fetchUser();
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value || "";
+  const response = await fetchUser(token);
+  const currencies = await fetchCurrencies();
+
+  const userCurrency = await fetchUserCurrencyPreference(token);
+
   return (
     <html lang="en">
       <head>
@@ -91,7 +143,10 @@ export default async function RootLayout({
         <WebVitals />
         <Toaster />
         <AuthProvider initialUser={response?.data.user || null}>
-          <CurrencyProvider>
+          <CurrencyProvider
+            initialCurrencies={currencies}
+            initialSelectedCurrency={userCurrency || undefined}
+          >
             <NuqsAdapter>
               <div className="min-h-screen flex flex-col">
                 <Navbar />
