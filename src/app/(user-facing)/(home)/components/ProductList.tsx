@@ -51,9 +51,13 @@ export default function ProductList({
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.data.map((product) => (
+            {products.data.map((product, index) => (
               <Suspense key={product.id} fallback={<ProductListSkeleton />}>
-                <ProductCart product={product} currency={products.currency} />
+                <ProductCart
+                  product={product}
+                  currency={products.currency}
+                  priority={index < 4} // Only first 4 products get priority
+                />
               </Suspense>
             ))}
           </div>

@@ -68,26 +68,10 @@ export default async function Page({
   const params = await searchParams;
   const products = await getProducts({ search: params.search, cookieCurrency });
 
-  // Preload critical images for LCP optimization
-  const criticalProducts = products.data?.slice(0, 4) || [];
-
   return (
-    <>
-      {/* Preload critical product images */}
-      {criticalProducts.map((product) => (
-        <link
-          key={`preload-${product.id}`}
-          rel="preload"
-          as="image"
-          href={`${process.env.NEXT_PUBLIC_CDN_URL}/${product.category?.image_url}`}
-          imageSizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-        />
-      ))}
-
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-8 text-gray-900">Our Products</h1>
-        <ProductList products={products} />
-      </main>
-    </>
+    <main className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-8 text-gray-900">Our Products</h1>
+      <ProductList products={products} />
+    </main>
   );
 }
