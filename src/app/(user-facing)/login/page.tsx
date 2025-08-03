@@ -4,9 +4,11 @@ import { useState, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -26,23 +28,11 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+      const success = await login(formData.email, formData.password);
+      if (success) {
+        router.push("/");
+        router.refresh();
       }
-
-      toast.success("Login successful");
-      router.push("/");
-      router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed");
     } finally {

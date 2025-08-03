@@ -15,6 +15,12 @@ type ContextType = {
   isAuthenticated: boolean;
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
+  register: (userData: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+  }) => Promise<boolean>;
   logout: () => Promise<boolean>;
   isLoading: boolean;
 };
@@ -79,7 +85,15 @@ export const AuthProvider = ({
       }
 
       const data = await response.json();
-      setUser(data.user);
+      // Fetch complete user data after login
+      const userResponse = await fetch("/api/auth/me");
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        setUser(userData.data.user);
+      } else {
+        // Fallback to basic user data if /me fails
+        setUser(data.user);
+      }
       toast.success("Logged in successfully!");
       return true;
     } catch (error) {
@@ -111,11 +125,48 @@ export const AuthProvider = ({
       return false;
     }
   };
+
+  const register = async (userData: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+  }) => {
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Registration failed");
+        return false;
+      }
+
+      // Fetch complete user data after registration
+      const userResponse = await fetch("/api/auth/me");
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        setUser(userData.data.user);
+      }
+      toast.success("Registration successful!");
+      return true;
+    } catch (error) {
+      console.error("Registration failed:", error);
+      toast.error("An unexpected error occurred during registration.");
+      return false;
+    }
+  };
   const value = {
     isAuthenticated: !!user,
     user,
     isLoading,
     login,
+    register,
     logout,
   };
 
