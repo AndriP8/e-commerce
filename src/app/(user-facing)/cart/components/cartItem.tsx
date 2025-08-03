@@ -29,16 +29,18 @@ export default function CartItem({
   const shouldUpdateRef = useRef(false);
 
   // Debounced quantity change handler
-  const handleQuantityChange = debounce((newQuantity: string) => {
-    const num = Number(newQuantity);
-    if (isNaN(num) || num < 1) {
-      dispatch({ type: "SET_QUANTITY", payload: "1" });
-      dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: "1" });
-    } else {
-      dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: newQuantity });
+  const handleQuantityChange = useCallback(
+    debounce((newQuantity: string) => {
+      const num = Number(newQuantity);
+      if (isNaN(num) || num < 1) {
+        dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: "1" });
+      } else {
+        dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: newQuantity });
+      }
       shouldUpdateRef.current = true;
-    }
-  }, 200);
+    }, 500),
+    [],
+  );
 
   // Handle quantity update
   const handleUpdateQuantity = useCallback(async () => {
@@ -56,7 +58,9 @@ export default function CartItem({
       );
 
       if (result.success) {
-        dispatch({ type: "SET_QUANTITY", payload: debouncedQuantity });
+        if (debouncedQuantity !== quantity) {
+          dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: quantity });
+        }
       } else {
         toast.error(result.error || "Failed to update cart quantity");
         dispatch({
@@ -74,7 +78,7 @@ export default function CartItem({
     } finally {
       dispatch({ type: "SET_UPDATING", payload: false });
     }
-  }, [item.id, item.quantity, debouncedQuantity, isUpdating]);
+  }, [item.id, item.quantity, debouncedQuantity, quantity, isUpdating]);
 
   // Handle item deletion
   const handleDeleteItem = async () => {
@@ -121,6 +125,7 @@ export default function CartItem({
         <div className="mt-2 flex items-center gap-2">
           <button
             className="px-2 py-1 border rounded"
+            disabled={isUpdating}
             onClick={() => {
               const newQuantity = Number(quantity) - 1;
               if (newQuantity >= 1) {
@@ -137,6 +142,7 @@ export default function CartItem({
           <input
             type="number"
             value={quantity}
+            disabled={isUpdating}
             onChange={(e) => {
               const value = e.target.value;
               dispatch({ type: "SET_QUANTITY", payload: value });
@@ -155,6 +161,7 @@ export default function CartItem({
           />
           <button
             className="px-2 py-1 border rounded"
+            disabled={isUpdating}
             onClick={() => {
               const newQuantity = Number(quantity) + 1;
               dispatch({
