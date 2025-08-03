@@ -1,14 +1,9 @@
-"use client";
-
-import { useState } from "react";
 import Image from "next/image";
 import { ProductsResponse } from "@/app/types/product-types";
-import { toast } from "sonner";
-import { useAuth } from "@/app/contexts/AuthContext";
 import Link from "next/link";
 import { formatPrice } from "@/app/utils/format-price-currency";
 import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/app/constants/images";
-import { addToCartAction, redirectToLogin } from "@/app/actions/cart-actions";
+import AddToCartButton from "./AddToCartButton";
 
 interface ProductCartProps {
   product: ProductsResponse["data"][number];
@@ -21,38 +16,6 @@ export default function ProductCart({
   currency,
   priority = false,
 }: ProductCartProps) {
-  const [isAdding, setIsAdding] = useState(false);
-  const { isAuthenticated } = useAuth();
-
-  const addToCart = async (productId: string) => {
-    // Check if user is authenticated
-    if (!isAuthenticated) {
-      toast.error("Please login to add items to your cart");
-      await redirectToLogin();
-      return;
-    }
-
-    setIsAdding(true);
-    try {
-      const result = await addToCartAction(productId, 1);
-
-      if (result.success) {
-        toast.success(result.message || "Product added to cart!");
-      } else {
-        toast.error(result.error || "Failed to add product to cart");
-
-        if (result.error?.includes("Authentication required")) {
-          await redirectToLogin();
-        }
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      toast.error("Failed to add product to cart");
-    } finally {
-      setIsAdding(false);
-    }
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <Link href={`/products/${product.id}`} className="block">
@@ -86,13 +49,7 @@ export default function ProductCart({
             {formatPrice(parseFloat(product.base_price), currency)}
           </span>
         </div>
-        <button
-          onClick={() => addToCart(product.id)}
-          disabled={isAdding}
-          className="bg-blue-600 text-white px-4 w-full py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isAdding ? "Adding..." : "Add to Cart"}
-        </button>
+        <AddToCartButton productId={product.id} />
       </div>
     </div>
   );

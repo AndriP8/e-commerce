@@ -71,7 +71,10 @@ export default async function Page({
   return (
     <main className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-8 text-gray-900">Our Products</h1>
-      <ProductList products={products} />
+      <ProductList 
+        products={products} 
+        searchParams={{ search: typeof params.search === 'string' ? params.search : undefined }}
+      />
     </main>
   );
 }
