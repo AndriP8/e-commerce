@@ -93,25 +93,20 @@ export const transformProductData = (row: ProductRow): TransformedProduct => ({
     business_name: row.seller_business_name,
     description: row.seller_description,
     logo_url: row.seller_logo_url,
-    rating: Number(row.seller_rating),
-    total_reviews: row.seller_total_reviews,
+    rating: Number(row.seller_rating) || 0,
+    total_reviews: row.seller_total_reviews || 0,
     is_verified: row.seller_is_verified,
   },
   rating: {
-    average: parseFloat(row.product_rating),
-    count: Number(row.product_review_count),
+    average: row.product_rating ? parseFloat(String(row.product_rating)) : 0,
+    count: Number(row.product_review_count) || 0,
   },
   stock: {
-    total_quantity: Number(row.total_stock),
-    variant_count: Number(row.variant_count),
+    total_quantity: Number(row.total_stock) || 0,
+    variant_count: Number(row.variant_count) || 0,
   },
 });
 
-/**
- * Builds SQL WHERE conditions based on product filters
- * @param filters Object containing filter parameters
- * @returns Object with whereConditions array and queryParams array
- */
 /**
  * Query builder return type
  */
