@@ -1,6 +1,76 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * Raw database row structure from product queries
+ */
+export interface ProductRow {
+  id: number;
+  name: string;
+  description: string;
+  base_price: string | number;
+  sku: string;
+  brand: string;
+  weight: string | number;
+  dimensions: string;
+  is_active: boolean;
+  created_at: Date | string;
+  updated_at: Date | string;
+  category_id: number;
+  category_name: string;
+  category_description: string;
+  category_image_url: string;
+  seller_id?: number;
+  seller_business_name?: string;
+  seller_description?: string;
+  seller_logo_url?: string;
+  seller_rating?: string | number;
+  seller_total_reviews?: number;
+  seller_is_verified?: boolean;
+  product_rating?: string | number;
+  product_review_count?: number;
+  total_stock?: string | number;
+  variant_count?: string | number;
+}
 
-export const transformProductData = (row: any) => ({
+/**
+ * Transformed product data structure
+ */
+export interface TransformedProduct {
+  id: number;
+  name: string;
+  description: string;
+  base_price: number;
+  sku: string;
+  brand: string;
+  weight: number;
+  dimensions: string;
+  is_active: boolean;
+  created_at: Date | string;
+  updated_at: Date | string;
+  category: {
+    id: number;
+    name: string;
+    description: string;
+    image_url: string;
+  };
+  seller: {
+    id?: number;
+    business_name?: string;
+    description?: string;
+    logo_url?: string;
+    rating?: number;
+    total_reviews?: number;
+    is_verified?: boolean;
+  };
+  rating: {
+    average: number;
+    count: number;
+  };
+  stock: {
+    total_quantity: number;
+    variant_count: number;
+  };
+}
+
+export const transformProductData = (row: ProductRow): TransformedProduct => ({
   id: row.id,
   name: row.name,
   description: row.description,
@@ -42,9 +112,18 @@ export const transformProductData = (row: any) => ({
  * @param filters Object containing filter parameters
  * @returns Object with whereConditions array and queryParams array
  */
-export const buildProductFilterConditions = (filters: ProductFilters) => {
+/**
+ * Query builder return type
+ */
+export interface FilterConditionsResult {
+  whereConditions: string[];
+  queryParams: (string | number | boolean)[];
+  paramCounter: number;
+}
+
+export const buildProductFilterConditions = (filters: ProductFilters): FilterConditionsResult => {
   const whereConditions = ["p.is_active = true"];
-  const queryParams: any[] = [];
+  const queryParams: (string | number | boolean)[] = [];
   let paramCounter = 1;
 
   if (filters.category_id) {
