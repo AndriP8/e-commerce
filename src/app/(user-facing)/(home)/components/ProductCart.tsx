@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { ProductsResponse } from "@/app/types/product-types";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatPrice } from "@/app/utils/format-price-currency";
 import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/app/constants/images";
 import AddToCartButton from "./AddToCartButton";
@@ -16,9 +19,20 @@ export default function ProductCart({
   currency,
   priority = false,
 }: ProductCartProps) {
+  const router = useRouter();
+  const productUrl = `/products/${product.id}`;
+
+  const handlePrefetch = () => {
+    // Prefetch product detail page on hover for faster navigation
+    router.prefetch(productUrl);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <Link href={`/products/${product.id}`} className="block">
+    <div
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+      onMouseEnter={handlePrefetch}
+    >
+      <Link href={productUrl} className="block" prefetch={true}>
         <div className="relative aspect-square w-full bg-gray-100">
           <Image
             src={`${process.env.NEXT_PUBLIC_CDN_URL}/${product.category?.image_url}`}
@@ -35,7 +49,7 @@ export default function ProductCart({
       </Link>
 
       <div className="p-4 space-y-4">
-        <Link href={`/products/${product.id}`}>
+        <Link href={productUrl} prefetch={true}>
           <h3 className="font-semibold text-lg mb-2transition-colors line-clamp-2">
             {product.name}
           </h3>
