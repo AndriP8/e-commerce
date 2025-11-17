@@ -10,6 +10,8 @@ import { cookies } from "next/headers";
 import { getPreferenceCurrency } from "@/middleware";
 import { convertCartPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
+import { validateBody } from "@/app/utils/validation";
+import { addToCartSchema } from "@/app/schemas/cart";
 
 /**
  * GET /api/cart/products
@@ -149,18 +151,8 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-
-    const { product_id, quantity } = body;
-
-    // Validate input parameters
-    if (!product_id || isNaN(Number(product_id))) {
-      throw new BadRequestError("Valid product_id is required");
-    }
-
-    if (!quantity || isNaN(Number(quantity)) || Number(quantity) < 1) {
-      throw new BadRequestError("Valid quantity is required (minimum 1)");
-    }
+    // Validate request body with Zod schema
+    const { product_id, quantity } = await validateBody(request, addToCartSchema);
 
     // Get the token from cookies
     const cookieStore = await cookies();

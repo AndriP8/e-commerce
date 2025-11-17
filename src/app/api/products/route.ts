@@ -12,6 +12,8 @@ import { handleApiError, BadRequestError } from "@/app/utils/api-error-handler";
 import { getPreferenceCurrency } from "@/middleware";
 import { convertProductPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
+import { validateQuery } from "@/app/utils/validation";
+import { productFiltersSchemaRefined } from "@/app/schemas/products";
 
 /**
  * Aggregate data from database queries
@@ -56,36 +58,35 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // Pagination parameters
-    const page = parseInt(searchParams.get("page") || "1");
-    const size = parseInt(searchParams.get("size") || "10");
+    // Validate and parse query parameters with Zod schema
+    const validatedParams = validateQuery(searchParams, productFiltersSchemaRefined);
+
+    const {
+      page,
+      size,
+      category_id,
+      seller_id,
+      min_price,
+      max_price,
+      brand,
+      search,
+      in_stock,
+      sort_by,
+      sort_order,
+    } = validatedParams;
+
     const offset = (page - 1) * size;
 
-    // Filtering parameters
+    // Build filters object for query builder
     const filters: ProductFilters = {
-      category_id: searchParams.get("category_id")
-        ? parseInt(searchParams.get("category_id") as string)
-        : undefined,
-      seller_id: searchParams.get("seller_id")
-        ? parseInt(searchParams.get("seller_id") as string)
-        : undefined,
-      min_price: searchParams.get("min_price")
-        ? parseFloat(searchParams.get("min_price") as string)
-        : undefined,
-      max_price: searchParams.get("max_price")
-        ? parseFloat(searchParams.get("max_price") as string)
-        : undefined,
-      brand: searchParams.get("brand") || undefined,
-      search: searchParams.get("search") || undefined,
-      in_stock: searchParams.get("in_stock")
-        ? searchParams.get("in_stock") === "true"
-        : undefined,
+      category_id,
+      seller_id,
+      min_price,
+      max_price,
+      brand,
+      search,
+      in_stock,
     };
-
-    // Sorting parameters
-    const sort_by = searchParams.get("sort_by") || "created_at";
-    const sort_order =
-      searchParams.get("sort_order")?.toUpperCase() === "ASC" ? "ASC" : "DESC";
 
     const client = await pool.connect();
 
@@ -94,28 +95,7 @@ export async function GET(request: NextRequest) {
       const { whereConditions, queryParams, paramCounter } =
         buildProductFilterConditions(filters);
 
-      // Validate sort_by to prevent SQL injection
-      const validSortColumns = [
-        "created_at",
-        "name",
-        "base_price",
-        "product_rating",
-      ];
-
-      if (!validSortColumns.includes(sort_by)) {
-        throw new BadRequestError(
-          "Invalid sort field. Valid options: " + validSortColumns.join(", "),
-        );
-      }
-
-      if (!["ASC", "DESC"].includes(sort_order)) {
-        throw new BadRequestError(
-          "Invalid sort order. Valid options: asc, desc",
-        );
-      }
-      const sortColumn = validSortColumns.includes(sort_by)
-        ? sort_by
-        : "created_at";
+      const sortColumn = sort_by;
 
       // Optimized query with reduced JOINs and better performance
       const query = `
@@ -149,7 +129,7 @@ export async function GET(request: NextRequest) {
         
         ORDER BY ${
           sortColumn === "product_rating" ? "p.created_at" : `p.${sortColumn}`
-        } ${sort_order}
+        } ${sort_order.toUpperCase()}
         LIMIT $${paramCounter} OFFSET $${paramCounter + 1}
       `;
 

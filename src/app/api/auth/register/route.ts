@@ -10,6 +10,8 @@ import {
   BadRequestError,
   ConflictError,
 } from "@/app/utils/api-error-handler";
+import { validateBody } from "@/app/utils/validation";
+import { registerSchema } from "@/app/schemas/auth";
 
 /**
  * POST /api/auth/register
@@ -26,21 +28,11 @@ import {
  */
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { email, password, firstName, lastName } = body;
-
-    // Validate input parameters
-    if (!email) {
-      throw new BadRequestError("Email is required");
-    }
-
-    if (!password) {
-      throw new BadRequestError("Password is required");
-    }
-
-    if (password.length < 8) {
-      throw new BadRequestError("Password must be at least 8 characters long");
-    }
+    // Validate request body with Zod schema
+    const { email, password, firstName, lastName } = await validateBody(
+      request,
+      registerSchema
+    );
 
     const client = await pool.connect();
 

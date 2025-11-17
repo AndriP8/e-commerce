@@ -3,6 +3,9 @@ import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
 import { pool } from "@/app/db/client";
 import { calculateTax } from "@/app/utils/tax-utils";
+import { validateBody } from "@/app/utils/validation";
+import { createOrderSchema } from "@/app/schemas/checkout";
+import { handleApiError, UnauthorizedError } from "@/app/utils/api-error-handler";
 
 export async function POST(request: NextRequest) {
   const client = await pool.connect();
@@ -11,10 +14,7 @@ export async function POST(request: NextRequest) {
     const token = cookieStore.get("token")?.value;
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
+      throw new UnauthorizedError("Authentication required");
     }
 
     let userId: string;
@@ -22,34 +22,19 @@ export async function POST(request: NextRequest) {
       const decoded = await verifyToken(token);
       userId = decoded.userId.toString();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid authentication token" },
-        { status: 401 },
-      );
+      throw new UnauthorizedError("Invalid authentication token");
     }
 
-    const body = await request.json();
+    // Validate request body with Zod schema
     const {
       cart_id,
       address_detail,
       shipping_detail,
       shipping_address,
       payment_detail,
-    } = body;
-
-    if (
-      !cart_id ||
-      !address_detail ||
-      !shipping_detail ||
-      !payment_detail ||
-      !shipping_address.receiver_name ||
-      !shipping_address.receiver_phone
-    ) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
-    }
+      billing_address,
+      notes,
+    } = await validateBody(request, createOrderSchema);
 
     // Start a transaction
     await client.query("BEGIN");
@@ -213,9 +198,10 @@ export async function POST(request: NextRequest) {
     // Rollback the transaction in case of error
     await client.query("ROLLBACK");
     console.error("Error creating order:", error);
+    const apiError = handleApiError(error);
     return NextResponse.json(
-      { error: "Failed to create order" },
-      { status: 500 },
+      { error: apiError.message },
+      { status: apiError.status },
     );
   } finally {
     client.release();

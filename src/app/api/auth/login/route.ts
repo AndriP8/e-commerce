@@ -10,6 +10,8 @@ import {
   BadRequestError,
   UnauthorizedError,
 } from "@/app/utils/api-error-handler";
+import { validateBody } from "@/app/utils/validation";
+import { loginSchema } from "@/app/schemas/auth";
 
 /**
  * POST /api/auth/login
@@ -24,17 +26,8 @@ import {
  */
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { email, password } = body;
-
-    // Validate input parameters
-    if (!email) {
-      throw new BadRequestError("Email is required");
-    }
-
-    if (!password) {
-      throw new BadRequestError("Password is required");
-    }
+    // Validate request body with Zod schema
+    const { email, password } = await validateBody(request, loginSchema);
 
     const client = await pool.connect();
 

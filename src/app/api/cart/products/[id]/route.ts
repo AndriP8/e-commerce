@@ -5,6 +5,8 @@ import {
   BadRequestError,
   NotFoundError,
 } from "@/app/utils/api-error-handler";
+import { validateBody, validateParams } from "@/app/utils/validation";
+import { updateCartQuantitySchema, cartItemIdSchema } from "@/app/schemas/cart";
 
 /**
  * PUT /api/cart/products/[id]
@@ -20,21 +22,13 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const searchParams = await params;
-    const cartItemId = parseInt(searchParams.id);
+    const { id: idString } = await params;
 
-    if (isNaN(cartItemId)) {
-      throw new BadRequestError("Invalid cart item ID");
-    }
+    // Validate path parameter with Zod schema
+    const { id: cartItemId } = validateParams({ id: idString }, cartItemIdSchema);
 
-    // Parse the request body
-    const body = await request.json();
-    const { quantity } = body;
-
-    // Validate the quantity
-    if (!quantity || typeof quantity !== "number" || quantity < 1) {
-      throw new BadRequestError("Quantity must be a positive number");
-    }
+    // Validate request body with Zod schema
+    const { quantity } = await validateBody(request, updateCartQuantitySchema);
 
     const client = await pool.connect();
 
@@ -151,12 +145,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const searchParams = await params;
-    const cartItemId = parseInt(searchParams.id);
+    const { id: idString } = await params;
 
-    if (isNaN(cartItemId)) {
-      throw new BadRequestError("Invalid cart item ID");
-    }
+    // Validate path parameter with Zod schema
+    const { id: cartItemId } = validateParams({ id: idString }, cartItemIdSchema);
 
     const client = await pool.connect();
 

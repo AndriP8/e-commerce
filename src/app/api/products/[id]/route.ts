@@ -7,6 +7,9 @@ import {
   convertProductVariantPrices,
 } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
+import { validateParams } from "@/app/utils/validation";
+import { productIdSchema } from "@/app/schemas/products";
+import { handleApiError } from "@/app/utils/api-error-handler";
 
 /**
  * GET /api/products/[id]
@@ -30,14 +33,12 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
-
-  // Validate ID
-  if (!id || isNaN(Number(id))) {
-    return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
-  }
-
   try {
+    const { id: idString } = await params;
+
+    // Validate and parse path parameter with Zod schema
+    const { id } = validateParams({ id: idString }, productIdSchema);
+
     const client = await pool.connect();
 
     try {
@@ -221,10 +222,11 @@ export async function GET(
       client.release();
     }
   } catch (error) {
-    console.error("Database connection error:", error);
+    console.error("Product fetch error:", error);
+    const apiError = handleApiError(error);
     return NextResponse.json(
-      { error: "Database connection failed" },
-      { status: 500 },
+      { error: apiError.message },
+      { status: apiError.status },
     );
   }
 }

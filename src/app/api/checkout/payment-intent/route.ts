@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
 import Stripe from "stripe";
+import { validateBody } from "@/app/utils/validation";
+import { createPaymentIntentSchema } from "@/app/schemas/checkout";
+import { handleApiError, UnauthorizedError } from "@/app/utils/api-error-handler";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 export async function POST(request: NextRequest) {
@@ -10,41 +13,29 @@ export async function POST(request: NextRequest) {
     const token = cookieStore.get("token")?.value;
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
+      throw new UnauthorizedError("Authentication required");
     }
 
     try {
       await verifyToken(token);
     } catch {
-      return NextResponse.json(
-        { error: "Invalid authentication token" },
-        { status: 401 },
-      );
+      throw new UnauthorizedError("Invalid authentication token");
     }
 
-    const body = await request.json();
-    const { cart_id, amount, currency } = body;
-
-    if (!cart_id || !amount || !currency) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
-    }
+    // Validate request body with Zod schema
+    const { amount, currency, metadata } = await validateBody(
+      request,
+      createPaymentIntentSchema
+    );
 
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount),
+      amount: Math.round(amount * 100), // Convert to cents
       currency: currency.toLowerCase(),
       automatic_payment_methods: {
         enabled: true,
       },
-      metadata: {
-        cart_id,
-      },
+      metadata: (metadata || {}) as Record<string, string>,
     });
 
     return NextResponse.json({
@@ -52,9 +43,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error creating payment intent:", error);
+    const apiError = handleApiError(error);
     return NextResponse.json(
-      { error: "Failed to create payment intent" },
-      { status: 500 },
+      { error: apiError.message },
+      { status: apiError.status },
     );
   }
 }
