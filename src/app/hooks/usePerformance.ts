@@ -109,10 +109,14 @@ export function usePerformance({
     let clsValue = 0;
     const clsObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      entries.forEach((entry: any) => {
-        if (!entry.hadRecentInput) {
-          clsValue += entry.value;
+      entries.forEach((entry) => {
+        // LayoutShift entry type
+        const layoutShiftEntry = entry as PerformanceEntry & {
+          hadRecentInput?: boolean;
+          value: number;
+        };
+        if (!layoutShiftEntry.hadRecentInput) {
+          clsValue += layoutShiftEntry.value;
           handleMetric("CLS", clsValue);
         }
       });

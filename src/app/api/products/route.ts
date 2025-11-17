@@ -1,16 +1,36 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse, NextRequest } from "next/server";
 
 import {
   ProductFilters,
   buildProductFilterConditions,
   transformProductData,
+  ProductRow,
+  TransformedProduct,
 } from "@/app/utils/product-utils";
 import { pool } from "@/app/db/client";
 import { handleApiError, BadRequestError } from "@/app/utils/api-error-handler";
 import { getPreferenceCurrency } from "@/middleware";
 import { convertProductPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
+
+/**
+ * Aggregate data from database queries
+ */
+interface AggregateRow {
+  id: number;
+  total_stock: string | number;
+  variant_count: string | number;
+}
+
+/**
+ * Processed product aggregate data
+ */
+interface ProductAggregate {
+  total_stock: number;
+  variant_count: number;
+}
+
+type AggregatesMap = Record<number, ProductAggregate>;
 
 /**
  * GET /api/products
@@ -145,11 +165,11 @@ export async function GET(request: NextRequest) {
       `;
 
       // Function to get aggregated data for products
-      const getProductAggregates = async (productIds: number[]) => {
+      const getProductAggregates = async (productIds: number[]): Promise<AggregatesMap> => {
         if (productIds.length === 0) return {};
 
         const aggregateQuery = `
-          SELECT 
+          SELECT
             p.id,
             COALESCE(SUM(pv.stock_quantity), 0) as total_stock,
             COUNT(DISTINCT pv.id) as variant_count
@@ -160,14 +180,14 @@ export async function GET(request: NextRequest) {
           GROUP BY p.id
         `;
 
-        const result = await client.query(aggregateQuery, [productIds]);
-        return result.rows.reduce((acc: Record<number, any>, row: any) => {
+        const result = await client.query<AggregateRow>(aggregateQuery, [productIds]);
+        return result.rows.reduce((acc: AggregatesMap, row) => {
           acc[row.id] = {
-            total_stock: parseInt(row.total_stock),
-            variant_count: parseInt(row.variant_count),
+            total_stock: parseInt(String(row.total_stock)),
+            variant_count: parseInt(String(row.variant_count)),
           };
           return acc;
-        }, {} as Record<number, any>);
+        }, {} as AggregatesMap);
       };
 
       const [productsResult, countResult] = await Promise.all([
@@ -185,8 +205,8 @@ export async function GET(request: NextRequest) {
       const aggregates = await getProductAggregates(productIds);
 
       // Transform the data to a more structured format with aggregated data
-      let products = productsResult.rows.map((row) => {
-        const productData = transformProductData(row);
+      let products: TransformedProduct[] = productsResult.rows.map((row) => {
+        const productData = transformProductData(row as ProductRow);
         const aggregate = aggregates[row.id] || {
           total_stock: 0,
           variant_count: 0,
@@ -194,7 +214,10 @@ export async function GET(request: NextRequest) {
 
         return {
           ...productData,
-          ...aggregate,
+          stock: {
+            total_quantity: aggregate.total_stock,
+            variant_count: aggregate.variant_count,
+          },
         };
       });
 

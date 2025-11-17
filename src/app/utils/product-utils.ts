@@ -1,6 +1,76 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * Raw database row structure from product queries
+ */
+export interface ProductRow {
+  id: number;
+  name: string;
+  description: string;
+  base_price: string | number;
+  sku: string;
+  brand: string;
+  weight: string | number;
+  dimensions: string;
+  is_active: boolean;
+  created_at: Date | string;
+  updated_at: Date | string;
+  category_id: number;
+  category_name: string;
+  category_description: string;
+  category_image_url: string;
+  seller_id?: number;
+  seller_business_name?: string;
+  seller_description?: string;
+  seller_logo_url?: string;
+  seller_rating?: string | number;
+  seller_total_reviews?: number;
+  seller_is_verified?: boolean;
+  product_rating?: string | number;
+  product_review_count?: number;
+  total_stock?: string | number;
+  variant_count?: string | number;
+}
 
-export const transformProductData = (row: any) => ({
+/**
+ * Transformed product data structure
+ */
+export interface TransformedProduct {
+  id: number;
+  name: string;
+  description: string;
+  base_price: number;
+  sku: string;
+  brand: string;
+  weight: number;
+  dimensions: string;
+  is_active: boolean;
+  created_at: Date | string;
+  updated_at: Date | string;
+  category: {
+    id: number;
+    name: string;
+    description: string;
+    image_url: string;
+  };
+  seller: {
+    id?: number;
+    business_name?: string;
+    description?: string;
+    logo_url?: string;
+    rating?: number;
+    total_reviews?: number;
+    is_verified?: boolean;
+  };
+  rating: {
+    average: number;
+    count: number;
+  };
+  stock: {
+    total_quantity: number;
+    variant_count: number;
+  };
+}
+
+export const transformProductData = (row: ProductRow): TransformedProduct => ({
   id: row.id,
   name: row.name,
   description: row.description,
@@ -23,28 +93,32 @@ export const transformProductData = (row: any) => ({
     business_name: row.seller_business_name,
     description: row.seller_description,
     logo_url: row.seller_logo_url,
-    rating: Number(row.seller_rating),
-    total_reviews: row.seller_total_reviews,
+    rating: Number(row.seller_rating) || 0,
+    total_reviews: row.seller_total_reviews || 0,
     is_verified: row.seller_is_verified,
   },
   rating: {
-    average: parseFloat(row.product_rating),
-    count: Number(row.product_review_count),
+    average: row.product_rating ? parseFloat(String(row.product_rating)) : 0,
+    count: Number(row.product_review_count) || 0,
   },
   stock: {
-    total_quantity: Number(row.total_stock),
-    variant_count: Number(row.variant_count),
+    total_quantity: Number(row.total_stock) || 0,
+    variant_count: Number(row.variant_count) || 0,
   },
 });
 
 /**
- * Builds SQL WHERE conditions based on product filters
- * @param filters Object containing filter parameters
- * @returns Object with whereConditions array and queryParams array
+ * Query builder return type
  */
-export const buildProductFilterConditions = (filters: ProductFilters) => {
+export interface FilterConditionsResult {
+  whereConditions: string[];
+  queryParams: (string | number | boolean)[];
+  paramCounter: number;
+}
+
+export const buildProductFilterConditions = (filters: ProductFilters): FilterConditionsResult => {
   const whereConditions = ["p.is_active = true"];
-  const queryParams: any[] = [];
+  const queryParams: (string | number | boolean)[] = [];
   let paramCounter = 1;
 
   if (filters.category_id) {
