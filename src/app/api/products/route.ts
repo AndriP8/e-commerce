@@ -14,6 +14,25 @@ import { convertProductPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 
 /**
+ * Aggregate data from database queries
+ */
+interface AggregateRow {
+  id: number;
+  total_stock: string | number;
+  variant_count: string | number;
+}
+
+/**
+ * Processed product aggregate data
+ */
+interface ProductAggregate {
+  total_stock: number;
+  variant_count: number;
+}
+
+type AggregatesMap = Record<number, ProductAggregate>;
+
+/**
  * GET /api/products
  *
  * Retrieves a list of products with pagination, filtering, and sorting
@@ -144,20 +163,6 @@ export async function GET(request: NextRequest) {
         LEFT JOIN product_variants pv2 ON p.id = pv2.product_id
         WHERE ${whereConditions.join(" AND ")}
       `;
-
-      // Types for aggregate data
-      interface AggregateRow {
-        id: number;
-        total_stock: string | number;
-        variant_count: string | number;
-      }
-
-      interface ProductAggregate {
-        total_stock: number;
-        variant_count: number;
-      }
-
-      type AggregatesMap = Record<number, ProductAggregate>;
 
       // Function to get aggregated data for products
       const getProductAggregates = async (productIds: number[]): Promise<AggregatesMap> => {
