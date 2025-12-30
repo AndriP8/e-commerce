@@ -1,6 +1,9 @@
 import { Pool } from "pg";
+import dotenv from "dotenv";
 
-// Create a connection pool using the Neon connection string
+dotenv.config();
+
+// Create a connection pool using the DATABASE_URL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
@@ -9,7 +12,7 @@ async function dropDatabase() {
   const client = await pool.connect();
 
   try {
-    console.log("🚀 Starting Neon database cleanup...\n");
+    console.log("🚀 Starting database cleanup...\n");
 
     // Begin transaction
     await client.query("BEGIN");
@@ -17,12 +20,12 @@ async function dropDatabase() {
     try {
       // Drop all tables in the public schema
       console.log("⏳ Retrieving all tables...");
-      
+
       // Get all tables in the public schema
       const tablesResult = await client.query(`
         SELECT tablename FROM pg_tables WHERE schemaname = 'public';
       `);
-      
+
       if (tablesResult.rows.length === 0) {
         console.log("ℹ️ No tables found in the database.");
       } else {
@@ -94,14 +97,14 @@ async function dropDatabase() {
 
       // Commit transaction
       await client.query("COMMIT");
-      console.log("\n🎉 Neon database cleanup completed successfully!");
+      console.log("\n🎉 Database cleanup completed successfully!");
     } catch (err) {
       // Rollback transaction on error
       await client.query("ROLLBACK");
       throw err;
     }
   } catch (err) {
-    console.error("\n💥 Error cleaning up Neon database:", err.message);
+    console.error("\n💥 Error cleaning up database:", err.message);
     process.exit(1);
   } finally {
     client.release();

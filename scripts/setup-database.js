@@ -2,12 +2,17 @@ import { Pool } from "pg";
 import { readdirSync, readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Get the directory name in ES modules
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilePath);
 
-// Create a connection pool using the Neon connection string
+console.log(process.env.POSTGRES_USER);
+
+// Create a connection pool using the DATABASE_URL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
@@ -16,7 +21,7 @@ async function setupDatabase() {
   const client = await pool.connect();
 
   try {
-    console.log("🚀 Starting Neon database setup...\n");
+    console.log("🚀 Starting database setup...\n");
 
     // Get all SQL files and sort them by name (ensures correct order)
     const sqlDir = currentDir;
@@ -68,12 +73,10 @@ async function setupDatabase() {
       throw err;
     }
 
-    console.log("\n🎉 Neon database setup completed successfully!");
+    console.log("\n🎉 Database setup completed successfully!");
   } catch (err) {
-    console.error("\n💥 Error setting up Neon database:", err.message);
-    console.error(
-      "🔄 Neon database setup failed. Please fix the errors and try again.",
-    );
+    console.error("\n💥 Error setting up database:", err.message);
+    console.error("🔄 Database setup failed. Please fix the errors and try again.");
     process.exit(1);
   } finally {
     client.release();

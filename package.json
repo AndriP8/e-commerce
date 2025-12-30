@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack --port 3001",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "setup-neon-db": "node scripts/setup-neon-database.js",
-    "drop-neon-db": "node scripts/drop-neon-database.js",
-    "reset-neon-db": "pnpm drop-neon-db && pnpm setup-neon-db"
+    "db:setup": "node scripts/setup-database.js",
+    "db:drop": "node scripts/drop-database.js",
+    "db:reset": "pnpm db:drop && pnpm db:setup"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^3.7.0",
@@ -33,9 +33,10 @@
     "@types/bcryptjs": "^3.0.0",
     "@types/cookie": "^1.0.0",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "19.1.9",
     "@types/react-dom": "19.1.7",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
     "kanel": "^3.14.1",
@@ -47,5 +48,12 @@
       "@types/react": "19.1.9",
       "@types/react-dom": "19.1.7"
     }
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "volta": {
+    "node": "22.21.1"
   }
 }
