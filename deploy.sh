@@ -152,9 +152,6 @@ run_database_migration() {
   fi
 
   log SUCCESS "Database migrations completed"
-
-  log INFO "Restarting app service..."
-  docker compose restart app
 }
 
 health_check() {
@@ -248,10 +245,10 @@ main() {
   build_docker_images
   echo ""
 
-  restart_services
+  run_database_migration
   echo ""
 
-  run_database_migration
+  restart_services
   echo ""
 
   if ! health_check; then
