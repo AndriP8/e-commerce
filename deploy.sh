@@ -145,7 +145,7 @@ run_database_migration() {
   fi
 
   # Run migrations
-  if ! docker compose run --rm app node scripts/setup-database.js; then
+  if ! docker compose run --rm app node scripts/setup-database.mjs; then
     log ERROR "Migration command failed. Showing app logs:"
     docker compose logs app
     error_exit "Database migration failed"

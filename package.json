@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:setup": "node scripts/setup-database.js",
+    "db:setup": "node scripts/setup-database.mjs",
     "db:drop": "node scripts/drop-database.js",
     "db:reset": "pnpm db:drop && pnpm db:setup"
   },
