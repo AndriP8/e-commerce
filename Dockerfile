@@ -48,6 +48,7 @@ COPY --from=builder --chown=nodejs:nodejs /app/next.config.ts ./
 COPY --from=builder --chown=nodejs:nodejs /app/package.json ./
 
 COPY --from=builder --chown=nodejs:nodejs /app/scripts ./scripts
+COPY --from=builder --chown=nodejs:nodejs /app/src ./src
 
 USER nodejs
 
