@@ -19,7 +19,8 @@ This is a full-featured e-commerce application built with Next.js, PostgreSQL, a
 
 ### Prerequisites
 
-- Node.js 18.x or higher
+- Node.js 22.x or higher
+- pnpm 10.x or higher
 - PostgreSQL database
 - Stripe account for payment processing
 
@@ -32,17 +33,36 @@ This is a full-featured e-commerce application built with Next.js, PostgreSQL, a
 pnpm install
 ```
 
-3. Set up environment variables:
-   - Copy `.env.local.example` to `.env.local`
-   - Add your Stripe API keys (get them from [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys))
+3. Set up PostgreSQL database:
 
-4. Run the development server:
+   - Install PostgreSQL locally or use Docker
+   - Create a database for the application
+   - Copy `.env.example` to `.env.local` and update `DATABASE_URL`
+
+4. Set up environment variables:
+
+   - Add your Stripe API keys (get them from [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys))
+   - Configure other required environment variables
+
+5. Initialize the database with schema and seed data:
+
+```bash
+pnpm db:setup
+```
+
+6. Run the development server:
 
 ```bash
 pnpm dev
 ```
 
 Open [http://localhost:3001](http://localhost:3001) with your browser to see the application.
+
+### Database Management
+
+- **Setup database**: `pnpm db:setup` - Creates all tables and seeds initial data
+- **Drop database**: `pnpm db:drop` - Drops all tables (use with caution!)
+- **Reset database**: `pnpm db:reset` - Drops and recreates all tables with fresh seed data
 
 ## Learn More
 
@@ -52,9 +72,3 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
