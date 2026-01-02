@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "./app/utils/auth-utils";
 
 // List of paths that don't require authentication
 const publicPaths = [
@@ -68,6 +69,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const token = request.cookies.get("token")?.value;
+  if (!token || !verifyToken(token)) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
   return NextResponse.next();
 }
 

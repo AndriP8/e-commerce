@@ -1,17 +1,26 @@
 "use client";
 
 import { useEffect, useReducer, useState } from "react";
+import dynamic from "next/dynamic";
 import { GetCartResponse } from "@/app/types/cart";
-import { Elements } from "@stripe/react-stripe-js";
 import { toast } from "sonner";
 import { initialState, checkoutReducer } from "./checkourReducer";
-import PaymentForm from "./PaymentForm";
-import { getStripe } from "@/app/utils/stripe";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
 import { CurrencyConversion } from "@/app/types/currency";
 import { formatPrice } from "@/app/utils/format-price-currency";
 
-const stripePromise = getStripe();
+// Dynamically import Stripe components only when needed
+const StripePaymentSection = dynamic(
+  () => import("./StripePaymentSection"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    ),
+  }
+);
 
 const getConversion = async ({
   amount,
@@ -833,26 +842,17 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
         <div className="space-y-6">
           <h2 className="text-xl font-bold mb-4">Payment</h2>
           {state.clientSecret ? (
-            <Elements
-              stripe={stripePromise}
-              options={{
-                clientSecret: state.clientSecret,
-                appearance: {
-                  theme: "stripe",
-                },
-              }}
-            >
-              <PaymentForm
-                cart={cart}
-                addressDetail={
-                  state.useSameForBilling
-                    ? state.addressDetail
-                    : state.billingAddress
-                }
-                shippingDetail={state.shippingDetail}
-                shippingAddress={state.addressDetail}
-              />
-            </Elements>
+            <StripePaymentSection
+              clientSecret={state.clientSecret}
+              cart={cart}
+              addressDetail={
+                state.useSameForBilling
+                  ? state.addressDetail
+                  : state.billingAddress
+              }
+              shippingDetail={state.shippingDetail}
+              shippingAddress={state.addressDetail}
+            />
           ) : (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>

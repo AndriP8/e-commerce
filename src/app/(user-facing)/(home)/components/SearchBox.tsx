@@ -25,9 +25,15 @@ export default function SearchBox({ defaultValue = "" }: SearchBoxProps) {
     () => debounce((query: string) => {
       setSearchQuery(query || null);
     }, 300),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [setSearchQuery]
   );
+
+  // Clean up debounced function on unmount
+  useEffect(() => {
+    return () => {
+      handleSearch.cancel();
+    };
+  }, [handleSearch]);
 
   return (
     <div className="relative w-1/2">
