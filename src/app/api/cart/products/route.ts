@@ -1,10 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { pool } from "@/app/db/client";
-import {
-  handleApiError,
-  BadRequestError,
-  UnauthorizedError,
-} from "@/app/utils/api-error-handler";
+import { handleApiError, BadRequestError, UnauthorizedError } from "@/app/utils/api-error-handler";
 import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
 import { getPreferenceCurrency } from "@/middleware";
@@ -95,9 +91,7 @@ export async function GET() {
         GROUP BY sc.id, sc.user_id, sc.created_at, sc.updated_at
       `;
 
-      const cartWithItemsResult = await client.query(cartWithItemsQuery, [
-        cart_id,
-      ]);
+      const cartWithItemsResult = await client.query(cartWithItemsQuery, [cart_id]);
 
       // Get the user's preferred currency from the request
       const currencyCode = await getPreferenceCurrency();
@@ -129,10 +123,7 @@ export async function GET() {
     console.error("Error retrieving cart:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json(
-      { error: apiError.message },
-      { status: apiError.status },
-    );
+    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   }
 }
 
@@ -231,12 +222,10 @@ export async function POST(request: NextRequest) {
       const cartItemQuery = `
         SELECT id, quantity FROM cart_items
         WHERE cart_id = $1 AND product_variant_id = $2
+        FOR UPDATE
       `;
 
-      const cartItemResult = await client.query(cartItemQuery, [
-        cart_id,
-        product.variant_id,
-      ]);
+      const cartItemResult = await client.query(cartItemQuery, [cart_id, product.variant_id]);
 
       if (cartItemResult.rows.length > 0) {
         // Update existing cart item
@@ -245,9 +234,7 @@ export async function POST(request: NextRequest) {
 
         // Check if the new quantity exceeds available stock
         if (newQuantity > product.stock_quantity) {
-          throw new BadRequestError(
-            "Adding this quantity would exceed available stock",
-          );
+          throw new BadRequestError("Adding this quantity would exceed available stock");
         }
 
         const updateCartItemQuery = `
@@ -257,11 +244,7 @@ export async function POST(request: NextRequest) {
           RETURNING id, quantity, unit_price
         `;
 
-        await client.query(updateCartItemQuery, [
-          newQuantity,
-          product.base_price,
-          existingItem.id,
-        ]);
+        await client.query(updateCartItemQuery, [newQuantity, product.base_price, existingItem.id]);
       } else {
         // Add new cart item
         const addCartItemQuery = `
@@ -278,10 +261,9 @@ export async function POST(request: NextRequest) {
       }
 
       // Update the cart's updated_at timestamp
-      await client.query(
-        "UPDATE shopping_carts SET updated_at = CURRENT_TIMESTAMP WHERE id = $1",
-        [cart_id],
-      );
+      await client.query("UPDATE shopping_carts SET updated_at = CURRENT_TIMESTAMP WHERE id = $1", [
+        cart_id,
+      ]);
 
       // Get the updated cart with items
       const updatedCartQuery = `
@@ -324,16 +306,8 @@ export async function POST(request: NextRequest) {
       let updatedCartData = updatedCartResult.rows[0];
 
       // Convert cart prices to the user's preferred currency
-      if (
-        currencyCode &&
-        currencyCode !== "USD" &&
-        updatedCartData.items.length > 0
-      ) {
-        updatedCartData = await convertCartPrices(
-          updatedCartData,
-          currencyCode,
-          "USD",
-        );
+      if (currencyCode && currencyCode !== "USD" && updatedCartData.items.length > 0) {
+        updatedCartData = await convertCartPrices(updatedCartData, currencyCode, "USD");
       }
 
       return NextResponse.json(
@@ -355,9 +329,6 @@ export async function POST(request: NextRequest) {
     console.error("Error adding product to cart:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json(
-      { error: apiError.message },
-      { status: apiError.status },
-    );
+    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   }
 }

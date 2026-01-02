@@ -17,35 +17,26 @@ export async function POST(request: NextRequest) {
     const token = cookieStore.get("token")?.value;
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     try {
       await verifyToken(token);
     } catch {
-      return NextResponse.json(
-        { error: "Invalid authentication token" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Invalid authentication token" }, { status: 401 });
     }
 
     const body = await request.json();
     const { cart_id, amount, currency } = body;
 
     if (!cart_id || !amount || !currency) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     // Create a PaymentIntent with the order amount and currency
     const stripe = getStripeInstance();
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount),
+      amount: Math.round(amount * 100),
       currency: currency.toLowerCase(),
       automatic_payment_methods: {
         enabled: true,
@@ -60,9 +51,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error creating payment intent:", error);
-    return NextResponse.json(
-      { error: "Failed to create payment intent" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to create payment intent" }, { status: 500 });
   }
 }

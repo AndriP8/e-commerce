@@ -5,16 +5,13 @@ import { pool } from "@/app/db/client";
 import { calculateTax } from "@/app/utils/tax-utils";
 
 export async function POST(request: NextRequest) {
-  const client = await pool.connect();
+  let client;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     let userId: string;
@@ -22,20 +19,11 @@ export async function POST(request: NextRequest) {
       const decoded = await verifyToken(token);
       userId = decoded.userId.toString();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid authentication token" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Invalid authentication token" }, { status: 401 });
     }
 
     const body = await request.json();
-    const {
-      cart_id,
-      address_detail,
-      shipping_detail,
-      shipping_address,
-      payment_detail,
-    } = body;
+    const { cart_id, address_detail, shipping_detail, shipping_address, payment_detail } = body;
 
     if (
       !cart_id ||
@@ -45,11 +33,10 @@ export async function POST(request: NextRequest) {
       !shipping_address.receiver_name ||
       !shipping_address.receiver_phone
     ) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+
+    client = await pool.connect();
 
     // Start a transaction
     await client.query("BEGIN");
@@ -85,10 +72,7 @@ export async function POST(request: NextRequest) {
 
     if (shippingMethodResult.rows.length === 0) {
       await client.query("ROLLBACK");
-      return NextResponse.json(
-        { error: "Invalid shipping method" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid shipping method" }, { status: 400 });
     }
 
     const shippingMethod = shippingMethodResult.rows[0];
@@ -129,11 +113,31 @@ export async function POST(request: NextRequest) {
 
     const orderId = orderResult.rows[0].id;
 
-    // Create order items
+    // Create order items and decrement inventory
     for (const item of cartItems) {
+      const inventoryResult = await client.query(
+        `UPDATE product_variants
+         SET stock_quantity = stock_quantity - $1
+         WHERE id = $2 AND stock_quantity >= $1
+         RETURNING stock_quantity`,
+        [item.quantity, item.product_variant_id],
+      );
+
+      if (inventoryResult.rows.length === 0) {
+        await client.query("ROLLBACK");
+        return NextResponse.json(
+          {
+            error: "Insufficient stock",
+            product_variant_id: item.product_variant_id,
+            product_name: item.product_name,
+          },
+          { status: 400 },
+        );
+      }
+
       await client.query(
         `INSERT INTO order_items (
-          id, order_id, product_variant_id, seller_id, quantity, 
+          id, order_id, product_variant_id, seller_id, quantity,
           unit_price, total_price, item_status
         ) VALUES (nextval('order_items_id_seq'),$1, $2, $3, $4, $5, $6, $7)`,
         [
@@ -211,13 +215,18 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     // Rollback the transaction in case of error
-    await client.query("ROLLBACK");
+    if (client) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error("Error rolling back transaction:", rollbackError);
+      }
+    }
     console.error("Error creating order:", error);
-    return NextResponse.json(
-      { error: "Failed to create order" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
   } finally {
-    client.release();
+    if (client) {
+      client.release();
+    }
   }
 }
