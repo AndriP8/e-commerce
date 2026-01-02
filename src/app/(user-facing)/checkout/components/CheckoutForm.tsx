@@ -4,23 +4,20 @@ import { useEffect, useReducer, useState } from "react";
 import dynamic from "next/dynamic";
 import { GetCartResponse } from "@/app/types/cart";
 import { toast } from "sonner";
-import { initialState, checkoutReducer } from "./checkourReducer";
+import { initialState, checkoutReducer } from "./checkoutReducer";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
 import { CurrencyConversion } from "@/app/types/currency";
 import { formatPrice } from "@/app/utils/format-price-currency";
 
 // Dynamically import Stripe components only when needed
-const StripePaymentSection = dynamic(
-  () => import("./StripePaymentSection"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    ),
-  }
-);
+const StripePaymentSection = dynamic(() => import("./StripePaymentSection"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center p-8">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
+  ),
+});
 
 const getConversion = async ({
   amount,
@@ -78,13 +75,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
   const nextStep = () => {
     if (state.step === 1) {
       // Validate shipping address
-      const {
-        address_line1,
-        city,
-        state: stateValue,
-        postal_code,
-        country,
-      } = state.addressDetail;
+      const { address_line1, city, state: stateValue, postal_code, country } = state.addressDetail;
       if (!address_line1 || !city || !stateValue || !postal_code || !country) {
         toast.error("Please fill in all required shipping address fields");
         return;
@@ -105,13 +96,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
           postal_code,
           country,
         } = state.billingAddress;
-        if (
-          !address_line1 ||
-          !city ||
-          !stateValue ||
-          !postal_code ||
-          !country
-        ) {
+        if (!address_line1 || !city || !stateValue || !postal_code || !country) {
           toast.error("Please fill in all required billing address fields");
           return;
         }
@@ -131,10 +116,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
   const createPaymentIntent = async () => {
     dispatch({ type: "SET_LOADING", payload: true });
     dispatch({ type: "SET_ERROR", payload: null });
-    const subTotal = cart.data.items.reduce(
-      (sum, item) => sum + parseFloat(item.total_price),
-      0,
-    );
+    const subTotal = cart.data.items.reduce((sum, item) => sum + parseFloat(item.total_price), 0);
     // Include tax in the total amount
     const total = subTotal + shippingCost + tax;
 
@@ -179,9 +161,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
 
   useEffect(() => {
     getConversion({
-      amount: parseFloat(
-        shippingMethods[shippingMethods.length - 1].base_costs,
-      ),
+      amount: parseFloat(shippingMethods[shippingMethods.length - 1].base_costs),
       from: "USD",
       to: cart.currency.code,
     }).then((data) => {
@@ -204,11 +184,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             <div className="ml-2 font-medium">Shipping</div>
           </div>
           <div className="h-1 w-16 bg-gray-200 mx-2">
-            <div
-              className={`h-full ${
-                state.step >= 2 ? "bg-blue-600" : "bg-gray-200"
-              }`}
-            ></div>
+            <div className={`h-full ${state.step >= 2 ? "bg-blue-600" : "bg-gray-200"}`}></div>
           </div>
           <div className="flex items-center">
             <div
@@ -221,11 +197,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             <div className="ml-2 font-medium">Delivery</div>
           </div>
           <div className="h-1 w-16 bg-gray-200 mx-2">
-            <div
-              className={`h-full ${
-                state.step >= 3 ? "bg-blue-600" : "bg-gray-200"
-              }`}
-            ></div>
+            <div className={`h-full ${state.step >= 3 ? "bg-blue-600" : "bg-gray-200"}`}></div>
           </div>
           <div className="flex items-center">
             <div
@@ -269,9 +241,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 aria-required="true"
                 aria-labelledby="receiver_name_label"
                 aria-invalid={
-                  !state.addressDetail.receiver_name && state.step > 1
-                    ? "true"
-                    : "false"
+                  !state.addressDetail.receiver_name && state.step > 1 ? "true" : "false"
                 }
                 required
               />
@@ -302,9 +272,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 aria-required="true"
                 aria-labelledby="receiver_phone_label"
                 aria-invalid={
-                  !state.addressDetail.receiver_phone && state.step > 1
-                    ? "true"
-                    : "false"
+                  !state.addressDetail.receiver_phone && state.step > 1 ? "true" : "false"
                 }
                 required
               />
@@ -334,9 +302,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 aria-required="true"
                 aria-labelledby="address_line1_label"
                 aria-invalid={
-                  !state.addressDetail.address_line1 && state.step > 1
-                    ? "true"
-                    : "false"
+                  !state.addressDetail.address_line1 && state.step > 1 ? "true" : "false"
                 }
                 required
               />
@@ -367,11 +333,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
               />
             </div>
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                htmlFor="city"
-                id="city_label"
-              >
+              <label className="block text-sm font-medium mb-1" htmlFor="city" id="city_label">
                 City *
               </label>
               <input
@@ -390,18 +352,12 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 spellCheck="false"
                 aria-required="true"
                 aria-labelledby="city_label"
-                aria-invalid={
-                  !state.addressDetail.city && state.step > 1 ? "true" : "false"
-                }
+                aria-invalid={!state.addressDetail.city && state.step > 1 ? "true" : "false"}
                 required
               />
             </div>
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                htmlFor="state"
-                id="state_label"
-              >
+              <label className="block text-sm font-medium mb-1" htmlFor="state" id="state_label">
                 State/Province *
               </label>
               <input
@@ -418,11 +374,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 autoComplete="shipping address-level1"
                 aria-required="true"
                 aria-labelledby="state_label"
-                aria-invalid={
-                  !state.addressDetail.state && state.step > 1
-                    ? "true"
-                    : "false"
-                }
+                aria-invalid={!state.addressDetail.state && state.step > 1 ? "true" : "false"}
                 required
               />
             </div>
@@ -451,11 +403,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 inputMode="numeric"
                 aria-required="true"
                 aria-labelledby="postal_code_label"
-                aria-invalid={
-                  !state.addressDetail.postal_code && state.step > 1
-                    ? "true"
-                    : "false"
-                }
+                aria-invalid={!state.addressDetail.postal_code && state.step > 1 ? "true" : "false"}
                 required
               />
             </div>
@@ -481,11 +429,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 autoComplete="shipping country"
                 aria-required="true"
                 aria-labelledby="country_label"
-                aria-invalid={
-                  !state.addressDetail.country && state.step > 1
-                    ? "true"
-                    : "false"
-                }
+                aria-invalid={!state.addressDetail.country && state.step > 1 ? "true" : "false"}
                 required
               />
             </div>
@@ -509,9 +453,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 onClick={() => {
                   const today = new Date();
                   const deliveryDate = new Date(today);
-                  deliveryDate.setDate(
-                    today.getDate() + method.estimated_days_max,
-                  );
+                  deliveryDate.setDate(today.getDate() + method.estimated_days_max);
 
                   // Update shipping method in local state
                   dispatch({
@@ -530,9 +472,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   );
                 }}
                 role="radio"
-                aria-checked={
-                  state.shippingDetail.shipping_method_id === method.id
-                }
+                aria-checked={state.shippingDetail.shipping_method_id === method.id}
                 aria-labelledby={`shipping_method_${method.id}_name shipping_method_${method.id}_price`}
                 aria-describedby={`shipping_method_${method.id}_description`}
                 tabIndex={0}
@@ -540,9 +480,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   if (e.key === "Enter" || e.key === " ") {
                     const today = new Date();
                     const deliveryDate = new Date(today);
-                    deliveryDate.setDate(
-                      today.getDate() + method.estimated_days_max,
-                    );
+                    deliveryDate.setDate(today.getDate() + method.estimated_days_max);
 
                     dispatch({
                       type: "UPDATE_SHIPPING",
@@ -562,10 +500,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3
-                      className="font-medium"
-                      id={`shipping_method_${method.id}_name`}
-                    >
+                    <h3 className="font-medium" id={`shipping_method_${method.id}_name`}>
                       {method.name}
                     </h3>
                     <p
@@ -575,10 +510,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                       {method.description}
                     </p>
                   </div>
-                  <div
-                    className="font-medium"
-                    id={`shipping_method_${method.id}_price`}
-                  >
+                  <div className="font-medium" id={`shipping_method_${method.id}_price`}>
                     {parseFloat(method.base_costs) === 0
                       ? "Free"
                       : formatPrice(shippingCostConversion, cart.currency)}
@@ -613,10 +545,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             {!state.useSameForBilling && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="billing_receiver_name"
-                  >
+                  <label className="block text-sm font-medium mb-1" htmlFor="billing_receiver_name">
                     Receiver Name *
                   </label>
                   <input
@@ -655,10 +584,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   />
                 </div>
                 <div className="col-span-2">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="billing_address_line1"
-                  >
+                  <label className="block text-sm font-medium mb-1" htmlFor="billing_address_line1">
                     Address Line 1 *
                   </label>
                   <input
@@ -676,10 +602,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   />
                 </div>
                 <div className="col-span-2">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="billing_address_line2"
-                  >
+                  <label className="block text-sm font-medium mb-1" htmlFor="billing_address_line2">
                     Address Line 2
                   </label>
                   <input
@@ -724,9 +647,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     aria-required="true"
                     aria-labelledby="billing_city_label"
                     aria-invalid={
-                      !state.billingAddress.city &&
-                      !state.useSameForBilling &&
-                      state.step > 2
+                      !state.billingAddress.city && !state.useSameForBilling && state.step > 2
                         ? "true"
                         : "false"
                     }
@@ -756,9 +677,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     aria-required="true"
                     aria-labelledby="billing_state_label"
                     aria-invalid={
-                      !state.billingAddress.state &&
-                      !state.useSameForBilling &&
-                      state.step > 2
+                      !state.billingAddress.state && !state.useSameForBilling && state.step > 2
                         ? "true"
                         : "false"
                     }
@@ -823,9 +742,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     aria-required="true"
                     aria-labelledby="billing_country_label"
                     aria-invalid={
-                      !state.billingAddress.country &&
-                      !state.useSameForBilling &&
-                      state.step > 2
+                      !state.billingAddress.country && !state.useSameForBilling && state.step > 2
                         ? "true"
                         : "false"
                     }
@@ -845,11 +762,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             <StripePaymentSection
               clientSecret={state.clientSecret}
               cart={cart}
-              addressDetail={
-                state.useSameForBilling
-                  ? state.addressDetail
-                  : state.billingAddress
-              }
+              addressDetail={state.useSameForBilling ? state.addressDetail : state.billingAddress}
               shippingDetail={state.shippingDetail}
               shippingAddress={state.addressDetail}
             />

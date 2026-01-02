@@ -1,10 +1,6 @@
 import { GetCartResponse } from "@/app/types/cart";
-import { AddressDetail, ShippingDetail } from "./checkourReducer";
-import {
-  PaymentElement,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js";
+import { AddressDetail, ShippingDetail } from "./checkoutReducer";
+import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -67,35 +63,43 @@ export default function PaymentForm({
       const orderData = await orderResponse.json();
 
       // Confirm the payment with Stripe
-      const { error: stripeError, paymentIntent } = await stripe.confirmPayment(
-        {
-          elements,
-          confirmParams: {
-            return_url: `${window.location.origin}/order-confirmation/${orderData.order_id}`,
-          },
-          redirect: "if_required",
+      const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/order-confirmation/${orderData.order_id}`,
         },
-      );
+        redirect: "if_required",
+      });
 
       if (stripeError) {
         throw new Error(stripeError.message);
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
         // Payment succeeded, update the order payment status
-        await fetch(`/api/checkout/update-payment/${orderData.order_id}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const updatePaymentResponse = await fetch(
+          `/api/checkout/update-payment/${orderData.order_id}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              transaction_id: paymentIntent.id,
+              payment_status: "completed",
+            }),
           },
-          body: JSON.stringify({
-            transaction_id: paymentIntent.id,
-            payment_status: "completed",
-          }),
-        });
+        );
 
-        // Clear the cart after successful payment
-        await fetch(`/api/cart/clear`, {
-          method: "DELETE",
-        });
+        if (!updatePaymentResponse.ok) {
+          console.error("Failed to update payment status");
+        }
+
+        try {
+          await fetch(`/api/cart/clear`, {
+            method: "DELETE",
+          });
+        } catch (cartError) {
+          console.error("Failed to clear cart:", cartError);
+        }
 
         toast.success("Payment successful!");
         router.push(`/order-confirmation/${orderData.order_id}`);
@@ -108,25 +112,20 @@ export default function PaymentForm({
     }
   };
 
-  const subTotal = cart.data.items.reduce(
-    (sum, item) => sum + parseFloat(item.total_price),
-    0,
-  );
+  const subTotal = cart.data.items.reduce((sum, item) => sum + parseFloat(item.total_price), 0);
 
   const total = subTotal + shippingCost + tax;
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2 className="text-xl font-semibold mb-4" id="payment-section-title">Payment Information</h2>
+      <h2 className="text-xl font-semibold mb-4" id="payment-section-title">
+        Payment Information
+      </h2>
       <div aria-labelledby="payment-section-title">
-        <PaymentElement />  
+        <PaymentElement />
       </div>
       {error && (
-        <div 
-          className="text-red-600 mt-4" 
-          role="alert" 
-          aria-live="assertive"
-        >
+        <div className="text-red-600 mt-4" role="alert" aria-live="assertive">
           {error}
         </div>
       )}

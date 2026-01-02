@@ -4,7 +4,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "@/app/utils/stripe";
 import PaymentForm from "./PaymentForm";
 import { GetCartResponse } from "@/app/types/cart";
-import { AddressDetail, ShippingDetail } from "./checkourReducer";
+import { AddressDetail, ShippingDetail } from "./checkoutReducer";
 
 const stripePromise = getStripe();
 
