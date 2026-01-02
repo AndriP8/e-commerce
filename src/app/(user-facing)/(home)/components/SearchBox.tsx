@@ -2,7 +2,7 @@
 
 import { useQueryState } from "nuqs";
 import { debounce } from "@/app/utils/debounce";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 interface SearchBoxProps {
   defaultValue?: string;
@@ -21,9 +21,13 @@ export default function SearchBox({ defaultValue = "" }: SearchBoxProps) {
     setInputValue(searchQuery || "");
   }, [searchQuery]);
 
-  const handleSearch = debounce((query: string) => {
-    setSearchQuery(query || null);
-  }, 300);
+  const handleSearch = useMemo(
+    () => debounce((query: string) => {
+      setSearchQuery(query || null);
+    }, 300),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   return (
     <div className="relative w-1/2">
