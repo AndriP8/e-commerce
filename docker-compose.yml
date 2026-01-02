@@ -25,6 +25,7 @@ services:
         NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL}
         NEXT_PUBLIC_CDN_URL: ${NEXT_PUBLIC_CDN_URL}
         NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
         DATABASE_URL: ${DATABASE_URL}
     container_name: ecommerce-app
     restart: unless-stopped
