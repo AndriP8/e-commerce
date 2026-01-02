@@ -6,10 +6,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { formatPrice } from "@/app/utils/format-price-currency";
 import { DEFAULT_BLUR_DATA_URL } from "@/app/constants/images";
-import {
-  updateCartQuantityAction,
-  removeFromCartAction,
-} from "@/app/actions/cart-actions";
+import { updateCartQuantityAction, removeFromCartAction } from "@/app/actions/cart-actions";
 import { cartItemReducer, createInitialCartItemState } from "./cartItemReducer";
 
 export default function CartItem({
@@ -19,10 +16,7 @@ export default function CartItem({
   item: GetCartResponse["data"]["items"][number];
   currency: GetCartResponse["currency"];
 }) {
-  const [state, dispatch] = useReducer(
-    cartItemReducer,
-    createInitialCartItemState(item.quantity),
-  );
+  const [state, dispatch] = useReducer(cartItemReducer, createInitialCartItemState(item.quantity));
   const { quantity, debouncedQuantity, isUpdating } = state;
 
   // Use ref to track if we need to update
@@ -52,10 +46,7 @@ export default function CartItem({
 
       dispatch({ type: "SET_UPDATING", payload: true });
 
-      const result = await updateCartQuantityAction(
-        item.id,
-        Number(debouncedQuantity),
-      );
+      const result = await updateCartQuantityAction(item.id, Number(debouncedQuantity));
 
       if (result.success) {
         if (debouncedQuantity !== quantity) {
@@ -107,7 +98,7 @@ export default function CartItem({
     <div className="border rounded-lg p-4 flex gap-4 items-center">
       <div className="w-24 h-24 bg-gray-100 rounded relative">
         <Image
-          src={`${process.env.NEXT_PUBLIC_CDN_URL}/${item.image_url}`}
+          src={item.image_url || ""}
           alt={item.product_name}
           fill
           className="object-cover rounded"
@@ -119,9 +110,7 @@ export default function CartItem({
       </div>
       <div className="flex-1">
         <h3 className="font-medium">{item.product_name}</h3>
-        <p className="text-gray-600">
-          {formatPrice(parseFloat(item.total_price), currency)}
-        </p>
+        <p className="text-gray-600">{formatPrice(parseFloat(item.total_price), currency)}</p>
         <div className="mt-2 flex items-center gap-2">
           <button
             className="px-2 py-1 border rounded"
@@ -175,10 +164,7 @@ export default function CartItem({
           </button>
         </div>
       </div>
-      <button
-        className="text-red-500 hover:text-red-700 cursor-pointer"
-        onClick={handleDeleteItem}
-      >
+      <button className="text-red-500 hover:text-red-700 cursor-pointer" onClick={handleDeleteItem}>
         Remove
       </button>
     </div>

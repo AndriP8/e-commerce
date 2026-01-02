@@ -11,17 +11,13 @@ interface ProductCartProps {
   priority?: boolean;
 }
 
-export default function ProductCart({
-  product,
-  currency,
-  priority = false,
-}: ProductCartProps) {
+export default function ProductCart({ product, currency, priority = false }: ProductCartProps) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <Link href={`/products/${product.id}`} className="block">
         <div className="relative aspect-square w-full bg-gray-100">
           <Image
-            src={`${process.env.NEXT_PUBLIC_CDN_URL}/${product.category?.image_url}`}
+            src={product.category?.image_url||""}
             alt={product.name}
             fill
             className="object-cover hover:scale-105 transition-transform duration-300"
@@ -41,9 +37,7 @@ export default function ProductCart({
           </h3>
         </Link>
 
-        <p className="text-gray-600 text-sm mb-3 line-clamp-1">
-          {product.description}
-        </p>
+        <p className="text-gray-600 text-sm mb-3 line-clamp-1">{product.description}</p>
         <div>
           <span className="text-xl font-bold ">
             {formatPrice(parseFloat(product.base_price), currency)}

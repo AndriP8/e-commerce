@@ -58,9 +58,7 @@ export default async function OrderConfirmationPage({
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold mb-4">Please Login</h2>
-        <p className="text-lg mb-6">
-          You need to be logged in to view order details
-        </p>
+        <p className="text-lg mb-6">You need to be logged in to view order details</p>
         <div className="flex justify-center space-x-4">
           <Link
             href="/login"
@@ -94,13 +92,8 @@ export default async function OrderConfirmationPage({
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold mb-4">Order Not Found</h2>
-        <p className="text-lg mb-6">
-          We couldn&apos;t find the order you&apos;re looking for
-        </p>
-        <Link
-          href="/"
-          className="text-blue-600 hover:text-blue-800 font-medium"
-        >
+        <p className="text-lg mb-6">We couldn&apos;t find the order you&apos;re looking for</p>
+        <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">
           Continue Shopping
         </Link>
       </div>
@@ -121,12 +114,7 @@ export default async function OrderConfirmationPage({
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
         <h1 className="text-3xl font-bold mb-2">Order Confirmed!</h1>
@@ -143,9 +131,7 @@ export default async function OrderConfirmationPage({
           </div>
           <div className="mb-4">
             <h2 className="text-sm font-medium text-gray-500">Date</h2>
-            <p className="text-lg font-medium">
-              {new Date(order.order_date).toLocaleDateString()}
-            </p>
+            <p className="text-lg font-medium">{new Date(order.order_date).toLocaleDateString()}</p>
           </div>
           <div className="mb-4">
             <h2 className="text-sm font-medium text-gray-500">Total</h2>
@@ -154,9 +140,7 @@ export default async function OrderConfirmationPage({
             </p>
           </div>
           <div className="mb-4">
-            <h2 className="text-sm font-medium text-gray-500">
-              Payment Method
-            </h2>
+            <h2 className="text-sm font-medium text-gray-500">Payment Method</h2>
             <p className="text-lg font-medium capitalize">
               {order.payment_provider} ({order.payment_method})
             </p>
@@ -168,22 +152,16 @@ export default async function OrderConfirmationPage({
           <div className="flex items-center mb-6">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                order.payment_status === "completed"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200"
+                order.payment_status === "completed" ? "bg-green-600 text-white" : "bg-gray-200"
               }`}
             >
               1
             </div>
-            <div className="ml-2 font-medium">
-              Payment {order.payment_status}
-            </div>
+            <div className="ml-2 font-medium">Payment {order.payment_status}</div>
             <div className="h-1 w-16 bg-gray-200 mx-4">
               <div
                 className={`h-full ${
-                  order.order_status !== "pending"
-                    ? "bg-green-600"
-                    : "bg-gray-200"
+                  order.order_status !== "pending" ? "bg-green-600" : "bg-gray-200"
                 }`}
               ></div>
             </div>
@@ -237,7 +215,7 @@ export default async function OrderConfirmationPage({
                   <div className="relative w-20 h-20 bg-gray-100 rounded overflow-hidden mr-4">
                     {item.image_url && (
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_CDN_URL}/${item.image_url}`}
+                        src={item.image_url}
                         alt={item.product_name}
                         fill
                         className="object-cover"
@@ -272,29 +250,21 @@ export default async function OrderConfirmationPage({
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>
-                  {formatPrice(parseFloat(order.shipping_amount), currency)}
-                </span>
+                <span>{formatPrice(parseFloat(order.shipping_amount), currency)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax</span>
-                <span>
-                  {formatPrice(parseFloat(order.tax_amount), currency)}
-                </span>
+                <span>{formatPrice(parseFloat(order.tax_amount), currency)}</span>
               </div>
               {parseFloat(order.discount_amount) > 0 && (
                 <div className="flex justify-between text-green-600">
                   <span>Discount</span>
-                  <span>
-                    {formatPrice(parseFloat(order.discount_amount), currency)}
-                  </span>
+                  <span>{formatPrice(parseFloat(order.discount_amount), currency)}</span>
                 </div>
               )}
               <div className="border-t pt-3 mt-3 flex justify-between font-bold">
                 <span>Total</span>
-                <span>
-                  {formatPrice(parseFloat(order.total_amount), currency)}
-                </span>
+                <span>{formatPrice(parseFloat(order.total_amount), currency)}</span>
               </div>
             </div>
           </div>
@@ -303,12 +273,9 @@ export default async function OrderConfirmationPage({
             <h2 className="text-xl font-bold mb-4">Shipping Address</h2>
             <address className="not-italic">
               <p>{shippingAddress.address_line1}</p>
-              {shippingAddress.address_line2 && (
-                <p>{shippingAddress.address_line2}</p>
-              )}
+              {shippingAddress.address_line2 && <p>{shippingAddress.address_line2}</p>}
               <p>
-                {shippingAddress.city}, {shippingAddress.state}{" "}
-                {shippingAddress.postal_code}
+                {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postal_code}
               </p>
               <p>{shippingAddress.country}</p>
             </address>

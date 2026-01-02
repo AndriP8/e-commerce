@@ -13,14 +13,11 @@ type Props = {
 async function getProduct(id: string): Promise<ProductDetailResponse> {
   const cookieStore = await cookies();
   const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`,
-    {
-      headers: {
-        Cookie: `preferred_currency=${cookieCurrency}`,
-      },
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`, {
+    headers: {
+      Cookie: `preferred_currency=${cookieCurrency}`,
     },
-  );
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch product");
   }
@@ -35,21 +32,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Get the first image URL if available
   const imageUrl =
-    product.images && product.images.length > 0
-      ? `${process.env.NEXT_PUBLIC_CDN_URL}/${product.images[0].image_url}`
-      : null;
+    product.images && product.images.length > 0 ? `${product.images[0].image_url}` : null;
 
   return {
     title: `${product.name} | E-Commerce Store`,
-    description:
-      product.description || `Buy ${product.name} at our E-Commerce Store`,
-    keywords: `${product.name}, ${
-      product.category?.name || "product"
-    }, e-commerce, shopping`,
+    description: product.description || `Buy ${product.name} at our E-Commerce Store`,
+    keywords: `${product.name}, ${product.category?.name || "product"}, e-commerce, shopping`,
     openGraph: {
       title: product.name,
-      description:
-        product.description || `Buy ${product.name} at our E-Commerce Store`,
+      description: product.description || `Buy ${product.name} at our E-Commerce Store`,
       type: "website",
       url: `${baseUrl}/products/${id}`,
       images: imageUrl ? [{ url: imageUrl }] : [],
@@ -60,11 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ProductDetail({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const productData = await getProduct(id);
   const product = productData.data;
@@ -78,7 +65,7 @@ export default async function ProductDetail({
             <div className="relative h-96 w-full mb-4 rounded-lg overflow-hidden">
               {product.images && product.images.length > 0 ? (
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_CDN_URL}/${product.images[0].image_url}`}
+                  src={`${product.images[0].image_url}`}
                   alt={product.name}
                   fill
                   className="object-cover"
@@ -89,7 +76,7 @@ export default async function ProductDetail({
                 />
               ) : (
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_CDN_URL}/400x500.webp}`}
+                  src={`400x500.webp}`}
                   alt={product.name}
                   fill
                   className="object-cover"
@@ -110,7 +97,7 @@ export default async function ProductDetail({
                     className="relative h-20 rounded-md overflow-hidden cursor-pointer border hover:border-blue-500"
                   >
                     <Image
-                      src={`${process.env.NEXT_PUBLIC_CDN_URL}/${image.image_url}`}
+                      src={`${image.image_url}`}
                       alt={image.alt_text || product.name}
                       fill
                       className="object-cover"
@@ -129,9 +116,7 @@ export default async function ProductDetail({
         {/* Product Details */}
         <div>
           <div className="mb-2">
-            <span className="text-sm text-blue-600">
-              {product.category?.name}
-            </span>
+            <span className="text-sm text-blue-600">{product.category?.name}</span>
           </div>
           <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
 
@@ -142,9 +127,7 @@ export default async function ProductDetail({
                 <svg
                   key={i}
                   className={`w-5 h-5 ${
-                    i < Math.round(product.rating.average)
-                      ? "text-yellow-400"
-                      : "text-gray-300"
+                    i < Math.round(product.rating.average) ? "text-yellow-400" : "text-gray-300"
                   }`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
@@ -154,18 +137,14 @@ export default async function ProductDetail({
               ))}
             </div>
             <span className="text-sm text-gray-600 ml-2">
-              {product.rating.average.toFixed(1)} ({product.rating.count}{" "}
-              reviews)
+              {product.rating.average.toFixed(1)} ({product.rating.count} reviews)
             </span>
           </div>
 
           {/* Price */}
           <div className="mb-6">
             <span className="text-2xl font-bold">
-              {formatPrice(
-                parseFloat(product.base_price),
-                productData.currency,
-              )}
+              {formatPrice(parseFloat(product.base_price), productData.currency)}
             </span>
           </div>
 
@@ -187,10 +166,7 @@ export default async function ProductDetail({
                   >
                     <div className="font-medium">{variant.variant_name}</div>
                     <div className="text-sm text-gray-600">
-                      {formatPrice(
-                        parseFloat(variant.price),
-                        productData.currency,
-                      )}
+                      {formatPrice(parseFloat(variant.price), productData.currency)}
                     </div>
                   </div>
                 ))}
@@ -220,12 +196,9 @@ export default async function ProductDetail({
                 </div>
               )}
               <div>
-                <div className="font-medium">
-                  {product.seller?.business_name}
-                </div>
+                <div className="font-medium">{product.seller?.business_name}</div>
                 <div className="text-sm text-gray-600">
-                  {product.seller?.rating} ★ ({product.seller?.total_reviews}{" "}
-                  reviews)
+                  {product.seller?.rating} ★ ({product.seller?.total_reviews} reviews)
                 </div>
               </div>
             </div>
@@ -247,9 +220,7 @@ export default async function ProductDetail({
                       <svg
                         key={i}
                         className={`w-4 h-4 ${
-                          i < review.rating
-                            ? "text-yellow-400"
-                            : "text-gray-300"
+                          i < review.rating ? "text-yellow-400" : "text-gray-300"
                         }`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
@@ -266,13 +237,9 @@ export default async function ProductDetail({
                     {review.first_name} {review.last_name}
                   </span>
                   <span className="mx-2">•</span>
-                  <span>
-                    {new Date(review.created_at).toLocaleDateString()}
-                  </span>
+                  <span>{new Date(review.created_at).toLocaleDateString()}</span>
                   {review.is_verified_purchase && (
-                    <span className="ml-2 text-green-600">
-                      Verified Purchase
-                    </span>
+                    <span className="ml-2 text-green-600">Verified Purchase</span>
                   )}
                 </div>
               </div>
