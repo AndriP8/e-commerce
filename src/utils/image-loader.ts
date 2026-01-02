@@ -9,8 +9,15 @@ export default function cloudflareLoader({ src, width, quality }: ImageLoaderPro
   if (quality) {
     params.push(`quality=${quality}`);
   }
+
   if (process.env.NODE_ENV === "development") {
     return `${src}?${params.join("&")}`;
   }
-  return `/cdn-cgi/image/${params.join(",")}/${normalizeSrc(src)}`;
+
+  const normalizedSrc = normalizeSrc(src);
+  const cdnDomain = process.env.NEXT_PUBLIC_CDN_URL;
+
+  const imagePath = normalizedSrc.replace(`${cdnDomain}/`, "");
+
+  return `${cdnDomain}/cdn-cgi/image/${params.join(",")}/${imagePath}`;
 }
