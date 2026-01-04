@@ -7,5 +7,3 @@ export const pool = new Pool({
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 20000,
 });
-
-export const db = () => pool.connect();
