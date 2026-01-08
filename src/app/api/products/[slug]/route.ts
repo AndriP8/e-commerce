@@ -9,12 +9,12 @@ import {
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 
 /**
- * GET /api/products/[id]
+ * GET /api/products/[slug]
  *
  * Retrieves detailed information about a specific product
  *
  * Path Parameters:
- * - id: Product ID
+ * - slug: Product Slug
  *
  * @returns JSON response with product details including:
  * - Basic product information
@@ -26,15 +26,12 @@ import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
  * - Product reviews
  * - Product images
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id } = await params;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
-  // Validate ID
-  if (!id || isNaN(Number(id))) {
-    return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
+  // Validate Slug
+  if (!slug || typeof slug !== "string") {
+    return NextResponse.json({ error: "Invalid product slug" }, { status: 400 });
   }
 
   try {
@@ -53,6 +50,7 @@ export async function GET(
           p.weight, 
           p.dimensions, 
           p.is_active,
+          p.slug,
           p.created_at,
           p.updated_at,
           
@@ -85,7 +83,7 @@ export async function GET(
         LEFT JOIN reviews r ON p.id = r.product_id
         LEFT JOIN product_variants pv ON p.id = pv.product_id
         
-        WHERE p.id = $1 AND p.is_active = true
+        WHERE p.slug = $1 AND p.is_active = true
         
         GROUP BY 
           p.id, 
@@ -97,6 +95,7 @@ export async function GET(
           p.weight, 
           p.dimensions, 
           p.is_active,
+          p.slug,
           p.created_at,
           p.updated_at,
           c.id,
@@ -123,7 +122,7 @@ export async function GET(
           variant_attributes,
           is_active
         FROM product_variants
-        WHERE product_id = $1 AND is_active = true
+        WHERE product_id = (SELECT id FROM products WHERE slug = $1) AND is_active = true
       `;
 
       // Get product reviews
@@ -141,7 +140,7 @@ export async function GET(
           u.last_name
         FROM reviews r
         JOIN users u ON r.user_id = u.id
-        WHERE r.product_id = $1
+        WHERE r.product_id = (SELECT id FROM products WHERE slug = $1)
         ORDER BY r.created_at DESC
         LIMIT 10
       `;
@@ -155,23 +154,19 @@ export async function GET(
           is_primary,
           sort_order
         FROM product_images
-        WHERE product_id = $1
+        WHERE product_id = (SELECT id FROM products WHERE slug = $1)
         ORDER BY is_primary DESC, sort_order ASC
       `;
 
-      const [productResult, variantsResult, reviewsResult, imagesResult] =
-        await Promise.all([
-          client.query(query, [id]),
-          client.query(variantsQuery, [id]),
-          client.query(reviewsQuery, [id]),
-          client.query(imagesQuery, [id]),
-        ]);
+      const [productResult, variantsResult, reviewsResult, imagesResult] = await Promise.all([
+        client.query(query, [slug]),
+        client.query(variantsQuery, [slug]),
+        client.query(reviewsQuery, [slug]),
+        client.query(imagesQuery, [slug]),
+      ]);
 
       if (productResult.rows.length === 0) {
-        return NextResponse.json(
-          { error: "Product not found" },
-          { status: 404 },
-        );
+        return NextResponse.json({ error: "Product not found" }, { status: 404 });
       }
 
       // Transform the product data
@@ -182,17 +177,9 @@ export async function GET(
       const currencyCode = await getPreferenceCurrency();
       // Convert product prices to the user's preferred currency
       if (currencyCode && currencyCode !== "USD") {
-        const convertedProduct = await convertProductPrices(
-          [product],
-          currencyCode,
-          "USD",
-        );
+        const convertedProduct = await convertProductPrices([product], currencyCode, "USD");
         product = convertedProduct[0];
-        const convertedVariants = await convertProductVariantPrices(
-          variants,
-          currencyCode,
-          "USD",
-        );
+        const convertedVariants = await convertProductVariantPrices(variants, currencyCode, "USD");
         variants = convertedVariants;
       }
 
@@ -213,18 +200,12 @@ export async function GET(
       );
     } catch (error) {
       console.error("Database query error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch product" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
     } finally {
       client.release();
     }
   } catch (error) {
     console.error("Database connection error:", error);
-    return NextResponse.json(
-      { error: "Database connection failed" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
   }
 }

@@ -55,6 +55,11 @@ export async function getPreferenceCurrency(): Promise<string> {
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
+  // Redirect /products (without slug) to homepage
+  if (path === "/products") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   // Cross-Site Request Forgery (CSRF) Protection
   const csrfError = csrfProtection(request);
   if (csrfError) {

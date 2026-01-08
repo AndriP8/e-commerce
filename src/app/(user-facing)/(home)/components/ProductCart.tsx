@@ -14,10 +14,10 @@ interface ProductCartProps {
 export default function ProductCart({ product, currency, priority = false }: ProductCartProps) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <Link href={`/products/${product.id}`} className="block">
+      <Link href={`/products/${product.slug}`} className="block">
         <div className="relative aspect-square w-full bg-gray-100">
           <Image
-            src={product.category?.image_url||""}
+            src={product.category?.image_url || ""}
             alt={product.name}
             fill
             className="object-cover hover:scale-105 transition-transform duration-300"
@@ -31,7 +31,7 @@ export default function ProductCart({ product, currency, priority = false }: Pro
       </Link>
 
       <div className="p-4 space-y-4">
-        <Link href={`/products/${product.id}`}>
+        <Link href={`/products/${product.slug}`}>
           <h3 className="font-semibold text-lg mb-2transition-colors line-clamp-2">
             {product.name}
           </h3>

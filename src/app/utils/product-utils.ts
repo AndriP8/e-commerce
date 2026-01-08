@@ -11,6 +11,7 @@ export interface ProductRow {
   weight: string | number;
   dimensions: string;
   is_active: boolean;
+  slug: string;
   created_at: Date | string;
   updated_at: Date | string;
   category_id: number;
@@ -43,6 +44,7 @@ export interface TransformedProduct {
   weight: number;
   dimensions: string;
   is_active: boolean;
+  slug: string;
   created_at: Date | string;
   updated_at: Date | string;
   category: {
@@ -80,6 +82,7 @@ export const transformProductData = (row: ProductRow): TransformedProduct => ({
   weight: Number(row.weight),
   dimensions: row.dimensions,
   is_active: row.is_active,
+  slug: row.slug,
   created_at: row.created_at,
   updated_at: row.updated_at,
   category: {
@@ -152,9 +155,7 @@ export const buildProductFilterConditions = (filters: ProductFilters): FilterCon
   }
 
   if (filters.search) {
-    whereConditions.push(
-      `(p.name ILIKE $${paramCounter} OR p.description ILIKE $${paramCounter})`,
-    );
+    whereConditions.push(`(p.name ILIKE $${paramCounter} OR p.description ILIKE $${paramCounter})`);
     queryParams.push(`%${filters.search}%`);
     paramCounter++;
   }

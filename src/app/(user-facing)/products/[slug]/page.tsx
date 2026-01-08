@@ -7,13 +7,13 @@ import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/app/constants/images";
 import { Metadata } from "next";
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 };
 
-async function getProduct(id: string): Promise<ProductDetailResponse> {
+async function getProduct(slug: string): Promise<ProductDetailResponse> {
   const cookieStore = await cookies();
   const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${slug}`, {
     headers: {
       Cookie: `preferred_currency=${cookieCurrency}`,
     },
@@ -25,8 +25,8 @@ async function getProduct(id: string): Promise<ProductDetailResponse> {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const productData = await getProduct(id);
+  const { slug } = await params;
+  const productData = await getProduct(slug);
   const product = productData.data;
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -42,18 +42,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: product.name,
       description: product.description || `Buy ${product.name} at our E-Commerce Store`,
       type: "website",
-      url: `${baseUrl}/products/${id}`,
+      url: `${baseUrl}/products/${slug}`,
       images: imageUrl ? [{ url: imageUrl }] : [],
     },
     alternates: {
-      canonical: `${baseUrl}/products/${id}`,
+      canonical: `${baseUrl}/products/${slug}`,
     },
   };
 }
 
-export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const productData = await getProduct(id);
+export default async function ProductDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const productData = await getProduct(slug);
   const product = productData.data;
 
   return (
@@ -76,7 +76,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
                 />
               ) : (
                 <Image
-                  src={`400x500.webp}`}
+                  src="400x500.webp"
                   alt={product.name}
                   fill
                   className="object-cover"

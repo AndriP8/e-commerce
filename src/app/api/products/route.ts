@@ -77,30 +77,21 @@ export async function GET(request: NextRequest) {
         : undefined,
       brand: searchParams.get("brand") || undefined,
       search: searchParams.get("search") || undefined,
-      in_stock: searchParams.get("in_stock")
-        ? searchParams.get("in_stock") === "true"
-        : undefined,
+      in_stock: searchParams.get("in_stock") ? searchParams.get("in_stock") === "true" : undefined,
     };
 
     // Sorting parameters
     const sort_by = searchParams.get("sort_by") || "created_at";
-    const sort_order =
-      searchParams.get("sort_order")?.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    const sort_order = searchParams.get("sort_order")?.toUpperCase() === "ASC" ? "ASC" : "DESC";
 
     const client = await pool.connect();
 
     try {
       // Build the WHERE clause based on filters
-      const { whereConditions, queryParams, paramCounter } =
-        buildProductFilterConditions(filters);
+      const { whereConditions, queryParams, paramCounter } = buildProductFilterConditions(filters);
 
       // Validate sort_by to prevent SQL injection
-      const validSortColumns = [
-        "created_at",
-        "name",
-        "base_price",
-        "product_rating",
-      ];
+      const validSortColumns = ["created_at", "name", "base_price", "product_rating"];
 
       if (!validSortColumns.includes(sort_by)) {
         throw new BadRequestError(
@@ -109,13 +100,9 @@ export async function GET(request: NextRequest) {
       }
 
       if (!["ASC", "DESC"].includes(sort_order)) {
-        throw new BadRequestError(
-          "Invalid sort order. Valid options: asc, desc",
-        );
+        throw new BadRequestError("Invalid sort order. Valid options: asc, desc");
       }
-      const sortColumn = validSortColumns.includes(sort_by)
-        ? sort_by
-        : "created_at";
+      const sortColumn = validSortColumns.includes(sort_by) ? sort_by : "created_at";
 
       // Optimized query with reduced JOINs and better performance
       const query = `
@@ -129,6 +116,7 @@ export async function GET(request: NextRequest) {
           p.weight, 
           p.dimensions, 
           p.is_active,
+          p.slug,
           p.created_at,
           p.updated_at,
           
@@ -250,18 +238,12 @@ export async function GET(request: NextRequest) {
       console.error("Database query error:", error);
       const apiError = handleApiError(error);
 
-      return NextResponse.json(
-        { error: apiError.message },
-        { status: apiError.status },
-      );
+      return NextResponse.json({ error: apiError.message }, { status: apiError.status });
     } finally {
       client.release();
     }
   } catch (error) {
     console.error("Database connection error:", error);
-    return NextResponse.json(
-      { error: "Database connection failed" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
   }
 }
