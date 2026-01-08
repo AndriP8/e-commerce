@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "./app/utils/auth-utils";
+import { csrfProtection } from "./app/utils/csrf";
 
 // List of paths that don't require authentication
 const publicPaths = [
@@ -8,6 +8,7 @@ const publicPaths = [
   "/register",
   "/",
   "/products",
+  "/api/currencies",
   "/api/auth/login",
   "/api/auth/register",
 ];
@@ -54,6 +55,12 @@ export async function getPreferenceCurrency(): Promise<string> {
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
+  // Cross-Site Request Forgery (CSRF) Protection
+  const csrfError = csrfProtection(request);
+  if (csrfError) {
+    return csrfError;
+  }
+
   // API routes for currency conversion
   if (
     path.startsWith("/api/products") ||
@@ -69,10 +76,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get("token")?.value;
-  if (!token || !verifyToken(token)) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
   return NextResponse.next();
 }
 

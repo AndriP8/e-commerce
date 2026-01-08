@@ -1,12 +1,9 @@
-import jwt from "jsonwebtoken";
+import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { UnauthorizedError } from "./api-error-handler";
 import { pool } from "../db/client";
-
-// JWT secret key - should be in environment variables in production
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
-const JWT_EXPIRES_IN = "24h"; // Token expiration time
+import { JWT_SECRET, JWT_EXPIRES_IN } from "./jwt-secret";
 
 // Interface for user data
 export interface UserData {
@@ -25,29 +22,37 @@ export interface JwtPayload {
 /**
  * Generate a JWT token for a user
  */
-export function generateToken(user: UserData): string {
+export async function generateToken(user: UserData): Promise<string> {
   const payload: JwtPayload = {
     userId: user.id,
     email: user.email,
     userType: user.user_type,
   };
 
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  const jwt = new SignJWT({ ...payload })
+    .setExpirationTime(JWT_EXPIRES_IN)
+    .setProtectedHeader({ alg: "HS256" });
+  const token = await jwt.sign(new TextEncoder().encode(JWT_SECRET));
+  return token;
 }
 
 /**
  * Verify a JWT token
  */
-export function verifyToken(token: string): Promise<JwtPayload> {
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+export async function verifyToken(token: string): Promise<JwtPayload> {
+  return await jwtVerify<JwtPayload>(token, new TextEncoder().encode(JWT_SECRET), {
+    algorithms: ["HS256"],
+  })
+    .then(({ payload }) => {
+      return payload;
+    })
+    .catch((err) => {
       if (err) {
-        reject(new UnauthorizedError("Invalid token"));
+        throw new UnauthorizedError("Invalid token");
       } else {
-        resolve(decoded as JwtPayload);
+        throw new UnauthorizedError("Invalid token");
       }
     });
-  });
 }
 
 /**
@@ -61,10 +66,7 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * Compare a password with a hash
  */
-export async function comparePassword(
-  password: string,
-  hashedPassword: string,
-): Promise<boolean> {
+export async function comparePassword(password: string, hashedPassword: string): Promise<boolean> {
   return bcrypt.compare(password, hashedPassword);
 }
 

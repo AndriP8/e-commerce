@@ -1,10 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
-import {
-  handleApiError,
-  BadRequestError,
-  NotFoundError,
-} from "@/app/utils/api-error-handler";
+import { handleApiError, BadRequestError, NotFoundError } from "@/app/utils/api-error-handler";
 
 /**
  * PUT /api/cart/products/[id]
@@ -15,10 +11,7 @@ import {
  * @param params - The route parameters containing the cart item ID
  * @returns JSON response with updated cart information
  */
-export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const searchParams = await params;
     const cartItemId = parseInt(searchParams.id);
@@ -60,9 +53,7 @@ export async function PUT(
 
       // Check if the requested quantity is available in stock
       if (quantity > cartItem.stock_quantity) {
-        throw new BadRequestError(
-          `Only ${cartItem.stock_quantity} items available in stock`,
-        );
+        throw new BadRequestError(`Only ${cartItem.stock_quantity} items available in stock`);
       }
 
       // Update the cart item quantity
@@ -104,9 +95,7 @@ export async function PUT(
         GROUP BY sc.id, sc.user_id, sc.created_at, sc.updated_at
       `;
 
-      const updatedCartResult = await client.query(updatedCartQuery, [
-        cartItem.cart_id,
-      ]);
+      const updatedCartResult = await client.query(updatedCartQuery, [cartItem.cart_id]);
 
       // Commit the transaction
       await client.query("COMMIT");
@@ -130,10 +119,7 @@ export async function PUT(
     console.error("Error updating cart item:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json(
-      { error: apiError.message },
-      { status: apiError.status },
-    );
+    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   }
 }
 
@@ -147,7 +133,7 @@ export async function PUT(
  * @returns JSON response with updated cart information
  */
 export async function DELETE(
-  _request: Request,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -239,9 +225,6 @@ export async function DELETE(
     console.error("Error removing cart item:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json(
-      { error: apiError.message },
-      { status: apiError.status },
-    );
+    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   }
 }

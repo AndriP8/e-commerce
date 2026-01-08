@@ -89,7 +89,7 @@ export async function POST(request: Request) {
       const newUser = insertUserResult.rows[0];
 
       // Generate JWT token
-      const token = generateToken({
+      const token = await generateToken({
         id: newUser.id,
         email: newUser.email,
         user_type: newUser.user_type,
