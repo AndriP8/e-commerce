@@ -4,16 +4,14 @@ import { useReportWebVitals } from "next/web-vitals";
 
 export function WebVitals() {
   useReportWebVitals((metric) => {
-    // Log metrics in development
+    if (process.env.NODE_ENV === "production") return;
+
+    const isDisableLog = process.env.NEXT_PUBLIC_DISABLE_WEB_VITALS_LOG === "true";
+
+    if (isDisableLog) return;
+
     if (process.env.NODE_ENV === "development") {
       console.log(`[Web Vitals] ${metric.name}:`, metric);
-    }
-
-    // Send to analytics in production
-    if (process.env.NODE_ENV === "production") {
-      // You can send to your analytics service here
-      // Example: analytics.track('Web Vitals', metric);
-      // For now, we'll use a simple beacon API
     }
 
     // Track specific metrics for optimization
