@@ -8,6 +8,7 @@ import { initialState, checkoutReducer } from "./checkoutReducer";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
 import { CurrencyConversion } from "@/app/types/currency";
 import { formatPrice } from "@/app/utils/format-price-currency";
+import { useApi } from "@/app/utils/api-client";
 
 // Dynamically import Stripe components only when needed
 const StripePaymentSection = dynamic(() => import("./StripePaymentSection"), {
@@ -71,6 +72,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
   const [shippingCostConversion, setShippingCostConversion] = useState(0);
   const [state, dispatch] = useReducer(checkoutReducer, initialState);
   const { updateShippingCost, shippingCost, tax } = useCheckoutCost();
+  const api = useApi();
 
   const nextStep = () => {
     if (state.step === 1) {
@@ -121,16 +123,10 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
     const total = subTotal + shippingCost + tax;
 
     try {
-      const response = await fetch("/api/checkout/payment-intent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          cart_id: cart.data.cart_id,
-          amount: total,
-          currency: cart.currency.code,
-        }),
+      const response = await api.post("/api/checkout/payment-intent", {
+        cart_id: cart.data.cart_id,
+        amount: total,
+        currency: cart.currency.code,
       });
 
       if (!response.ok) {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const CSRF_TOKEN_COOKIE = "csrf-secret";
-const CSRF_TOKEN_HEADER = "x-csrf-token";
+export const CSRF_TOKEN_COOKIE = "csrf-secret";
+export const CSRF_TOKEN_HEADER = "x-csrf-token";
 
 export function generateCsrfToken(existingSecret?: string): {
   secret: string;

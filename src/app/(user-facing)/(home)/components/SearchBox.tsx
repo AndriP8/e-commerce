@@ -2,7 +2,7 @@
 
 import { useQueryState } from "nuqs";
 import { debounce } from "@/app/utils/debounce";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 
 interface SearchBoxProps {
   defaultValue?: string;
@@ -13,7 +13,7 @@ export default function SearchBox({ defaultValue = "" }: SearchBoxProps) {
     defaultValue: "",
     shallow: false,
   });
-  
+
   const [inputValue, setInputValue] = useState(defaultValue);
 
   // Update input value when searchQuery changes (e.g., browser back/forward)
@@ -21,11 +21,18 @@ export default function SearchBox({ defaultValue = "" }: SearchBoxProps) {
     setInputValue(searchQuery || "");
   }, [searchQuery]);
 
+  const setSearchQueryRef = useRef(setSearchQuery);
+
+  useEffect(() => {
+    setSearchQueryRef.current = setSearchQuery;
+  }, [setSearchQuery]);
+
   const handleSearch = useMemo(
-    () => debounce((query: string) => {
-      setSearchQuery(query || null);
-    }, 300),
-    [setSearchQuery]
+    () =>
+      debounce((query: string) => {
+        setSearchQueryRef.current(query || null);
+      }, 300),
+    [],
   );
 
   // Clean up debounced function on unmount

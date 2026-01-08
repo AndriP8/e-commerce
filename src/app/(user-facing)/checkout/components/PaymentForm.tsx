@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
 import { formatPrice } from "@/app/utils/format-price-currency";
+import { useApi } from "@/app/utils/api-client";
 
 interface PaymentFormProps {
   cart: GetCartResponse;
@@ -26,6 +27,7 @@ export default function PaymentForm({
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { shippingCost, tax } = useCheckoutCost();
+  const api = useApi();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -39,21 +41,15 @@ export default function PaymentForm({
 
     try {
       // Create the order first
-      const orderResponse = await fetch("/api/checkout/create-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const orderResponse = await api.post("/api/checkout/create-order", {
+        cart_id: cart.data.cart_id,
+        address_detail: addressDetail,
+        shipping_detail: shippingDetail,
+        shipping_address: shippingAddress,
+        payment_detail: {
+          payment_method: "card",
+          payment_provider: "stripe",
         },
-        body: JSON.stringify({
-          cart_id: cart.data.cart_id,
-          address_detail: addressDetail,
-          shipping_detail: shippingDetail,
-          shipping_address: shippingAddress,
-          payment_detail: {
-            payment_method: "card",
-            payment_provider: "stripe",
-          },
-        }),
       });
 
       if (!orderResponse.ok) {
@@ -75,17 +71,11 @@ export default function PaymentForm({
         throw new Error(stripeError.message);
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
         // Payment succeeded, update the order payment status
-        const updatePaymentResponse = await fetch(
+        const updatePaymentResponse = await api.post(
           `/api/checkout/update-payment/${orderData.order_id}`,
           {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              transaction_id: paymentIntent.id,
-              payment_status: "completed",
-            }),
+            transaction_id: paymentIntent.id,
+            payment_status: "completed",
           },
         );
 
@@ -94,9 +84,7 @@ export default function PaymentForm({
         }
 
         try {
-          await fetch(`/api/cart/clear`, {
-            method: "DELETE",
-          });
+          await api.delete(`/api/cart/clear`);
         } catch (cartError) {
           console.error("Failed to clear cart:", cartError);
         }

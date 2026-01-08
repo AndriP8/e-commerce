@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "../styles/performance.css";
-import { NuqsAdapter } from "nuqs/adapters/next";
-import { AuthProvider } from "../contexts/AuthContext";
-import { CurrencyProvider } from "../contexts/CurrencyContext";
+import { Providers } from "./components/Providers";
 import Navbar from "./components/Navbar";
 import { Toaster } from "sonner";
 import { cookies } from "next/headers";
@@ -47,21 +45,16 @@ export const metadata: Metadata = {
   },
 };
 
-const fetchUser = async (
-  token: string,
-): Promise<{ data: { user: User } } | null> => {
+const fetchUser = async (token: string): Promise<{ data: { user: User } } | null> => {
   try {
     if (!token) {
       return null;
     }
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/me`,
-      {
-        headers: {
-          Cookie: `token=${token}`,
-        },
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/me`, {
+      headers: {
+        Cookie: `token=${token}`,
       },
-    );
+    });
     if (!response.ok) {
       return null;
     }
@@ -75,13 +68,10 @@ const fetchUser = async (
 
 const fetchCurrencies = async () => {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/currencies`,
-      {
-        cache: "force-cache",
-        next: { revalidate: 3600 }, // Revalidate every hour
-      },
-    );
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/currencies`, {
+      cache: "force-cache",
+      next: { revalidate: 3600 }, // Revalidate every hour
+    });
     if (!response.ok) {
       throw new Error("Failed to fetch currencies");
     }
@@ -98,6 +88,7 @@ const fetchUserCurrencyPreference = async (token?: string) => {
     if (!token) {
       return null;
     }
+    console.log("Fetching user currency preference with token:", !token);
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/currency-preference`,
       {
@@ -137,24 +128,19 @@ export default async function RootLayout({
         <link rel="preconnect" href={process.env.NEXT_PUBLIC_CDN_URL} />
         <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_CDN_URL} />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <WebVitals />
         <Toaster />
-        <AuthProvider initialUser={response?.data.user || null}>
-          <CurrencyProvider
-            initialCurrencies={currencies}
-            initialSelectedCurrency={userCurrency || undefined}
-          >
-            <NuqsAdapter>
-              <div className="min-h-screen flex flex-col">
-                <Navbar />
-                {children}
-              </div>
-            </NuqsAdapter>
-          </CurrencyProvider>
-        </AuthProvider>
+        <Providers
+          initialUser={response?.data.user || null}
+          initialCurrencies={currencies}
+          initialSelectedCurrency={userCurrency || undefined}
+        >
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );

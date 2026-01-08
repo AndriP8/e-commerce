@@ -1,34 +1,39 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
-import { addToCartAction, redirectToLogin } from "@/app/actions/cart-actions";
+import { useApi } from "@/app/utils/api-client";
+import { addToCart as addToCartAction } from "@/app/utils/cart-client-actions";
 
 export default function AddToCart({ productId }: { productId: string }) {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const { isAuthenticated } = useAuth();
+  const api = useApi();
+  const router = useRouter();
 
-  const addToCart = async () => {
+  const handleAddToCart = async () => {
     if (!isAuthenticated) {
       toast.error("Please login to add items to your cart");
-      await redirectToLogin();
+      router.push("/login");
       return;
     }
 
     setIsAdding(true);
     try {
-      const result = await addToCartAction(productId, quantity);
+      const result = await addToCartAction(api, productId, quantity);
 
       if (result.success) {
         toast.success(result.message || "Product added to cart");
+        router.refresh();
       } else {
         toast.error(result.error || "Failed to add product to cart");
 
         // If authentication error, redirect to login
         if (result.error?.includes("Authentication required")) {
-          await redirectToLogin();
+          router.push("/login");
         }
       }
     } catch (error) {
@@ -60,7 +65,7 @@ export default function AddToCart({ productId }: { productId: string }) {
       </div>
 
       <button
-        onClick={addToCart}
+        onClick={handleAddToCart}
         disabled={isAdding}
         className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 disabled:bg-blue-400 flex items-center justify-center"
       >

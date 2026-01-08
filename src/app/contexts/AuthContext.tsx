@@ -10,6 +10,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { User } from "../(user-facing)/layout";
+import { useCsrf } from "./CsrfContext";
 
 type ContextType = {
   isAuthenticated: boolean;
@@ -51,6 +52,7 @@ export const AuthProvider = ({
   const [isLoading, setLoading] = useState(true);
 
   const router = useRouter();
+  const { csrfFetch } = useCsrf();
 
   const checkUser = useCallback(async () => {
     if (user) {
@@ -70,7 +72,7 @@ export const AuthProvider = ({
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await csrfFetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +107,7 @@ export const AuthProvider = ({
 
   const logout = async () => {
     try {
-      const response = await fetch("/api/auth/logout", {
+      const response = await csrfFetch("/api/auth/logout", {
         method: "POST",
       });
 
@@ -133,7 +135,7 @@ export const AuthProvider = ({
     lastName: string;
   }) => {
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await csrfFetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

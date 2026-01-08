@@ -1,12 +1,14 @@
 "use client";
 import { GetCartResponse } from "@/app/types/cart";
 import { debounce } from "@/app/utils/debounce";
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
 import { formatPrice } from "@/app/utils/format-price-currency";
 import { DEFAULT_BLUR_DATA_URL } from "@/app/constants/images";
-import { updateCartQuantityAction, removeFromCartAction } from "@/app/actions/cart-actions";
+import { useApi } from "@/app/utils/api-client";
+import { updateCartQuantity, removeFromCart } from "@/app/utils/cart-client-actions";
 import { cartItemReducer, createInitialCartItemState } from "./cartItemReducer";
 
 export default function CartItem({
@@ -18,21 +20,24 @@ export default function CartItem({
 }) {
   const [state, dispatch] = useReducer(cartItemReducer, createInitialCartItemState(item.quantity));
   const { quantity, debouncedQuantity, isUpdating } = state;
+  const api = useApi();
+  const router = useRouter();
 
   // Use ref to track if we need to update
   const shouldUpdateRef = useRef(false);
 
   // Debounced quantity change handler
-  const handleQuantityChange = useCallback(
-    debounce((newQuantity: string) => {
-      const num = Number(newQuantity);
-      if (isNaN(num) || num < 1) {
-        dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: "1" });
-      } else {
-        dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: newQuantity });
-      }
-      shouldUpdateRef.current = true;
-    }, 500),
+  const handleQuantityChange = useMemo(
+    () =>
+      debounce((newQuantity: string) => {
+        const num = Number(newQuantity);
+        if (isNaN(num) || num < 1) {
+          dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: "1" });
+        } else {
+          dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: newQuantity });
+        }
+        shouldUpdateRef.current = true;
+      }, 500),
     [],
   );
 
@@ -46,12 +51,13 @@ export default function CartItem({
 
       dispatch({ type: "SET_UPDATING", payload: true });
 
-      const result = await updateCartQuantityAction(item.id, Number(debouncedQuantity));
+      const result = await updateCartQuantity(api, item.id, Number(debouncedQuantity));
 
       if (result.success) {
         if (debouncedQuantity !== quantity) {
           dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: quantity });
         }
+        router.refresh();
       } else {
         toast.error(result.error || "Failed to update cart quantity");
         dispatch({
@@ -69,15 +75,16 @@ export default function CartItem({
     } finally {
       dispatch({ type: "SET_UPDATING", payload: false });
     }
-  }, [item.id, item.quantity, debouncedQuantity, quantity, isUpdating]);
+  }, [api, router, item.id, item.quantity, debouncedQuantity, quantity, isUpdating]);
 
   // Handle item deletion
   const handleDeleteItem = async () => {
     try {
-      const result = await removeFromCartAction(item.id);
+      const result = await removeFromCart(api, item.id);
 
       if (result.success) {
         toast.success(result.message || "Product removed from cart");
+        router.refresh();
       } else {
         toast.error(result.error || "Failed to remove product from cart");
       }
