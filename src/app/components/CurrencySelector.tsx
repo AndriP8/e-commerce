@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { SelectedCurrency, useCurrency } from "@/app/contexts/CurrencyContext";
 
 interface CurrencySelectorProps {
@@ -12,10 +12,26 @@ export default function CurrencySelector({
   className = "",
   showLabel = true,
 }: CurrencySelectorProps) {
-  const { selectedCurrency, availableCurrencies, changeCurrency, isLoading } =
-    useCurrency();
+  const { selectedCurrency, availableCurrencies, changeCurrency, isLoading } = useCurrency();
 
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   const handleCurrencyChange = async (currency: SelectedCurrency) => {
     await changeCurrency(currency);
@@ -25,20 +41,16 @@ export default function CurrencySelector({
   if (isLoading) {
     return (
       <div className={`flex items-center space-x-2 h-[38px] ${className}`}>
-        {showLabel && (
-          <span className="text-sm text-gray-600 w-full">Currency:</span>
-        )}
+        {showLabel && <span className="text-sm text-gray-600 w-full">Currency:</span>}
         <div className="animate-pulse bg-gray-200 h-8 w-full rounded"></div>
       </div>
     );
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} ref={dropdownRef}>
       {showLabel && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Currency
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
       )}
 
       <div className="relative">
@@ -51,8 +63,7 @@ export default function CurrencySelector({
         >
           <span className="flex items-center">
             <span className="ml-3 block truncate">
-              {selectedCurrency.symbol} {selectedCurrency.code} -{" "}
-              {selectedCurrency.name}
+              {selectedCurrency.symbol} {selectedCurrency.code} - {selectedCurrency.name}
             </span>
           </span>
           <span className="ml-3 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -87,9 +98,7 @@ export default function CurrencySelector({
                 <div className="flex items-center">
                   <span
                     className={`${
-                      currency.code === selectedCurrency.code
-                        ? "font-semibold"
-                        : "font-normal"
+                      currency.code === selectedCurrency.code ? "font-semibold" : "font-normal"
                     } ml-3 block truncate`}
                   >
                     {currency.symbol} {currency.code} - {currency.name}
