@@ -44,7 +44,7 @@ RUN pnpm install --prod --frozen-lockfile
 
 COPY --from=builder --chown=nodejs:nodejs /app/.next ./.next
 COPY --from=builder --chown=nodejs:nodejs /app/public ./public
-COPY --from=builder --chown=nodejs:nodejs /app/next.config.ts ./
+COPY --from=builder --chown=nodejs:nodejs /app/next.config.mjs ./
 COPY --from=builder --chown=nodejs:nodejs /app/package.json ./
 
 COPY --from=builder --chown=nodejs:nodejs /app/scripts ./scripts
