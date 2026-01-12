@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
-import {
-  handleApiError,
-  UnauthorizedError,
-} from "@/app/utils/api-error-handler";
+import { handleApiError, UnauthorizedError } from "@/app/utils/api-error-handler";
 import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
+import { revalidateTag } from "next/cache";
 
 /**
  * DELETE /api/cart/clear
@@ -64,13 +62,14 @@ export async function DELETE() {
       await client.query(deleteCartItemsQuery, [cart_id]);
 
       // Update the cart's updated_at timestamp
-      await client.query(
-        "UPDATE shopping_carts SET updated_at = CURRENT_TIMESTAMP WHERE id = $1",
-        [cart_id],
-      );
+      await client.query("UPDATE shopping_carts SET updated_at = CURRENT_TIMESTAMP WHERE id = $1", [
+        cart_id,
+      ]);
 
       // Commit the transaction
       await client.query("COMMIT");
+
+      revalidateTag("cart");
 
       return NextResponse.json(
         {
@@ -90,9 +89,6 @@ export async function DELETE() {
     console.error("Error clearing cart:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json(
-      { error: apiError.message },
-      { status: apiError.status },
-    );
+    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   }
 }

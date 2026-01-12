@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
 import { handleApiError, BadRequestError, NotFoundError } from "@/app/utils/api-error-handler";
+import { revalidateTag } from "next/cache";
 
 /**
  * PUT /api/cart/products/[id]
@@ -99,6 +100,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
       // Commit the transaction
       await client.query("COMMIT");
+
+      revalidateTag("cart");
 
       return NextResponse.json(
         {
@@ -205,6 +208,8 @@ export async function DELETE(
 
       // Commit the transaction
       await client.query("COMMIT");
+
+      revalidateTag("cart");
 
       return NextResponse.json(
         {

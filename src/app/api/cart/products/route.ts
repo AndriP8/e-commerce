@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { getPreferenceCurrency } from "@/middleware";
 import { convertCartPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
+import { revalidateTag } from "next/cache";
 
 /**
  * GET /api/cart/products
@@ -298,6 +299,8 @@ export async function POST(request: NextRequest) {
 
       // Commit the transaction
       await client.query("COMMIT");
+
+      revalidateTag("cart");
 
       // Get the user's preferred currency from the request
       const currencyCode = await getPreferenceCurrency();
