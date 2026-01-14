@@ -39,8 +39,8 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              `script-src 'self' ${
-                isDev ? "'unsafe-inline' 'unsafe-eval'" : ""
+              `script-src 'self' 'unsafe-inline' ${
+                isDev ? "'unsafe-eval'" : ""
               } https://js.stripe.com; ` +
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: https://cdn.andripurnomo.com; " +
