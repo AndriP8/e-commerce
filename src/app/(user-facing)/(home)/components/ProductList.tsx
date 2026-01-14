@@ -23,12 +23,13 @@ export default function ProductList({
         </Link>
       </header>
       <div>
+        <h2 className="text-xl font-semibold mb-6 text-gray-900">
+          {searchQuery ? `Search Results for "${searchQuery}"` : "Featured Products"}
+        </h2>
         {products.data.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Frown className="size-16 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900">
-              No products found
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900">No products found</h3>
             <p className="text-gray-500">Try adjusting your search criteria</p>
           </div>
         ) : (
