@@ -41,11 +41,11 @@ const nextConfig = {
               "default-src 'self'; " +
               `script-src 'self' 'unsafe-inline' ${
                 isDev ? "'unsafe-eval'" : ""
-              } https://js.stripe.com; ` +
+              } https://js.stripe.com https://static.cloudflareinsights.com; ` +
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: https://cdn.andripurnomo.com; " +
               "font-src 'self' data:; " +
-              "connect-src 'self' https://api.stripe.com; " +
+              "connect-src 'self' https://api.stripe.com https://cloudflareinsights.com; " +
               "frame-src https://js.stripe.com; " +
               "object-src 'none'; " +
               "base-uri 'self'; " +
@@ -57,15 +57,6 @@ const nextConfig = {
             key: "Cross-Origin-Opener-Policy",
             value: "same-origin",
           },
-          // COEP can break dev tools, only enable in production
-          ...(isDev
-            ? []
-            : [
-                {
-                  key: "Cross-Origin-Embedder-Policy",
-                  value: "require-corp",
-                },
-              ]),
           {
             key: "Cross-Origin-Resource-Policy",
             value: "same-origin",
