@@ -2,6 +2,10 @@ import { pool } from "@/app/db/client";
 import Currencies from "@/schemas/public/Currencies";
 import { cookies } from "next/headers";
 
+// In-memory cache for exchange rates (1 hour TTL)
+const exchangeRateCache = new Map<string, { rate: number; timestamp: number }>();
+const CACHE_TTL = 3600 * 1000; // 1 hour in milliseconds
+
 /**
  * Get all active currencies
  */
@@ -20,9 +24,7 @@ export async function getCurrencies(): Promise<Currencies[]> {
 /**
  * Get currency by code
  */
-export async function getCurrencyByCode(
-  code: string,
-): Promise<Currencies | null> {
+export async function getCurrencyByCode(code: string): Promise<Currencies | null> {
   const client = await pool.connect();
   try {
     const result = await client.query(
@@ -36,7 +38,7 @@ export async function getCurrencyByCode(
 }
 
 /**
- * Get exchange rate between two currencies
+ * Get exchange rate between two currencies (with caching)
  */
 export async function getExchangeRate(
   fromCurrencyCode: string,
@@ -44,6 +46,13 @@ export async function getExchangeRate(
 ): Promise<number> {
   if (fromCurrencyCode === toCurrencyCode) {
     return 1.0;
+  }
+
+  const cacheKey = `${fromCurrencyCode}_${toCurrencyCode}`;
+  const cached = exchangeRateCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.rate;
   }
 
   const client = await pool.connect();
@@ -60,7 +69,9 @@ export async function getExchangeRate(
     );
 
     if (result.rows.length > 0) {
-      return parseFloat(result.rows[0].rate);
+      const rate = parseFloat(result.rows[0].rate);
+      exchangeRateCache.set(cacheKey, { rate, timestamp: Date.now() });
+      return rate;
     }
 
     // If direct rate not found, try reverse rate
@@ -76,12 +87,12 @@ export async function getExchangeRate(
     );
 
     if (reverseResult.rows.length > 0) {
-      return parseFloat(reverseResult.rows[0].rate);
+      const rate = parseFloat(reverseResult.rows[0].rate);
+      exchangeRateCache.set(cacheKey, { rate, timestamp: Date.now() });
+      return rate;
     }
 
-    throw new Error(
-      `Exchange rate not found for ${fromCurrencyCode} to ${toCurrencyCode}`,
-    );
+    throw new Error(`Exchange rate not found for ${fromCurrencyCode} to ${toCurrencyCode}`);
   } finally {
     client.release();
   }
@@ -102,12 +113,9 @@ export async function convertPrice(
 /**
  * Get user's preferred currency
  */
-export async function getUserPreferredCurrency(
-  userId?: string,
-): Promise<Currencies> {
+export async function getUserPreferredCurrency(userId?: string): Promise<Currencies> {
   const cookieStore = await cookies();
-  const prefered_currency =
-    cookieStore.get("preferred_currency")?.value || "USD";
+  const prefered_currency = cookieStore.get("preferred_currency")?.value || "USD";
   const client = await pool.connect();
   try {
     const result = await client.query(

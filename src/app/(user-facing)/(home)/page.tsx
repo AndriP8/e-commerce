@@ -3,13 +3,13 @@ import { ProductsResponse } from "@/app/types/product-types";
 import ProductList from "./components/ProductList";
 import { Metadata } from "next";
 
+export const revalidate = 300; // 5 minutes
+
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata({
-  searchParams,
-}: Props): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const { search } = await searchParams;
 
@@ -71,9 +71,9 @@ export default async function Page({
   return (
     <main className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-8 text-gray-900">Our Products</h1>
-      <ProductList 
-        products={products} 
-        searchParams={{ search: typeof params.search === 'string' ? params.search : undefined }}
+      <ProductList
+        products={products}
+        searchParams={{ search: typeof params.search === "string" ? params.search : undefined }}
       />
     </main>
   );
