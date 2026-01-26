@@ -7,7 +7,10 @@ interface SearchBarProps {
   className?: string;
 }
 
+import { useTranslations } from "next-intl";
+
 export default function SearchBar({ className = "" }: SearchBarProps) {
+  const t = useTranslations("Home");
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
@@ -25,13 +28,13 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search products..."
+          placeholder={t("search")}
           className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
         <button
           type="submit"
           className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600"
-          aria-label="Search"
+          aria-label={t("search")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -1,6 +1,8 @@
+import createMiddleware from "next-intl/middleware";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { csrfProtection } from "./app/utils/csrf";
+import { routing } from "./i18n/routing";
 
 // List of paths that don't require authentication
 const publicPaths = [
@@ -15,11 +17,13 @@ const publicPaths = [
 
 // Function to check if the path is public
 function isPublicPath(path: string) {
+  const pathWithoutLocale = path.replace(/^\/[a-z]{2}(?=\/|$)/, "") || "/";
+
   return publicPaths.some((publicPath) => {
     if (publicPath === "/") {
-      return path === "/";
+      return pathWithoutLocale === "/";
     }
-    return path.startsWith(publicPath);
+    return pathWithoutLocale.startsWith(publicPath);
   });
 }
 
@@ -30,37 +34,36 @@ async function handleCurrencyMiddleware() {
   const cookieStore = await cookies();
   let currencyCode = cookieStore.get("preferred_currency")?.value;
 
-  // Default to USD if no currency preference found
   if (!currencyCode) {
     currencyCode = "USD";
   }
 
-  // Set the currency code in cookies
   cookieStore.set("preferred_currency", currencyCode);
 
   return response;
 }
 
-// Modified to be Edge-compatible
 export async function getPreferenceCurrency(): Promise<string> {
-  // If request is provided, get from request cookies
   const cookieStore = await cookies();
   const currencyCode = cookieStore.get("preferred_currency")?.value;
   if (currencyCode) return currencyCode;
 
-  // Default to USD
   return "USD";
 }
 
+const intlMiddleware = createMiddleware(routing);
+
 export async function middleware(request: NextRequest) {
+  const response = intlMiddleware(request);
+
   const path = request.nextUrl.pathname;
 
-  // Redirect /products (without slug) to homepage
-  if (path === "/products") {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (path === "/products" || path.match(/^\/[a-z]{2}\/products$/)) {
+    const locale = path.match(/^\/([a-z]{2})\//)?.[1] || "";
+    const redirectPath = locale ? `/${locale}` : "/";
+    return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
-  // Cross-Site Request Forgery (CSRF) Protection
   const csrfError = csrfProtection(request);
   if (csrfError) {
     return csrfError;
@@ -76,12 +79,11 @@ export async function middleware(request: NextRequest) {
     return handleCurrencyMiddleware();
   }
 
-  // Allow public paths without authentication
   if (isPublicPath(path)) {
-    return NextResponse.next();
+    return response;
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 // Configure the middleware to run on specific paths
@@ -92,7 +94,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - api (API routes)
      */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

@@ -1,15 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { User } from "../(user-facing)/layout";
+import { User } from "../[locale]/(user-facing)/layout";
 import { useCsrf } from "./CsrfContext";
 
 type ContextType = {
