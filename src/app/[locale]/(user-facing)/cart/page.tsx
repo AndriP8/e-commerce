@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import { CartItemSkeleton } from "@/app/components/Skeleton";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import CheckoutPrefetcher from "./components/CheckoutPrefetcher";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -118,6 +119,8 @@ export default async function CartPage({ params }: Props) {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <CheckoutPrefetcher />
+
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-8">
         <Link
