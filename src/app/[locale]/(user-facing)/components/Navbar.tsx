@@ -3,9 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/app/contexts/AuthContext";
-import CurrencySelector from "@/app/components/CurrencySelector";
 import SearchBar from "@/app/components/SearchBar";
-import LanguageSwitcher from "@/app/components/LanguageSwitcher";
+import RegionalSettings from "@/app/components/RegionalSettings";
 import { useTranslations } from "next-intl";
 
 export default function Navbar() {
@@ -109,10 +108,7 @@ export default function Navbar() {
                       {t("myOrders")}
                     </Link>
                     <div className="py-2">
-                      <CurrencySelector className="w-full" showLabel={true} />
-                    </div>
-                    <div className="py-2">
-                      <LanguageSwitcher />
+                      <RegionalSettings className="w-full" />
                     </div>
                     <button
                       onClick={() => {
@@ -141,10 +137,7 @@ export default function Navbar() {
                       {t("register")}
                     </Link>
                     <div className="py-2">
-                      <CurrencySelector className="w-full" showLabel={true} />
-                    </div>
-                    <div className="py-2">
-                      <LanguageSwitcher />
+                      <RegionalSettings className="w-full" />
                     </div>
                   </>
                 )}
@@ -164,8 +157,7 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-6 ml-6">
-            <LanguageSwitcher />
-            <CurrencySelector className="w-48" showLabel={false} />
+            <RegionalSettings />
 
             <div className="flex items-center space-x-4">
               <Link href="/" className="text-gray-700 hover:text-blue-600">

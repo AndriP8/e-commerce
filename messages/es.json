@@ -7,12 +7,20 @@
     "removeFromCart": "Eliminar {product} del carrito",
     "openCart": "Abrir carrito de compras",
     "starRating": "{rating} de 5 estrellas",
-    "selectCurrency": "Seleccionar moneda",
     "searchProducts": "Buscar productos",
     "cartUpdated": "Carrito actualizado",
     "itemAdded": "Artículo añadido al carrito",
     "itemRemoved": "Artículo eliminado del carrito",
     "morePages": "Más páginas"
+  },
+  "RegionalSettings": {
+    "trigger": "{language} - {currency}",
+    "modalTitle": "Configurar idioma y moneda",
+    "modalDescription": "Puedes actualizar tu idioma y moneda preferidos. Puedes actualizar la configuración en cualquier momento.",
+    "languageLabel": "Idioma",
+    "currencyLabel": "Moneda",
+    "saveButton": "Guardar",
+    "cancelButton": "Cancelar"
   },
   "Common": {
     "loading": "Cargando...",

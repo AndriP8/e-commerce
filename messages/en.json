@@ -7,12 +7,20 @@
     "removeFromCart": "Remove {product} from cart",
     "openCart": "Open shopping cart",
     "starRating": "{rating} out of 5 stars",
-    "selectCurrency": "Select currency",
     "searchProducts": "Search products",
     "cartUpdated": "Cart updated",
     "itemAdded": "Item added to cart",
     "itemRemoved": "Item removed from cart",
     "morePages": "More pages"
+  },
+  "RegionalSettings": {
+    "trigger": "{language} - {currency}",
+    "modalTitle": "Set language and currency",
+    "modalDescription": "You can update your preferred language and currency. You can update the settings at any time.",
+    "languageLabel": "Language",
+    "currencyLabel": "Currency",
+    "saveButton": "Save",
+    "cancelButton": "Cancel"
   },
   "Common": {
     "loading": "Loading...",

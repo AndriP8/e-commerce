@@ -7,12 +7,20 @@
     "removeFromCart": "إزالة {product} من السلة",
     "openCart": "فتح سلة التسوق",
     "starRating": "{rating} من 5 نجوم",
-    "selectCurrency": "اختر العملة",
     "searchProducts": "البحث عن المنتجات",
     "cartUpdated": "تم تحديث السلة",
     "itemAdded": "تمت إضافة العنصر إلى السلة",
     "itemRemoved": "تمت إزالة العنصر من السلة",
     "morePages": "المزيد من الصفحات"
+  },
+  "RegionalSettings": {
+    "trigger": "{language} - {currency}",
+    "modalTitle": "تعيين اللغة والعملة",
+    "modalDescription": "يمكنك تحديث اللغة والعملة المفضلة لديك. يمكنك تحديث الإعدادات في أي وقت.",
+    "languageLabel": "اللغة",
+    "currencyLabel": "العملة",
+    "saveButton": "حفظ",
+    "cancelButton": "إلغاء"
   },
   "Common": {
     "loading": "جاري التحميل...",
