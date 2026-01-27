@@ -74,7 +74,6 @@ async function getProducts({
 export default async function Page({ params, searchParams }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations({ locale, namespace: "Home" });
   const cookieStore = await cookies();
   const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
   const resolvedSearchParams = await searchParams;
@@ -91,7 +90,6 @@ export default async function Page({ params, searchParams }: Props) {
 
   return (
     <main className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-8 text-gray-900">{t("title")}</h1>
       <ProductList
         products={products}
         searchParams={{

@@ -154,7 +154,9 @@ export default async function RootLayout({
           >
             <div className="min-h-screen flex flex-col">
               <Navbar />
-              <main className="flex-grow">{children}</main>
+              <main id="main-content" className="flex-grow" tabIndex={-1}>
+                {children}
+              </main>
             </div>
           </Providers>
         </NextIntlClientProvider>

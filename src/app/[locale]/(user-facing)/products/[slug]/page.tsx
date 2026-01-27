@@ -9,6 +9,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ImagePreload } from "@/app/components/ImagePreload";
 import { ProductJsonLd, BreadcrumbJsonLd } from "@/app/components/JsonLd";
 import LazyReviewsSection from "./components/LazyReviewsSection";
+import StarRating from "./components/StarRating";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
@@ -139,11 +140,17 @@ export default async function ProductDetail({ params }: Props) {
 
               {/* Thumbnail Images */}
               {product.images && product.images.length > 1 && (
-                <div className="grid grid-cols-5 gap-2">
+                <div
+                  className="grid grid-cols-5 gap-2"
+                  role="group"
+                  aria-label="Product image thumbnails"
+                >
                   {product.images.map((image, index) => (
-                    <div
+                    <button
                       key={image.id}
-                      className="relative h-20 rounded-md overflow-hidden cursor-pointer border hover:border-blue-500"
+                      type="button"
+                      className="relative h-20 rounded-md overflow-hidden cursor-pointer border hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label={`View image ${index + 1} of ${product.images.length}`}
                     >
                       <Image
                         src={`${image.image_url}`}
@@ -155,7 +162,7 @@ export default async function ProductDetail({ params }: Props) {
                         placeholder="blur"
                         blurDataURL={DEFAULT_BLUR_DATA_URL}
                       />
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
@@ -171,20 +178,7 @@ export default async function ProductDetail({ params }: Props) {
 
             {/* Ratings */}
             <div className="flex items-center mb-4">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <svg
-                    key={i}
-                    className={`w-5 h-5 ${
-                      i < Math.round(product.rating.average) ? "text-yellow-400" : "text-gray-300"
-                    }`}
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
+              <StarRating rating={product.rating.average} />
               <span className="text-sm text-gray-600 ml-2">
                 {product.rating.average.toFixed(1)} ({t("reviews", { count: product.rating.count })}
                 )
@@ -206,22 +200,29 @@ export default async function ProductDetail({ params }: Props) {
 
             {/* Variants */}
             {product.variants && product.variants.length > 0 && (
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold mb-2">{t("variants")}</h2>
-                <div className="grid grid-cols-2 gap-2">
-                  {product.variants.map((variant) => (
-                    <div
+              <fieldset className="mb-6">
+                <legend className="text-lg font-semibold mb-2">{t("variants")}</legend>
+                <div className="grid grid-cols-2 gap-2" role="radiogroup">
+                  {product.variants.map((variant, index) => (
+                    <label
                       key={variant.id}
-                      className="border rounded-md p-3 cursor-pointer hover:border-blue-500"
+                      className="border rounded-md p-3 cursor-pointer hover:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500"
                     >
+                      <input
+                        type="radio"
+                        name="product-variant"
+                        value={variant.id}
+                        defaultChecked={index === 0}
+                        className="sr-only"
+                      />
                       <div className="font-medium">{variant.variant_name}</div>
                       <div className="text-sm text-gray-600">
                         {formatPrice(parseFloat(variant.price), productData.currency)}
                       </div>
-                    </div>
+                    </label>
                   ))}
                 </div>
-              </div>
+              </fieldset>
             )}
 
             {/* Add to Cart */}

@@ -20,6 +20,7 @@ export default function CartItem({
   currency: GetCartResponse["currency"];
 }) {
   const t = useTranslations("Cart");
+  const tA11y = useTranslations("Accessibility");
   const [state, dispatch] = useReducer(cartItemReducer, createInitialCartItemState(item.quantity));
   const { quantity, debouncedQuantity, isUpdating } = state;
   const api = useApi();
@@ -120,10 +121,16 @@ export default function CartItem({
       <div className="flex-1">
         <h3 className="font-medium">{item.product_name}</h3>
         <p className="text-gray-600">{formatPrice(parseFloat(item.total_price), currency)}</p>
-        <div className="mt-2 flex items-center gap-2">
+        <div
+          className="mt-2 flex items-center gap-2"
+          role="group"
+          aria-label={tA11y("quantityFor", { product: item.product_name })}
+        >
           <button
-            className="px-2 py-1 border rounded"
-            disabled={isUpdating}
+            className="px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isUpdating || Number(quantity) <= 1}
+            aria-disabled={isUpdating || Number(quantity) <= 1}
+            aria-label={tA11y("decreaseQuantity", { product: item.product_name })}
             onClick={() => {
               const newQuantity = Number(quantity) - 1;
               if (newQuantity >= 1) {
@@ -135,12 +142,13 @@ export default function CartItem({
               }
             }}
           >
-            -
+            <span aria-hidden="true">-</span>
           </button>
           <input
             type="number"
             value={quantity}
             disabled={isUpdating}
+            aria-label={tA11y("quantityFor", { product: item.product_name })}
             onChange={(e) => {
               const value = e.target.value;
               dispatch({ type: "SET_QUANTITY", payload: value });
@@ -153,13 +161,15 @@ export default function CartItem({
                 handleQuantityChange("1");
               }
             }}
-            className="w-10 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-10 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             min={1}
             max={999}
           />
           <button
-            className="px-2 py-1 border rounded"
+            className="px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isUpdating}
+            aria-disabled={isUpdating}
+            aria-label={tA11y("increaseQuantity", { product: item.product_name })}
             onClick={() => {
               const newQuantity = Number(quantity) + 1;
               dispatch({
@@ -169,11 +179,15 @@ export default function CartItem({
               handleQuantityChange(newQuantity.toString());
             }}
           >
-            +
+            <span aria-hidden="true">+</span>
           </button>
         </div>
       </div>
-      <button className="text-red-500 hover:text-red-700 cursor-pointer" onClick={handleDeleteItem}>
+      <button
+        className="text-red-500 hover:text-red-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-2 py-1"
+        onClick={handleDeleteItem}
+        aria-label={tA11y("removeFromCart", { product: item.product_name })}
+      >
         {t("remove")}
       </button>
     </div>

@@ -6,21 +6,23 @@ import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useApi } from "@/app/utils/api-client";
 import { addToCart as addToCartAction } from "@/app/utils/cart-client-actions";
+import { useTranslations } from "next-intl";
 
 interface AddToCartButtonProps {
   productId: string;
+  productName?: string;
 }
 
-export default function AddToCartButton({ productId }: AddToCartButtonProps) {
+export default function AddToCartButton({ productId, productName }: AddToCartButtonProps) {
+  const t = useTranslations("Products");
   const [isAdding, setIsAdding] = useState(false);
   const { isAuthenticated } = useAuth();
   const api = useApi();
   const router = useRouter();
 
   const handleAddToCart = async () => {
-    // Check if user is authenticated
     if (!isAuthenticated) {
-      toast.error("Please login to add items to your cart");
+      toast.error(t("pleaseLogin"));
       router.push("/login");
       return;
     }
@@ -30,10 +32,10 @@ export default function AddToCartButton({ productId }: AddToCartButtonProps) {
       const result = await addToCartAction(api, productId, 1);
 
       if (result.success) {
-        toast.success(result.message || "Product added to cart!");
+        toast.success(result.message || t("addedToCart"));
         router.refresh();
       } else {
-        toast.error(result.error || "Failed to add product to cart");
+        toast.error(result.error || t("failedToAdd"));
 
         if (result.error?.includes("Authentication required")) {
           router.push("/login");
@@ -41,7 +43,7 @@ export default function AddToCartButton({ productId }: AddToCartButtonProps) {
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Failed to add product to cart");
+      toast.error(t("failedToAdd"));
     } finally {
       setIsAdding(false);
     }
@@ -51,9 +53,11 @@ export default function AddToCartButton({ productId }: AddToCartButtonProps) {
     <button
       onClick={handleAddToCart}
       disabled={isAdding}
-      className="bg-blue-600 text-white px-4 w-full py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      aria-disabled={isAdding}
+      aria-label={productName ? `${t("addToCart")} - ${productName}` : t("addToCart")}
+      className="bg-blue-600 text-white px-4 w-full py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
     >
-      {isAdding ? "Adding..." : "Add to Cart"}
+      {isAdding ? t("adding") : t("addToCart")}
     </button>
   );
 }

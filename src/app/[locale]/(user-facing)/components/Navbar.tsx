@@ -10,11 +10,12 @@ import { useTranslations } from "next-intl";
 
 export default function Navbar() {
   const t = useTranslations("Navigation");
+  const tA11y = useTranslations("Accessibility");
   const { isAuthenticated, user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white shadow-sm" aria-label={t("home")}>
       <div className="container mx-auto px-4 py-3">
         {/* Mobile Layout */}
         <div className="md:hidden">
@@ -24,13 +25,18 @@ export default function Navbar() {
             </Link>
 
             <div className="flex items-center space-x-4">
-              <Link href="/cart" className="text-gray-700 hover:text-blue-600">
+              <Link
+                href="/cart"
+                className="text-gray-700 hover:text-blue-600"
+                aria-label={tA11y("openCart")}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -45,6 +51,8 @@ export default function Navbar() {
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-gray-700 hover:text-blue-600"
                 aria-label="Toggle menu"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -52,6 +60,7 @@ export default function Navbar() {
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  aria-hidden="true"
                 >
                   {isMobileMenuOpen ? (
                     <path
@@ -77,7 +86,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Dropdown */}
           {isMobileMenuOpen && (
-            <div className="mt-4 py-4 border-t border-gray-200">
+            <div id="mobile-menu" className="mt-4 py-4 border-t border-gray-200" role="menu">
               <div className="flex flex-col space-y-3">
                 <Link
                   href="/"
