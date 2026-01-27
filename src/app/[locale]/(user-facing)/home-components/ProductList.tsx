@@ -1,8 +1,6 @@
-import Link from "next/link";
 import { ProductsResponse } from "@/app/types/product-types";
 import ProductCart from "./ProductCart";
-import { Frown, ShoppingCart } from "lucide-react";
-import SearchBox from "./SearchBox";
+import { Frown } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Pagination from "./Pagination";
 
@@ -21,17 +19,10 @@ export default async function ProductList({
 
   return (
     <div>
-      <header className="flex items-center justify-between mb-8">
-        <SearchBox defaultValue={searchQuery} />
-        <Link href="/cart" className="flex items-center gap-2">
-          <ShoppingCart className="size-6" />
-          <span>{t("cart")}</span>
-        </Link>
-      </header>
       <div>
-        <h2 className="text-xl font-semibold mb-6 text-gray-900">
+        <h1 className="text-3xl font-semibold mb-6 text-gray-900">
           {searchQuery ? t("searchResults", { query: searchQuery }) : t("featuredProducts")}
-        </h2>
+        </h1>
         {products.data.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Frown className="size-16 text-gray-400 mb-4" />

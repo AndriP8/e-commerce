@@ -1,8 +1,9 @@
 "use client";
 
-import { useId, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useId, useState, useEffect } from "react";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { useQueryState } from "nuqs";
 
 interface SearchBarProps {
   className?: string;
@@ -11,14 +12,31 @@ interface SearchBarProps {
 export default function SearchBar({ className = "" }: SearchBarProps) {
   const t = useTranslations("Home");
   const tA11y = useTranslations("Accessibility");
-  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
   const inputId = useId();
+
+  const [queryState, setQueryState] = useQueryState("search", {
+    defaultValue: "",
+    shallow: false,
+  });
+
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    if (pathname === "/") {
+      setInputValue(queryState || "");
+    }
+  }, [queryState, pathname]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    const trimmedQuery = inputValue.trim();
+
+    if (pathname === "/") {
+      setQueryState(trimmedQuery || null);
+    } else if (trimmedQuery) {
+      router.push(`/?search=${encodeURIComponent(trimmedQuery)}`);
     }
   };
 
@@ -31,8 +49,14 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
         <input
           id={inputId}
           type="search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            const newValue = e.target.value;
+            setInputValue(newValue);
+            if (newValue === "" && pathname === "/") {
+              setQueryState(null);
+            }
+          }}
+          value={inputValue}
           placeholder={t("search")}
           className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           autoComplete="off"
