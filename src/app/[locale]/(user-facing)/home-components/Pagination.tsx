@@ -20,6 +20,7 @@ export default function Pagination({
   searchQuery,
 }: PaginationProps) {
   const t = useTranslations("Home");
+  const tA11y = useTranslations("Accessibility");
 
   if (totalPages <= 1) return null;
 
@@ -32,19 +33,16 @@ export default function Pagination({
     const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
-      // Show all pages if total is small
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Always show first page
       pages.push(1);
 
       if (currentPage > 3) {
         pages.push("ellipsis");
       }
 
-      // Show pages around current page
       const startPage = Math.max(2, currentPage - 1);
       const endPage = Math.min(totalPages - 1, currentPage + 1);
 
@@ -56,7 +54,6 @@ export default function Pagination({
         pages.push("ellipsis");
       }
 
-      // Always show last page
       pages.push(totalPages);
     }
 
@@ -78,26 +75,29 @@ export default function Pagination({
       className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-gray-200"
       aria-label="Pagination"
     >
-      <p className="text-sm text-gray-700">
-        {t("showing", { start, end, total: totalItems })}
-      </p>
+      <p className="text-sm text-gray-700">{t("showing", { start, end, total: totalItems })}</p>
 
       <div className="flex items-center gap-1">
         {/* Previous button */}
         {currentPage > 1 ? (
           <Link
             href={buildUrl(currentPage - 1)}
-            className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label={t("previous")}
           >
-            <ChevronLeft className="size-4" />
+            <ChevronLeft className="size-4" aria-hidden="true" />
             <span className="hidden sm:inline">{t("previous")}</span>
           </Link>
         ) : (
-          <span className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded-md cursor-not-allowed">
-            <ChevronLeft className="size-4" />
+          <button
+            disabled
+            aria-disabled="true"
+            aria-label={t("previous")}
+            className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded-md cursor-not-allowed"
+          >
+            <ChevronLeft className="size-4" aria-hidden="true" />
             <span className="hidden sm:inline">{t("previous")}</span>
-          </span>
+          </button>
         )}
 
         {/* Page numbers */}
@@ -107,23 +107,25 @@ export default function Pagination({
               <span
                 key={`ellipsis-${index}`}
                 className="px-3 py-2 text-sm text-gray-500"
+                aria-label={tA11y("morePages")}
               >
-                ...
+                <span aria-hidden="true">...</span>
               </span>
             ) : (
               <Link
                 key={page}
                 href={buildUrl(page)}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   page === currentPage
                     ? "bg-blue-600 text-white"
                     : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
                 }`}
                 aria-current={page === currentPage ? "page" : undefined}
+                aria-label={`Page ${page}`}
               >
                 {page}
               </Link>
-            )
+            ),
           )}
         </div>
 
@@ -136,17 +138,22 @@ export default function Pagination({
         {currentPage < totalPages ? (
           <Link
             href={buildUrl(currentPage + 1)}
-            className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label={t("next")}
           >
             <span className="hidden sm:inline">{t("next")}</span>
-            <ChevronRight className="size-4" />
+            <ChevronRight className="size-4" aria-hidden="true" />
           </Link>
         ) : (
-          <span className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded-md cursor-not-allowed">
+          <button
+            disabled
+            aria-disabled="true"
+            aria-label={t("next")}
+            className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded-md cursor-not-allowed"
+          >
             <span className="hidden sm:inline">{t("next")}</span>
-            <ChevronRight className="size-4" />
-          </span>
+            <ChevronRight className="size-4" aria-hidden="true" />
+          </button>
         )}
       </div>
     </nav>

@@ -89,7 +89,7 @@ export default async function Page({ params, searchParams }: Props) {
   });
 
   return (
-    <main className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
       <ProductList
         products={products}
         searchParams={{
@@ -100,6 +100,6 @@ export default async function Page({ params, searchParams }: Props) {
         }}
         locale={locale}
       />
-    </main>
+    </div>
   );
 }

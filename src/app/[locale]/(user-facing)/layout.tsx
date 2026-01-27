@@ -92,7 +92,6 @@ const fetchUserCurrencyPreference = async (token?: string) => {
     if (!token) {
       return null;
     }
-    console.log("Fetching user currency preference with token:", !token);
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/currency-preference`,
       {

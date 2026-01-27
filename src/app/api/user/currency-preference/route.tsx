@@ -21,22 +21,29 @@ export async function GET() {
     const token = cookieStore.get("token")?.value;
     const preferred_currency = cookieStore.get("preferred_currency")?.value || "USD";
 
-    // If user is authenticated, get their preference from database
     if (token) {
-      const user = await getCurrentUser(token);
-      const currency = await getUserPreferredCurrency(user.id);
+      try {
+        const user = await getCurrentUser(token);
+        const currency = await getUserPreferredCurrency(user.id);
 
-      return NextResponse.json({
-        currency,
-        is_authenticated: true,
-      });
-    } else {
-      const currency = await getCurrencyByCode(preferred_currency);
-      return NextResponse.json({
-        currency,
-        is_authenticated: false,
-      });
+        return NextResponse.json({
+          currency,
+          is_authenticated: true,
+        });
+      } catch {
+        cookieStore.delete("token");
+      }
     }
+
+    let currency = await getCurrencyByCode(preferred_currency);
+    if (!currency) {
+      currency = await getCurrencyByCode("USD");
+    }
+
+    return NextResponse.json({
+      currency,
+      is_authenticated: false,
+    });
   } catch (error) {
     console.error("Error fetching currency preference:", error);
     const apiError = handleApiError(error);
