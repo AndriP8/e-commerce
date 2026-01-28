@@ -63,7 +63,7 @@ export default function AddToCart({ productId }: { productId: string }) {
           <span aria-hidden="true">-</span>
         </button>
         <div className="w-16 h-10 border-t border-b flex items-center justify-center">
-          <span className="sr-only">Quantity:</span>
+          <span className="sr-only">{tA11y("quantityLabel")}</span>
           {quantity}
         </div>
         <button

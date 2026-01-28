@@ -143,7 +143,7 @@ export default async function ProductDetail({ params }: Props) {
                 <div
                   className="grid grid-cols-5 gap-2"
                   role="group"
-                  aria-label="Product image thumbnails"
+                  aria-label={t("thumbnailsAria")}
                 >
                   {product.images.map((image, index) => (
                     <button

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
 import { formatPrice } from "@/app/utils/format-price-currency";
 import { useApi } from "@/app/utils/api-client";
+import { useTranslations } from "next-intl";
 
 interface PaymentFormProps {
   cart: GetCartResponse;
@@ -28,6 +29,7 @@ export default function PaymentForm({
   const router = useRouter();
   const { shippingCost, tax } = useCheckoutCost();
   const api = useApi();
+  const t = useTranslations("Checkout");
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -133,7 +135,7 @@ export default function PaymentForm({
               fill="none"
               viewBox="0 0 24 24"
               role="img"
-              aria-label="Loading indicator"
+              aria-label={t("loadingIndicator")}
             >
               <circle
                 className="opacity-25"

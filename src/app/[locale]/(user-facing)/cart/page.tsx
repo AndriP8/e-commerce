@@ -126,7 +126,7 @@ export default async function CartPage({ params }: Props) {
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
-          aria-label="Back to products"
+          aria-label={t("backToProductsAria")}
         >
           <ArrowLeft size={20} />
           <span className="hidden sm:inline">{t("backToShopping")}</span>
@@ -163,13 +163,15 @@ export default async function CartPage({ params }: Props) {
 
         {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 sticky top-4">
-            <h2 className="text-xl font-bold mb-6 text-gray-900">Order Summary</h2>
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h2 className="text-xl font-bold mb-6 text-gray-900">{t("orderSummary")}</h2>
 
             <div className="space-y-4 mb-6">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Items ({cartItems.length})</span>
-                <span className="font-medium">
+              <div className="flex justify-between items-center pb-4 border-b">
+                <span className="text-gray-600">
+                  {t("itemsCount", { count: cartItems.length })}
+                </span>
+                <span className="font-semibold">
                   {formatPrice(cart.data.total_price, cart.currency)}
                 </span>
               </div>

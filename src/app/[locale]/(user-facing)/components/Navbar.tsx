@@ -49,7 +49,7 @@ export default function Navbar() {
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-gray-700 hover:text-blue-600"
-                aria-label="Toggle menu"
+                aria-label={t("toggleMenu")}
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-menu"
               >

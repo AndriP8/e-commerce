@@ -73,7 +73,7 @@ export default function Pagination({
   return (
     <nav
       className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-gray-200"
-      aria-label="Pagination"
+      aria-label={tA11y("pagination")}
     >
       <p className="text-sm text-gray-700">{t("showing", { start, end, total: totalItems })}</p>
 

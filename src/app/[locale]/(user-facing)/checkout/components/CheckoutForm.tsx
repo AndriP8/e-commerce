@@ -45,25 +45,6 @@ type ShippingMethod = {
   estimated_days_max: number;
 };
 
-const shippingMethods: ShippingMethod[] = [
-  {
-    id: 1,
-    name: "Standard Shipping",
-    description: "Delivery in 3-5 business days",
-    base_costs: "0",
-    estimated_days_min: 3,
-    estimated_days_max: 5,
-  },
-  {
-    id: 2,
-    name: "Express Shipping",
-    description: "Delivery in 1-2 business days",
-    base_costs: "10.00",
-    estimated_days_min: 1,
-    estimated_days_max: 2,
-  },
-];
-
 import { useTranslations } from "next-intl";
 
 interface CheckoutFormProps {
@@ -76,6 +57,25 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
   const [state, dispatch] = useReducer(checkoutReducer, initialState);
   const { updateShippingCost, shippingCost, tax } = useCheckoutCost();
   const api = useApi();
+
+  const shippingMethods: ShippingMethod[] = [
+    {
+      id: 1,
+      name: t("shippingStandard"),
+      description: t("shippingStandardDesc"),
+      base_costs: "0",
+      estimated_days_min: 3,
+      estimated_days_max: 5,
+    },
+    {
+      id: 2,
+      name: t("shippingExpress"),
+      description: t("shippingExpressDesc"),
+      base_costs: "10.00",
+      estimated_days_min: 1,
+      estimated_days_max: 2,
+    },
+  ];
 
   const nextStep = () => {
     if (state.step === 1) {
@@ -440,7 +440,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
         <div className="space-y-6">
           <h2 className="text-xl font-bold mb-4">{t("shippingMethod")}</h2>
           <fieldset className="space-y-4">
-            <legend className="sr-only">Shipping Method Options</legend>
+            <legend className="sr-only">{t("shippingMethodOptions")}</legend>
             {shippingMethods.map((method) => (
               <div
                 key={method.id}

@@ -11,7 +11,9 @@
     "cartUpdated": "Cart updated",
     "itemAdded": "Item added to cart",
     "itemRemoved": "Item removed from cart",
-    "morePages": "More pages"
+    "morePages": "More pages",
+    "pagination": "Pagination",
+    "quantityLabel": "Quantity:"
   },
   "RegionalSettings": {
     "trigger": "{language} - {currency}",
@@ -36,7 +38,8 @@
     "register": "Register",
     "logout": "Logout",
     "myOrders": "My Orders",
-    "hello": "Hello, {name}"
+    "hello": "Hello, {name}",
+    "toggleMenu": "Toggle menu"
   },
   "Home": {
     "title": "Our Products",
@@ -67,7 +70,8 @@
     "variants": "Variants",
     "addedToCart": "Product added to cart",
     "failedToAdd": "Failed to add product to cart",
-    "pleaseLogin": "Please login to add items to your cart"
+    "pleaseLogin": "Please login to add items to your cart",
+    "thumbnailsAria": "Product image thumbnails"
   },
   "Cart": {
     "title": "Your Shopping Cart",
@@ -85,7 +89,9 @@
     "orderSummary": "Order Summary",
     "pleaseLogin": "Please Login",
     "loginRequired": "You need to be logged in to view your cart",
-    "remove": "Remove"
+    "remove": "Remove",
+    "backToProductsAria": "Back to products",
+    "itemsCount": "Items ({count})"
   },
   "Checkout": {
     "title": "Checkout",
@@ -119,7 +125,16 @@
     "subtotal": "Subtotal",
     "tax": "Tax",
     "total": "Total",
-    "orderSummary": "Order Summary"
+    "orderSummary": "Order Summary",
+    "loadingIndicator": "Loading indicator",
+    "shippingStandard": "Standard Shipping",
+    "shippingStandardDesc": "Delivery in 3-5 business days",
+    "shippingExpress": "Express Shipping",
+    "shippingExpressDesc": "Delivery in 1-2 business days",
+    "shippingMethodOptions": "Shipping Method Options",
+    "shippingAddressLegend": "Shipping Address Details",
+    "billingAddressLegend": "Billing Address Details",
+    "paymentMethodLegend": "Payment Method Details"
   },
   "Auth": {
     "login": "Login",
@@ -141,7 +156,11 @@
     "firstName": "First Name",
     "lastName": "Last Name",
     "loginFailed": "Login failed",
-    "registrationFailed": "Registration failed"
+    "registrationFailed": "Registration failed",
+    "emailPlaceholder": "Email address",
+    "passwordPlaceholder": "Password",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password"
   },
   "Order": {
     "confirmedTitle": "Order Confirmed!",

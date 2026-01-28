@@ -1,9 +1,9 @@
 {
   "Accessibility": {
     "skipToContent": "Saltar al contenido principal",
-    "decreaseQuantity": "Disminuir cantidad de {product}",
-    "increaseQuantity": "Aumentar cantidad de {product}",
-    "quantityFor": "Cantidad de {product}",
+    "decreaseQuantity": "Disminuir cantidad para {product}",
+    "increaseQuantity": "Aumentar cantidad para {product}",
+    "quantityFor": "Cantidad para {product}",
     "removeFromCart": "Eliminar {product} del carrito",
     "openCart": "Abrir carrito de compras",
     "starRating": "{rating} de 5 estrellas",
@@ -11,7 +11,9 @@
     "cartUpdated": "Carrito actualizado",
     "itemAdded": "Artículo añadido al carrito",
     "itemRemoved": "Artículo eliminado del carrito",
-    "morePages": "Más páginas"
+    "morePages": "Más páginas",
+    "pagination": "Paginación",
+    "quantityLabel": "Cantidad:"
   },
   "RegionalSettings": {
     "trigger": "{language} - {currency}",
@@ -36,7 +38,8 @@
     "register": "Registrarse",
     "logout": "Cerrar sesión",
     "myOrders": "Mis Pedidos",
-    "hello": "Hola, {name}"
+    "hello": "Hola, {name}",
+    "toggleMenu": "Alternar menú"
   },
   "Home": {
     "title": "Nuestros Productos",
@@ -67,7 +70,8 @@
     "variants": "Variantes",
     "addedToCart": "Producto añadido al carrito",
     "failedToAdd": "Error al añadir producto al carrito",
-    "pleaseLogin": "Por favor inicia sesión para añadir artículos a tu carrito"
+    "pleaseLogin": "Por favor inicia sesión para añadir artículos a tu carrito",
+    "thumbnailsAria": "Miniaturas de imágenes del producto"
   },
   "Cart": {
     "title": "Tu Carrito de Compras",
@@ -75,17 +79,19 @@
     "emptyDescription": "Parece que aún no has agregado nada a tu carrito",
     "continueShopping": "Seguir Comprando",
     "proceedToCheckout": "Proceder al Pago",
-    "backToShopping": "Volver a Compras",
+    "backToShopping": "Volver a productos",
     "subtotal": "Subtotal",
     "shipping": "Envío",
     "free": "Gratis",
     "total": "Total",
-    "items": "{count} artículos",
+    "items": "Artículos",
     "item": "{count} artículo",
     "orderSummary": "Resumen del Pedido",
     "pleaseLogin": "Por favor Inicia Sesión",
     "loginRequired": "Debes iniciar sesión para ver tu carrito",
-    "remove": "Eliminar"
+    "remove": "Eliminar",
+    "backToProductsAria": "Volver a productos",
+    "itemsCount": "Artículos ({count})"
   },
   "Checkout": {
     "title": "Pagar",
@@ -119,7 +125,13 @@
     "subtotal": "Subtotal",
     "tax": "Impuesto",
     "total": "Total",
-    "orderSummary": "Resumen del Pedido"
+    "orderSummary": "Resumen del Pedido",
+    "loadingIndicator": "Indicador de carga",
+    "shippingStandard": "Envío Estándar",
+    "shippingStandardDesc": "Entrega en 3-5 días hábiles",
+    "shippingExpress": "Envío Exprés",
+    "shippingExpressDesc": "Entrega en 1-2 días hábiles",
+    "shippingMethodOptions": "Opciones de Envío"
   },
   "Auth": {
     "login": "Iniciar Sesión",
@@ -141,7 +153,19 @@
     "firstName": "Nombre",
     "lastName": "Apellido",
     "loginFailed": "Error al iniciar sesión",
-    "registrationFailed": "Error en el registro"
+    "registrationFailed": "Error en el registro",
+    "emailPlaceholder": "Correo electrónico",
+    "passwordPlaceholder": "Contraseña",
+    "hidePassword": "Ocultar contraseña",
+    "showPassword": "Mostrar contraseña"
+  },
+  "Error": {
+    "title": "¡Algo salió mal!",
+    "description": "Pedimos disculpas por las molestias. Ha ocurrido un error inesperado.",
+    "globalDescription": "Ha ocurrido un error crítico. Por favor intente refrescar la página.",
+    "errorId": "ID de Error: {digest}",
+    "tryAgain": "Intentar de nuevo",
+    "home": "Ir a inicio"
   },
   "Order": {
     "confirmedTitle": "¡Pedido Confirmado!",

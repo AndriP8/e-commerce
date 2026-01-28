@@ -2,6 +2,7 @@
 
 import { Link } from "@/i18n/navigation";
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 export default function GlobalError({
   error,
@@ -10,6 +11,8 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("Error");
+
   useEffect(() => {
     // Log the error to an error reporting service
     console.error("Global application error:", error);
@@ -37,25 +40,25 @@ export default function GlobalError({
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong!</h2>
-              <p className="text-gray-600 mb-6">
-                A critical error has occurred. Please try refreshing the page.
-              </p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("title")}</h2>
+              <p className="text-gray-600 mb-6">{t("globalDescription")}</p>
               {error.digest && (
-                <p className="text-sm text-gray-500 mb-4">Error ID: {error.digest}</p>
+                <p className="text-sm text-gray-500 mb-4">
+                  {t("errorId", { digest: error.digest })}
+                </p>
               )}
               <div className="space-y-3">
                 <button
                   onClick={reset}
                   className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
                 >
-                  Try again
+                  {t("tryAgain")}
                 </button>
                 <Link
                   href="/"
                   className="block w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
                 >
-                  Go to homepage
+                  {t("home")}
                 </Link>
               </div>
             </div>
