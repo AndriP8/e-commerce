@@ -13,7 +13,7 @@ export async function getCurrencies(): Promise<Currencies[]> {
   const client = await pool.connect();
   try {
     const result = await client.query(
-      "SELECT * FROM currencies WHERE is_active = true ORDER BY code",
+      "SELECT * FROM currencies WHERE is_active = true ORDER BY id",
     );
     return result.rows;
   } finally {

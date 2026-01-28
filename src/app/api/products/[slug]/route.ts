@@ -130,7 +130,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         SELECT 
           r.id,
           r.rating,
-          r.title,
           r.review_text,
           r.is_verified_purchase,
           r.created_at,

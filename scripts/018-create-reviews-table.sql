@@ -6,7 +6,7 @@ CREATE TABLE reviews (
     user_id BIGINT NOT NULL,
     order_item_id BIGINT NOT NULL,
     rating INT NOT NULL,
-    title VARCHAR(255) NOT NULL,
+
     review_text TEXT NOT NULL,
     is_verified_purchase BOOLEAN NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

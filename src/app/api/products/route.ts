@@ -119,6 +119,7 @@ export async function GET(request: NextRequest) {
           p.slug,
           p.created_at,
           p.updated_at,
+          p.product_rating,
           
           -- Category information
           c.id as category_id,
@@ -136,7 +137,7 @@ export async function GET(request: NextRequest) {
         WHERE ${whereConditions.join(" AND ")}
         
         ORDER BY ${
-          sortColumn === "product_rating" ? "p.created_at" : `p.${sortColumn}`
+          sortColumn === "product_rating" ? "p.product_rating" : `p.${sortColumn}`
         } ${sort_order}
         LIMIT $${paramCounter} OFFSET $${paramCounter + 1}
       `;

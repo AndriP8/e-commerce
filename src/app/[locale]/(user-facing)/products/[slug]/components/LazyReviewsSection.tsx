@@ -7,7 +7,6 @@ const ReviewsSection = lazy(() => import("./ReviewsSection"));
 interface Review {
   first_name: string | null;
   last_name: string | null;
-  title: string | null;
   review_text: string | null;
   rating: number;
   created_at: Date | string;

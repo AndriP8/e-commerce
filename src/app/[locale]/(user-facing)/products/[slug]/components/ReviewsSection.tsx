@@ -6,7 +6,7 @@ import StarRating from "./StarRating";
 interface Review {
   first_name: string | null;
   last_name: string | null;
-  title: string | null;
+
   review_text: string | null;
   rating: number;
   created_at: Date | string;
@@ -36,7 +36,6 @@ export default function ReviewsSection({ reviews }: ReviewsSectionProps) {
             >
               <div className="flex items-center mb-2">
                 <StarRating rating={review.rating} size="sm" />
-                <span className="font-medium ml-2">{review.title}</span>
               </div>
               <p className="text-gray-700 mb-2">{review.review_text}</p>
               <footer className="text-sm text-gray-500">
