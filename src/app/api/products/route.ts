@@ -47,7 +47,7 @@ type AggregatesMap = Record<number, ProductAggregate>;
  * - brand: Filter by brand name (partial match)
  * - search: Search in product name and description
  * - in_stock: Filter by stock availability (true/false)
- * - sort_by: Sort field (created_at, name, base_price, product_rating)
+ * - sort_by: Sort field (created_at, name, base_price)
  * - sort_order: Sort direction (asc/desc)
  *
  * @returns JSON response with products array and pagination metadata
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
       const { whereConditions, queryParams, paramCounter } = buildProductFilterConditions(filters);
 
       // Validate sort_by to prevent SQL injection
-      const validSortColumns = ["created_at", "name", "base_price", "product_rating"];
+      const validSortColumns = ["created_at", "name", "base_price"];
 
       if (!validSortColumns.includes(sort_by)) {
         throw new BadRequestError(
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
           p.slug,
           p.created_at,
           p.updated_at,
-          p.product_rating,
+
           
           -- Category information
           c.id as category_id,
@@ -136,9 +136,7 @@ export async function GET(request: NextRequest) {
         
         WHERE ${whereConditions.join(" AND ")}
         
-        ORDER BY ${
-          sortColumn === "product_rating" ? "p.product_rating" : `p.${sortColumn}`
-        } ${sort_order}
+        ORDER BY ${`p.${sortColumn}`} ${sort_order}
         LIMIT $${paramCounter} OFFSET $${paramCounter + 1}
       `;
 

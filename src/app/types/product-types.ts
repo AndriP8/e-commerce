@@ -9,19 +9,15 @@ import Sellers from "@/schemas/public/Sellers";
 import Currencies from "@/schemas/public/Currencies";
 
 export type Product = Omit<Products, "seller_id" | "category_id"> & {
-  category?: Omit<
-    Categories,
-    "parent_category_id" | "is_active" | "created_at"
-  >;
+  category?: Omit<Categories, "parent_category_id" | "is_active" | "created_at">;
   seller?: Omit<SellersInitializer, "user_id" | "tax_id" | "created_at">;
-  product_rating: number;
   product_review_count: number;
   total_stock: number;
   variant_count: number;
 };
 
 export type ProductsResponse = {
-  data: Omit<Product, "product_rating" | "product_review_count" | "seller">[];
+  data: Omit<Product, "product_review_count" | "seller">[];
   currency: Currencies;
   pagination: {
     total: number;
