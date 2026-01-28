@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:setup": "node scripts/setup-database.mjs",
-    "db:drop": "node scripts/drop-database.js",
+    "db:drop": "node scripts/drop-database.mjs",
     "db:reset": "pnpm db:drop && pnpm db:setup"
   },
   "dependencies": {
