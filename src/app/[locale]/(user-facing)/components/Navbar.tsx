@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
 import SearchBar from "@/app/components/SearchBar";
 import RegionalSettings from "@/app/components/RegionalSettings";

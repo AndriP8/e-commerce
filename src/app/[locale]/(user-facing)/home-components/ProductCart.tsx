@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ProductsResponse } from "@/app/types/product-types";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { formatPrice } from "@/app/utils/format-price-currency";
 import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/app/constants/images";
 import AddToCartButton from "./AddToCartButton";

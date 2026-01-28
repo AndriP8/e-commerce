@@ -1,7 +1,7 @@
 import { GetCartResponse } from "@/app/types/cart";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/app/utils/auth-utils";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import CheckoutForm from "./components/CheckoutForm";
 import DynamicOrderSummary from "./components/DynamicOrderSummary";
 import { getTranslations, setRequestLocale } from "next-intl/server";

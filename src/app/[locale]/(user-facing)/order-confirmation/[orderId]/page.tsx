@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifyToken } from "@/app/utils/auth-utils";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { OrderDetailResponse } from "@/app/types/orders";
 import Image from "next/image";
 import { formatPrice } from "@/app/utils/format-price-currency";

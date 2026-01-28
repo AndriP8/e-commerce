@@ -1,5 +1,5 @@
 import { GetCartResponse } from "@/app/types/cart";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import CartItem from "./components/cartItem";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/app/utils/auth-utils";

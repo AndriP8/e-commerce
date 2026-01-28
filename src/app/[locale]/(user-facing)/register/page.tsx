@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useTranslations } from "next-intl";
