@@ -15,7 +15,6 @@ interface RegionalSettingsProps {
 const AVAILABLE_LOCALES = [
   { code: "en", name: "English" },
   { code: "es", name: "Español" },
-  { code: "ar", name: "العربية" },
 ] as const;
 
 export default function RegionalSettings({ className = "" }: RegionalSettingsProps) {

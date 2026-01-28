@@ -128,8 +128,6 @@ export default async function RootLayout({
 
   setRequestLocale(locale);
 
-  const isRTL = locale === "ar";
-
   const messages = await getMessages();
 
   const cookieStore = await cookies();
@@ -141,7 +139,7 @@ export default async function RootLayout({
   const userCurrency = await fetchUserCurrencyPreference(token);
 
   return (
-    <html lang={locale} dir={isRTL ? "rtl" : "ltr"}>
+    <html lang={locale} dir="ltr">
       <body>
         <WebVitals />
         <Toaster />
