@@ -57,8 +57,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     // Pagination parameters
-    const page = parseInt(searchParams.get("page") || "1");
-    const size = parseInt(searchParams.get("size") || "10");
+    const pageInput = parseInt(searchParams.get("page") || "1");
+    const page = Math.max(1, pageInput);
+    const sizeInput = parseInt(searchParams.get("size") || "10");
+    const size = Math.max(1, sizeInput);
     const offset = (page - 1) * size;
 
     // Filtering parameters

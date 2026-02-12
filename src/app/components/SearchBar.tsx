@@ -3,7 +3,7 @@
 import { useId, useState, useEffect } from "react";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { useQueryState } from "nuqs";
+import { useQueryState, useQueryStates, parseAsInteger, parseAsString } from "nuqs";
 
 interface SearchBarProps {
   className?: string;
@@ -16,10 +16,15 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   const pathname = usePathname();
   const inputId = useId();
 
-  const [queryState, setQueryState] = useQueryState("search", {
-    defaultValue: "",
-    shallow: false,
-  });
+  const [{ search: queryState, page }, setQueryParams] = useQueryStates(
+    {
+      search: parseAsString.withDefault(""),
+      page: parseAsInteger.withDefault(1),
+    },
+    {
+      shallow: false,
+    },
+  );
 
   const [inputValue, setInputValue] = useState("");
 
@@ -34,7 +39,10 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     const trimmedQuery = inputValue.trim();
 
     if (pathname === "/") {
-      setQueryState(trimmedQuery || null);
+      setQueryParams({
+        search: trimmedQuery || null,
+        page: null, // Reset page to 1
+      });
     } else if (trimmedQuery) {
       router.push(`/?search=${encodeURIComponent(trimmedQuery)}`);
     }
@@ -53,7 +61,10 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
             const newValue = e.target.value;
             setInputValue(newValue);
             if (newValue === "" && pathname === "/") {
-              setQueryState(null);
+              setQueryParams({
+                search: null,
+                page: null,
+              });
             }
           }}
           value={inputValue}
