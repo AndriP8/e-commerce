@@ -3,13 +3,6 @@ import { cookies } from "next/headers";
 import { getCurrentUser } from "@/app/utils/auth-utils";
 import { handleApiError } from "@/app/utils/api-error-handler";
 
-/**
- * GET /api/auth/me
- *
- * Retrieves the current authenticated user's information
- *
- * @returns JSON response with user information or null
- */
 export async function GET() {
   try {
     const cookieStore = await cookies();

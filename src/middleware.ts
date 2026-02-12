@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { csrfProtection } from "./app/utils/csrf";
 import { routing } from "./i18n/routing";
 
-// List of paths that don't require authentication
 const publicPaths = [
   "/login",
   "/register",
@@ -15,7 +14,6 @@ const publicPaths = [
   "/api/auth/register",
 ];
 
-// Function to check if the path is public
 function isPublicPath(path: string) {
   const pathWithoutLocale = path.replace(/^\/[a-z]{2}(?=\/|$)/, "") || "/";
 
@@ -27,7 +25,6 @@ function isPublicPath(path: string) {
   });
 }
 
-// Currency middleware function
 async function handleCurrencyMiddleware() {
   const response = NextResponse.next();
 
@@ -69,7 +66,6 @@ export async function middleware(request: NextRequest) {
     return csrfError;
   }
 
-  // API routes for currency conversion
   if (
     path.startsWith("/api/products") ||
     path.startsWith("/api/cart") ||
@@ -86,16 +82,6 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
-// Configure the middleware to run on specific paths
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - api (API routes)
-     */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

@@ -11,19 +11,6 @@ import {
   ConflictError,
 } from "@/app/utils/api-error-handler";
 
-/**
- * POST /api/auth/register
- *
- * Registers a new user
- *
- * Request Body:
- * - email: User's email
- * - password: User's password
- * - firstName: User's first name (optional)
- * - lastName: User's last name (optional)
- *
- * @returns JSON response with token
- */
 export async function POST(request: Request) {
   try {
     const body = await request.json();

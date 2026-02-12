@@ -8,13 +8,6 @@ import { convertCartPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 import { revalidateTag } from "next/cache";
 
-/**
- * GET /api/cart/products
- *
- * Retrieves the current user's shopping cart with all items
- *
- * @returns JSON response with cart information
- */
 export async function GET() {
   try {
     // Get the token from cookies
@@ -128,17 +121,6 @@ export async function GET() {
   }
 }
 
-/**
- * POST /api/cart/products
- *
- * Adds a product to the user's shopping cart
- *
- * Request Body:
- * - product_id: ID of the product to add
- * - quantity: Number of items to add
- *
- * @returns JSON response with updated cart information
- */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

@@ -5,13 +5,6 @@ import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
 import { revalidateTag } from "next/cache";
 
-/**
- * DELETE /api/cart/clear
- *
- * Clears all items from the user's shopping cart
- *
- * @returns JSON response with success message
- */
 export async function DELETE() {
   try {
     // Get the token from cookies

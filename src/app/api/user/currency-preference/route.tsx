@@ -8,13 +8,6 @@ import {
 } from "@/app/utils/currency-utils";
 import { handleApiError, BadRequestError } from "@/app/utils/api-error-handler";
 
-/**
- * GET /api/user/currency-preference
- *
- * Retrieves the current user's currency preference
- *
- * @returns JSON response with the user's preferred currency code
- */
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -52,16 +45,6 @@ export async function GET() {
   }
 }
 
-/**
- * POST /api/user/currency-preference
- *
- * Updates the user's currency preference
- *
- * Request Body:
- * - currencyCode: The ISO currency code to set as preference
- *
- * @returns JSON response with success message
- */
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();

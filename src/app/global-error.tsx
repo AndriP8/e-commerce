@@ -14,7 +14,6 @@ export default function GlobalError({
   const t = useTranslations("Error");
 
   useEffect(() => {
-    // Log the error to an error reporting service
     console.error("Global application error:", error);
   }, [error]);
 

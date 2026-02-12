@@ -13,18 +13,12 @@ import { getPreferenceCurrency } from "@/middleware";
 import { convertProductPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 
-/**
- * Aggregate data from database queries
- */
 interface AggregateRow {
   id: number;
   total_stock: string | number;
   variant_count: string | number;
 }
 
-/**
- * Processed product aggregate data
- */
 interface ProductAggregate {
   total_stock: number;
   variant_count: number;
@@ -32,26 +26,6 @@ interface ProductAggregate {
 
 type AggregatesMap = Record<number, ProductAggregate>;
 
-/**
- * GET /api/products
- *
- * Retrieves a list of products with pagination, filtering, and sorting
- *
- * Query Parameters:
- * - page: Page number (default: 1)
- * - size: Number of items per page (default: 10)
- * - category_id: Filter by category ID
- * - seller_id: Filter by seller ID
- * - min_price: Filter by minimum price
- * - max_price: Filter by maximum price
- * - brand: Filter by brand name (partial match)
- * - search: Search in product name and description
- * - in_stock: Filter by stock availability (true/false)
- * - sort_by: Sort field (created_at, name, base_price)
- * - sort_order: Sort direction (asc/desc)
- *
- * @returns JSON response with products array and pagination metadata
- */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -122,7 +96,6 @@ export async function GET(request: NextRequest) {
           p.created_at,
           p.updated_at,
 
-          
           -- Category information
           c.id as category_id,
           c.name as category_name,

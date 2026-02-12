@@ -3,15 +3,6 @@ import { pool } from "@/app/db/client";
 import { handleApiError, BadRequestError, NotFoundError } from "@/app/utils/api-error-handler";
 import { revalidateTag } from "next/cache";
 
-/**
- * PUT /api/cart/products/[id]
- *
- * Updates the quantity of a cart item
- *
- * @param request - The request object
- * @param params - The route parameters containing the cart item ID
- * @returns JSON response with updated cart information
- */
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const searchParams = await params;
@@ -126,15 +117,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
-/**
- * DELETE /api/cart/products/[id]
- *
- * Removes an item from the cart
- *
- * @param request - The request object
- * @param params - The route parameters containing the cart item ID
- * @returns JSON response with updated cart information
- */
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

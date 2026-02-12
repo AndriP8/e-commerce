@@ -11,17 +11,6 @@ import {
   UnauthorizedError,
 } from "@/app/utils/api-error-handler";
 
-/**
- * POST /api/auth/login
- *
- * Authenticates a user and returns a JWT token
- *
- * Request Body:
- * - email: User's email
- * - password: User's password
- *
- * @returns JSON response with token
- */
 export async function POST(request: Request) {
   try {
     const body = await request.json();

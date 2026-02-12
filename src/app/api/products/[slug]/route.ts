@@ -8,24 +8,6 @@ import {
 } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 
-/**
- * GET /api/products/[slug]
- *
- * Retrieves detailed information about a specific product
- *
- * Path Parameters:
- * - slug: Product Slug
- *
- * @returns JSON response with product details including:
- * - Basic product information
- * - Category information
- * - Seller information
- * - Rating information
- * - Stock information
- * - Product variants
- * - Product reviews
- * - Product images
- */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
