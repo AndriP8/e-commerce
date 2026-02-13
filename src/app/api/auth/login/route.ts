@@ -1,29 +1,16 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
-import {
-  comparePassword,
-  generateToken,
-  setAuthCookie,
-} from "@/app/utils/auth-utils";
-import {
-  handleApiError,
-  BadRequestError,
-  UnauthorizedError,
-} from "@/app/utils/api-error-handler";
+import { comparePassword, generateToken, setAuthCookie } from "@/app/utils/auth-utils";
+import { handleApiError, UnauthorizedError } from "@/app/utils/api-error-handler";
+
+import { loginSchema } from "@/schemas/api-schemas";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password } = body;
 
-    // Validate input parameters
-    if (!email) {
-      throw new BadRequestError("Email is required");
-    }
-
-    if (!password) {
-      throw new BadRequestError("Password is required");
-    }
+    // Validate input parameters using Zod
+    const { email, password } = loginSchema.parse(body);
 
     const client = await pool.connect();
 
@@ -49,10 +36,7 @@ export async function POST(request: Request) {
       }
 
       // Verify password
-      const isPasswordValid = await comparePassword(
-        password,
-        user.password_hash,
-      );
+      const isPasswordValid = await comparePassword(password, user.password_hash);
 
       if (!isPasswordValid) {
         throw new UnauthorizedError("Invalid email or password");
@@ -89,9 +73,6 @@ export async function POST(request: Request) {
     console.error("Login error:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json(
-      { error: apiError.message },
-      { status: apiError.status },
-    );
+    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   }
 }

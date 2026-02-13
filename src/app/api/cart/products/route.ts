@@ -121,20 +121,14 @@ export async function GET() {
   }
 }
 
+import { addToCartSchema } from "@/schemas/api-schemas";
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const { product_id, quantity } = body;
-
-    // Validate input parameters
-    if (!product_id || isNaN(Number(product_id))) {
-      throw new BadRequestError("Valid product_id is required");
-    }
-
-    if (!quantity || isNaN(Number(quantity)) || Number(quantity) < 1) {
-      throw new BadRequestError("Valid quantity is required (minimum 1)");
-    }
+    // Validate input parameters using Zod
+    const { product_id, quantity } = addToCartSchema.parse(body);
 
     // Get the token from cookies
     const cookieStore = await cookies();

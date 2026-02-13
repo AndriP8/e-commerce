@@ -6,7 +6,7 @@ import {
   getUserPreferredCurrency,
   getCurrencyByCode,
 } from "@/app/utils/currency-utils";
-import { handleApiError, BadRequestError } from "@/app/utils/api-error-handler";
+import { handleApiError } from "@/app/utils/api-error-handler";
 
 export async function GET() {
   try {
@@ -45,14 +45,16 @@ export async function GET() {
   }
 }
 
+import { currencyPreferenceSchema } from "@/schemas/api-schemas";
+
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const { currencyCode } = await request.json();
+    const body = await request.json();
 
-    if (!currencyCode) {
-      throw new BadRequestError("Currency code is required");
-    }
+    // Validate input parameters using Zod
+    const { currencyCode } = currencyPreferenceSchema.parse(body);
+
+    const cookieStore = await cookies();
 
     // Always set the cookie for all users
     cookieStore.set("preferred_currency", currencyCode, {

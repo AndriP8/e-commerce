@@ -1,4 +1,4 @@
-import Currencies from "@/schemas/public/Currencies";
+import { Currencies } from "@/schemas/db-schemas";
 
 export const formatPrice = (amount: number, currency: Currencies): string => {
   return new Intl.NumberFormat(currency.locales, {

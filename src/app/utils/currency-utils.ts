@@ -1,5 +1,5 @@
 import { pool } from "@/app/db/client";
-import Currencies from "@/schemas/public/Currencies";
+import { Currencies } from "@/schemas/db-schemas";
 import { cookies } from "next/headers";
 
 // In-memory cache for exchange rates (1 hour TTL)

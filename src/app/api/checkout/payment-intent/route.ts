@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/app/utils/auth-utils";
-import { cookies } from "next/headers";
 import Stripe from "stripe";
+import { handleApiError } from "@/app/utils/api-error-handler";
 
 function getStripeInstance() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -11,27 +10,14 @@ function getStripeInstance() {
   return new Stripe(secretKey);
 }
 
+import { paymentIntentSchema } from "@/schemas/api-schemas";
+
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-    }
-
-    try {
-      await verifyToken(token);
-    } catch {
-      return NextResponse.json({ error: "Invalid authentication token" }, { status: 401 });
-    }
-
     const body = await request.json();
-    const { cart_id, amount, currency } = body;
 
-    if (!cart_id || !amount || !currency) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
+    // Validate input parameters using Zod
+    const { cart_id, amount, currency } = paymentIntentSchema.parse(body);
 
     // Create a PaymentIntent with the order amount and currency
     const stripe = getStripeInstance();
@@ -51,6 +37,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error creating payment intent:", error);
-    return NextResponse.json({ error: "Failed to create payment intent" }, { status: 500 });
+    const apiError = handleApiError(error);
+    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   }
 }

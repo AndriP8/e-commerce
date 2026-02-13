@@ -1,33 +1,16 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
-import {
-  hashPassword,
-  generateToken,
-  setAuthCookie,
-} from "@/app/utils/auth-utils";
-import {
-  handleApiError,
-  BadRequestError,
-  ConflictError,
-} from "@/app/utils/api-error-handler";
+import { hashPassword, generateToken, setAuthCookie } from "@/app/utils/auth-utils";
+import { handleApiError, ConflictError } from "@/app/utils/api-error-handler";
+
+import { registerSchema } from "@/schemas/api-schemas";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, firstName, lastName } = body;
 
-    // Validate input parameters
-    if (!email) {
-      throw new BadRequestError("Email is required");
-    }
-
-    if (!password) {
-      throw new BadRequestError("Password is required");
-    }
-
-    if (password.length < 8) {
-      throw new BadRequestError("Password must be at least 8 characters long");
-    }
+    // Validate input parameters using Zod
+    const { email, password, firstName, lastName } = registerSchema.parse(body);
 
     const client = await pool.connect();
 
@@ -110,9 +93,6 @@ export async function POST(request: Request) {
     console.error("Registration error:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json(
-      { error: apiError.message },
-      { status: apiError.status },
-    );
+    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   }
 }

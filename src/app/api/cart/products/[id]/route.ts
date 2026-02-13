@@ -2,24 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
 import { handleApiError, BadRequestError, NotFoundError } from "@/app/utils/api-error-handler";
 import { revalidateTag } from "next/cache";
+import { updateCartItemSchema } from "@/schemas/api-schemas";
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const searchParams = await params;
-    const cartItemId = parseInt(searchParams.id);
+    const cartItemId = searchParams.id;
 
-    if (isNaN(cartItemId)) {
+    if (!cartItemId) {
       throw new BadRequestError("Invalid cart item ID");
     }
 
     // Parse the request body
     const body = await request.json();
-    const { quantity } = body;
 
-    // Validate the quantity
-    if (!quantity || typeof quantity !== "number" || quantity < 1) {
-      throw new BadRequestError("Quantity must be a positive number");
-    }
+    // Validate the quantity using Zod
+    const { quantity } = updateCartItemSchema.parse(body);
 
     const client = await pool.connect();
 
@@ -123,9 +121,9 @@ export async function DELETE(
 ) {
   try {
     const searchParams = await params;
-    const cartItemId = parseInt(searchParams.id);
+    const cartItemId = searchParams.id;
 
-    if (isNaN(cartItemId)) {
+    if (!cartItemId) {
       throw new BadRequestError("Invalid cart item ID");
     }
 

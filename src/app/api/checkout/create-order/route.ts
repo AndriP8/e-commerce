@@ -3,10 +3,19 @@ import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
 import { pool } from "@/app/db/client";
 import { calculateTax } from "@/app/utils/tax-utils";
+import { handleApiError } from "@/app/utils/api-error-handler";
+
+import { createOrderSchema } from "@/schemas/api-schemas";
 
 export async function POST(request: NextRequest) {
   let client;
   try {
+    const body = await request.json();
+
+    // Validate input parameters using Zod
+    const { cart_id, address_detail, shipping_detail, shipping_address, payment_detail } =
+      createOrderSchema.parse(body);
+
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
@@ -20,20 +29,6 @@ export async function POST(request: NextRequest) {
       userId = decoded.userId.toString();
     } catch {
       return NextResponse.json({ error: "Invalid authentication token" }, { status: 401 });
-    }
-
-    const body = await request.json();
-    const { cart_id, address_detail, shipping_detail, shipping_address, payment_detail } = body;
-
-    if (
-      !cart_id ||
-      !address_detail ||
-      !shipping_detail ||
-      !payment_detail ||
-      !shipping_address.receiver_name ||
-      !shipping_address.receiver_phone
-    ) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     client = await pool.connect();
@@ -223,7 +218,8 @@ export async function POST(request: NextRequest) {
       }
     }
     console.error("Error creating order:", error);
-    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
+    const apiError = handleApiError(error);
+    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   } finally {
     if (client) {
       client.release();

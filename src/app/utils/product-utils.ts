@@ -2,7 +2,7 @@
  * Raw database row structure from product queries
  */
 export interface ProductRow {
-  id: number;
+  id: string;
   name: string;
   description: string;
   base_price: string | number;
@@ -14,11 +14,11 @@ export interface ProductRow {
   slug: string;
   created_at: Date | string;
   updated_at: Date | string;
-  category_id: number;
+  category_id: string;
   category_name: string;
   category_description: string;
   category_image_url: string;
-  seller_id?: number;
+  seller_id?: string;
   seller_business_name?: string;
   seller_description?: string;
   seller_logo_url?: string;
@@ -35,7 +35,7 @@ export interface ProductRow {
  * Transformed product data structure
  */
 export interface TransformedProduct {
-  id: number;
+  id: string;
   name: string;
   description: string;
   base_price: number;
@@ -48,13 +48,13 @@ export interface TransformedProduct {
   created_at: Date | string;
   updated_at: Date | string;
   category: {
-    id: number;
+    id: string;
     name: string;
     description: string;
     image_url: string;
   };
   seller: {
-    id?: number;
+    id?: string;
     business_name?: string;
     description?: string;
     logo_url?: string;

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
 import { pool } from "@/app/db/client";
+import { handleApiError } from "@/app/utils/api-error-handler";
+
+import { updatePaymentSchema } from "@/schemas/api-schemas";
 
 export async function POST(
   request: NextRequest,
@@ -9,6 +12,13 @@ export async function POST(
 ) {
   const client = await pool.connect();
   try {
+    const body = await request.json();
+
+    // Validate input parameters using Zod
+    const { transaction_id, payment_status } = updatePaymentSchema.parse(body);
+
+    const { orderId } = await params;
+
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
@@ -22,15 +32,6 @@ export async function POST(
       userId = decoded.userId.toString();
     } catch {
       return NextResponse.json({ error: "Invalid authentication token" }, { status: 401 });
-    }
-
-    const { orderId } = await params;
-
-    const body = await request.json();
-    const { transaction_id, payment_status } = body;
-
-    if (!transaction_id || !payment_status) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     // Start a transaction
@@ -88,7 +89,8 @@ export async function POST(
     // Rollback the transaction in case of error
     await client.query("ROLLBACK");
     console.error("Error updating payment:", error);
-    return NextResponse.json({ error: "Failed to update payment" }, { status: 500 });
+    const apiError = handleApiError(error);
+    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   } finally {
     client.release();
   }
