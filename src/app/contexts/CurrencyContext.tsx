@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from "react";
 import { CurrencyPreferenceResponse } from "../types/currency-preference";
-import Currencies, { CurrenciesId } from "@/schemas/public/Currencies";
+import { Currencies } from "@/schemas/db-schemas";
 import { useRouter } from "next/navigation";
 import { useCsrf } from "./CsrfContext";
 
@@ -23,7 +23,7 @@ type CurrencyAction =
 
 const initialState: CurrencyState = {
   selectedCurrency: {
-    id: "1" as CurrenciesId,
+    id: "1",
     code: "USD",
     name: "US Dollar",
     symbol: "$",

@@ -138,9 +138,7 @@ export default async function OrderConfirmationPage({
           </div>
           <div className="mb-4">
             <h2 className="text-sm font-medium text-gray-500">{t("total")}</h2>
-            <p className="text-lg font-medium">
-              {formatPrice(parseFloat(order.total_amount), currency)}
-            </p>
+            <p className="text-lg font-medium">{formatPrice(order.total_amount, currency)}</p>
           </div>
           <div className="mb-4">
             <h2 className="text-sm font-medium text-gray-500">{t("paymentMethod")}</h2>
@@ -233,13 +231,11 @@ export default async function OrderConfirmationPage({
                     <h3 className="font-medium">{item.product_name}</h3>
                     <p className="text-gray-500">{t("quantity", { count: item.quantity })}</p>
                     <p className="font-medium mt-1">
-                      {formatPrice(parseFloat(item.unit_price), currency)} {t("each")}
+                      {formatPrice(item.unit_price, currency)} {t("each")}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">
-                      {formatPrice(parseFloat(item.total_price), currency)}
-                    </p>
+                    <p className="font-medium">{formatPrice(item.total_price, currency)}</p>
                   </div>
                 </div>
               ))}
@@ -253,25 +249,25 @@ export default async function OrderConfirmationPage({
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span>{tCart("subtotal")}</span>
-                <span>{formatPrice(parseFloat(order.subtotal), currency)}</span>
+                <span>{formatPrice(order.subtotal, currency)}</span>
               </div>
               <div className="flex justify-between">
                 <span>{tCart("shipping")}</span>
-                <span>{formatPrice(parseFloat(order.shipping_amount), currency)}</span>
+                <span>{formatPrice(order.shipping_amount, currency)}</span>
               </div>
               <div className="flex justify-between">
                 <span>{tCart("tax")}</span>
-                <span>{formatPrice(parseFloat(order.tax_amount), currency)}</span>
+                <span>{formatPrice(order.tax_amount, currency)}</span>
               </div>
-              {parseFloat(order.discount_amount) > 0 && (
+              {order.discount_amount > 0 && (
                 <div className="flex justify-between text-green-600">
                   <span>{t("discount")}</span>
-                  <span>{formatPrice(parseFloat(order.discount_amount), currency)}</span>
+                  <span>{formatPrice(order.discount_amount, currency)}</span>
                 </div>
               )}
               <div className="border-t pt-3 mt-3 flex justify-between font-bold">
                 <span>{tCart("total")}</span>
-                <span>{formatPrice(parseFloat(order.total_amount), currency)}</span>
+                <span>{formatPrice(order.total_amount, currency)}</span>
               </div>
             </div>
           </div>

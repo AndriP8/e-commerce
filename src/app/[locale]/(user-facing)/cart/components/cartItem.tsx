@@ -120,7 +120,7 @@ export default function CartItem({
       </div>
       <div className="flex-1">
         <h3 className="font-medium">{item.product_name}</h3>
-        <p className="text-gray-600">{formatPrice(parseFloat(item.total_price), currency)}</p>
+        <p className="text-gray-600">{formatPrice(item.total_price, currency)}</p>
         <div
           className="mt-2 flex items-center gap-2"
           role="group"

@@ -188,7 +188,7 @@ export default async function ProductDetail({ params }: Props) {
             {/* Price */}
             <div className="mb-6">
               <span className="text-2xl font-bold">
-                {formatPrice(parseFloat(product.base_price), productData.currency)}
+                {formatPrice(product.base_price, productData.currency)}
               </span>
             </div>
 
@@ -217,7 +217,7 @@ export default async function ProductDetail({ params }: Props) {
                       />
                       <div className="font-medium">{variant.variant_name}</div>
                       <div className="text-sm text-gray-600">
-                        {formatPrice(parseFloat(variant.price), productData.currency)}
+                        {formatPrice(variant.price, productData.currency)}
                       </div>
                     </label>
                   ))}

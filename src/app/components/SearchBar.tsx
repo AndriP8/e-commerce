@@ -3,7 +3,7 @@
 import { useId, useState, useEffect } from "react";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { useQueryState, useQueryStates, parseAsInteger, parseAsString } from "nuqs";
+import { useQueryStates, parseAsInteger, parseAsString } from "nuqs";
 
 interface SearchBarProps {
   className?: string;
@@ -16,10 +16,10 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   const pathname = usePathname();
   const inputId = useId();
 
-  const [{ search: queryState, page }, setQueryParams] = useQueryStates(
+  const [{ search: queryState }, setQueryParams] = useQueryStates(
     {
       search: parseAsString.withDefault(""),
-      page: parseAsInteger.withDefault(1),
+      page: parseAsInteger.withDefault(1), // Keep page in definition for reset functionality
     },
     {
       shallow: false,

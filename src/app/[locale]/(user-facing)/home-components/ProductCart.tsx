@@ -41,9 +41,7 @@ export default function ProductCart({ product, currency, priority = false }: Pro
 
           <p className="text-gray-600 text-sm mb-3 line-clamp-1">{product.description}</p>
           <div>
-            <span className="text-xl font-bold ">
-              {formatPrice(parseFloat(product.base_price), currency)}
-            </span>
+            <span className="text-xl font-bold ">{formatPrice(product.base_price, currency)}</span>
           </div>
           <AddToCartButton productId={product.id} />
         </div>

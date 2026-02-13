@@ -4,10 +4,7 @@ interface JsonLdProps {
 
 function JsonLdScript({ data }: JsonLdProps) {
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
   );
 }
 
@@ -16,7 +13,7 @@ interface ProductJsonLdProps {
     name: string;
     description?: string | null;
     slug: string;
-    base_price: string;
+    base_price: string | number;
     brand?: string | null;
     sku?: string | null;
     images?: { image_url: string }[] | null;
@@ -29,8 +26,7 @@ interface ProductJsonLdProps {
 }
 
 export function ProductJsonLd({ product, currencyCode, baseUrl }: ProductJsonLdProps) {
-  const imageUrl =
-    product.images && product.images.length > 0 ? product.images[0].image_url : null;
+  const imageUrl = product.images && product.images.length > 0 ? product.images[0].image_url : null;
 
   const availability =
     product.stock && product.stock.total_quantity > 0
@@ -49,7 +45,10 @@ export function ProductJsonLd({ product, currencyCode, baseUrl }: ProductJsonLdP
     ...(product.category && { category: product.category.name }),
     offers: {
       "@type": "Offer",
-      price: parseFloat(product.base_price).toFixed(2),
+      price: (typeof product.base_price === "string"
+        ? parseFloat(product.base_price)
+        : product.base_price
+      ).toFixed(2),
       priceCurrency: currencyCode,
       availability,
       url: `${baseUrl}/products/${product.slug}`,
@@ -74,13 +73,7 @@ interface BreadcrumbItem {
   url: string;
 }
 
-export function BreadcrumbJsonLd({
-  items,
-  baseUrl,
-}: {
-  items: BreadcrumbItem[];
-  baseUrl: string;
-}) {
+export function BreadcrumbJsonLd({ items, baseUrl }: { items: BreadcrumbItem[]; baseUrl: string }) {
   const data = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
