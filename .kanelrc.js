@@ -1,11 +1,13 @@
 const path = require("path");
+const generateZodSchemas = require("./scripts/kanel-zod-local").default;
 
 /** @type {import('kanel').Config} */
 module.exports = {
   connection: {
     host: "localhost",
     user: "postgres",
-    database: "ecommerce",
+    password: "securedb",
+    database: "e-commerce",
   },
 
   preDeleteOutputFolder: true,
@@ -15,4 +17,6 @@ module.exports = {
     "pg_catalog.tsvector": "string",
     "pg_catalog.bpchar": "string",
   },
+
+  preRenderHooks: [generateZodSchemas],
 };
