@@ -9,7 +9,7 @@ import { addToCart as addToCartAction } from "@/app/utils/cart-client-actions";
 import { useTranslations } from "next-intl";
 
 export default function AddToCart({ productId }: { productId: string }) {
-  const t = useTranslations("Products");
+  const t = useTranslations("ProductList");
   const tA11y = useTranslations("Accessibility");
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
@@ -19,7 +19,7 @@ export default function AddToCart({ productId }: { productId: string }) {
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      toast.error(t("pleaseLogin"));
+      toast.error(t("messages.pleaseLogin"));
       router.push("/login");
       return;
     }
@@ -29,10 +29,10 @@ export default function AddToCart({ productId }: { productId: string }) {
       const result = await addToCartAction(api, productId, quantity);
 
       if (result.success) {
-        toast.success(result.message || t("addedToCart"));
+        toast.success(result.message || t("messages.addedToCart"));
         router.refresh();
       } else {
-        toast.error(result.error || t("failedToAdd"));
+        toast.error(result.error || t("messages.failedToAdd"));
 
         if (result.error?.includes("Authentication required")) {
           router.push("/login");
@@ -81,7 +81,7 @@ export default function AddToCart({ productId }: { productId: string }) {
         aria-disabled={isAdding}
         className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 disabled:bg-blue-400 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
-        {isAdding ? <span>{t("adding")}</span> : <span>{t("addToCart")}</span>}
+        {isAdding ? <span>{t("actions.adding")}</span> : <span>{t("actions.addToCart")}</span>}
       </button>
     </div>
   );

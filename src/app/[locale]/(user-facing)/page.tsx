@@ -25,11 +25,11 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   return {
     title: searchQuery
-      ? `${t("searchResults", { query: searchQuery })} | ${t("metaTitle")}`
-      : t("metaTitle"),
+      ? `${t("search.results", { query: searchQuery })} | ${t("metadata.title")}`
+      : t("metadata.title"),
     description: searchQuery
-      ? `${t("searchResults", { query: searchQuery })} - ${t("metaDescription")}`
-      : t("metaDescription"),
+      ? `${t("search.results", { query: searchQuery })} - ${t("metadata.description")}`
+      : t("metadata.description"),
     keywords: searchQuery
       ? `${searchQuery}, search results, e-commerce, shopping`
       : "e-commerce, shopping, fast loading, performance",

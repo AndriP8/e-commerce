@@ -63,8 +63,8 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
     () => [
       {
         id: "1", // Database ID for Standard Shipping
-        name: t("standard"),
-        description: t("standardDesc"),
+        name: t("shippingMethods.standard.name"),
+        description: t("shippingMethods.standard.description"),
         base_costs: 0,
         currency_id: "USD",
         min_days: 3,
@@ -72,8 +72,8 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
       },
       {
         id: "2", // Database ID for Express Shipping
-        name: t("express"),
-        description: t("expressDesc"),
+        name: t("shippingMethods.express.name"),
+        description: t("shippingMethods.express.description"),
         base_costs: 10, // Updated to match database value
         currency_id: "USD",
         min_days: 1,
@@ -88,13 +88,13 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
       // Validate shipping address
       const { address_line1, city, state: stateValue, postal_code, country } = state.addressDetail;
       if (!address_line1 || !city || !stateValue || !postal_code || !country) {
-        toast.error(t("fillAllFields"));
+        toast.error(t("errors.fillAllFields"));
         return;
       }
     } else if (state.step === 2) {
       // Validate shipping method
       if (!state.shippingDetail.shipping_method_id) {
-        toast.error(t("selectShippingMethod"));
+        toast.error(t("errors.selectShippingMethod"));
         return;
       }
 
@@ -108,7 +108,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
           country,
         } = state.billingAddress;
         if (!address_line1 || !city || !stateValue || !postal_code || !country) {
-          toast.error(t("fillBillingFields"));
+          toast.error(t("errors.fillBillingFields"));
           return;
         }
       }
@@ -186,7 +186,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             >
               1
             </div>
-            <div className="ml-2 font-medium">{t("shipping")}</div>
+            <div className="ml-2 font-medium">{t("steps.shipping")}</div>
           </div>
           <div className="h-1 w-16 bg-gray-200 mx-2">
             <div className={`h-full ${state.step >= 2 ? "bg-blue-600" : "bg-gray-200"}`}></div>
@@ -199,7 +199,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             >
               2
             </div>
-            <div className="ml-2 font-medium">{t("delivery")}</div>
+            <div className="ml-2 font-medium">{t("steps.delivery")}</div>
           </div>
           <div className="h-1 w-16 bg-gray-200 mx-2">
             <div className={`h-full ${state.step >= 3 ? "bg-blue-600" : "bg-gray-200"}`}></div>
@@ -212,14 +212,14 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             >
               3
             </div>
-            <div className="ml-2 font-medium">{t("payment")}</div>
+            <div className="ml-2 font-medium">{t("steps.payment")}</div>
           </div>
         </div>
       </div>
 
       {state.step === 1 && (
         <div className="space-y-6">
-          <h2 className="text-xl font-bold mb-4">{t("shippingAddress")}</h2>
+          <h2 className="text-xl font-bold mb-4">{t("address.shipping")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="col-span-2">
               <label
@@ -227,7 +227,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 htmlFor="receiver_name"
                 id="receiver_name_label"
               >
-                {t("receiverName")} *
+                {t("address.receiverName")} *
               </label>
               <input
                 type="text"
@@ -257,7 +257,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 htmlFor="receiver_phone"
                 id="receiver_phone_label"
               >
-                {t("receiverPhone")} *
+                {t("address.receiverPhone")} *
               </label>
               <input
                 type="tel"
@@ -288,7 +288,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 htmlFor="address_line1"
                 id="address_line1_label"
               >
-                {t("addressLine1")} *
+                {t("address.addressLine1")} *
               </label>
               <input
                 type="text"
@@ -318,7 +318,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 htmlFor="address_line2"
                 id="address_line2_label"
               >
-                {t("addressLine2")}
+                {t("address.addressLine2")}
               </label>
               <input
                 type="text"
@@ -339,7 +339,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1" htmlFor="city" id="city_label">
-                {t("city")} *
+                {t("address.city")} *
               </label>
               <input
                 type="text"
@@ -363,7 +363,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1" htmlFor="state" id="state_label">
-                {t("state")} *
+                {t("address.state")} *
               </label>
               <input
                 type="text"
@@ -389,7 +389,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 htmlFor="postal_code"
                 id="postal_code_label"
               >
-                {t("postalCode")} *
+                {t("address.postalCode")} *
               </label>
               <input
                 type="text"
@@ -418,7 +418,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 htmlFor="country"
                 id="country_label"
               >
-                {t("country")} *
+                {t("address.country")} *
               </label>
               <input
                 type="text"
@@ -444,9 +444,9 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
 
       {state.step === 2 && (
         <div className="space-y-6">
-          <h2 className="text-xl font-bold mb-4">{t("shippingMethod")}</h2>
+          <h2 className="text-xl font-bold mb-4">{t("shippingMethods.title")}</h2>
           <fieldset className="space-y-4">
-            <legend className="sr-only">{t("shippingMethodOptions")}</legend>
+            <legend className="sr-only">{t("shippingMethods.options")}</legend>
             {shippingMethods.map((method) => (
               <div
                 key={method.id}
@@ -512,7 +512,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   </div>
                   <div className="font-medium" id={`shipping_method_${method.id}_price`}>
                     {method.base_costs === 0
-                      ? t("free")
+                      ? t("summary.free")
                       : formatPrice(shippingCostConversion, cart.currency)}
                   </div>
                 </div>
@@ -521,7 +521,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
           </fieldset>
 
           <div className="mt-8">
-            <h2 className="text-xl font-bold mb-4">{t("billingAddress")}</h2>
+            <h2 className="text-xl font-bold mb-4">{t("address.billing")}</h2>
             <div className="mb-4">
               <div className="flex items-center">
                 <input
@@ -537,7 +537,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   id="same_billing_address_label"
                   className="cursor-pointer"
                 >
-                  {t("sameAsBilling")}
+                  {t("address.sameAsBilling")}
                 </label>
               </div>
             </div>
@@ -546,7 +546,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1" htmlFor="billing_receiver_name">
-                    {t("receiverName")} *
+                    {t("address.receiverName")} *
                   </label>
                   <input
                     type="text"
@@ -567,7 +567,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     className="block text-sm font-medium mb-1"
                     htmlFor="billing_receiver_phone"
                   >
-                    {t("receiverPhone")} *
+                    {t("address.receiverPhone")} *
                   </label>
                   <input
                     type="tel"
@@ -585,7 +585,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1" htmlFor="billing_address_line1">
-                    {t("addressLine1")} *
+                    {t("address.addressLine1")} *
                   </label>
                   <input
                     type="text"
@@ -603,7 +603,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1" htmlFor="billing_address_line2">
-                    {t("addressLine2")}
+                    {t("address.addressLine2")}
                   </label>
                   <input
                     type="text"
@@ -628,7 +628,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     htmlFor="billing_city"
                     id="billing_city_label"
                   >
-                    {t("city")} *
+                    {t("address.city")} *
                   </label>
                   <input
                     type="text"
@@ -660,7 +660,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     htmlFor="billing_state"
                     id="billing_state_label"
                   >
-                    {t("state")} *
+                    {t("address.state")} *
                   </label>
                   <input
                     type="text"
@@ -690,7 +690,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     htmlFor="billing_postal_code"
                     id="billing_postal_code_label"
                   >
-                    {t("postalCode")} *
+                    {t("address.postalCode")} *
                   </label>
                   <input
                     type="text"
@@ -725,7 +725,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     htmlFor="billing_country"
                     id="billing_country_label"
                   >
-                    {t("country")} *
+                    {t("address.country")} *
                   </label>
                   <input
                     type="text"
@@ -757,7 +757,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
 
       {state.step === 3 && (
         <div className="space-y-6">
-          <h2 className="text-xl font-bold mb-4">{t("payment")}</h2>
+          <h2 className="text-xl font-bold mb-4">{t("steps.payment")}</h2>
           {state.clientSecret ? (
             <StripePaymentSection
               clientSecret={state.clientSecret}
@@ -769,7 +769,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
           ) : (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p>{t("preparingPayment")}</p>
+              <p>{t("actions.preparingPayment")}</p>
             </div>
           )}
         </div>
@@ -782,7 +782,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             onClick={prevStep}
             className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            {t("back")}
+            {t("actions.back")}
           </button>
         )}
         {state.step < 3 && (
@@ -791,7 +791,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             onClick={handleSubmit}
             className="ml-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            {t("continue")}
+            {t("actions.continue")}
           </button>
         )}
       </div>

@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductDetail({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations({ locale, namespace: "Products" });
+  const t = await getTranslations({ locale, namespace: "ProductDetail" });
   const tNav = await getTranslations({ locale, namespace: "Navigation" });
   const productData = await getProduct(slug);
   const product = productData.data;
@@ -143,7 +143,7 @@ export default async function ProductDetail({ params }: Props) {
                 <div
                   className="grid grid-cols-5 gap-2"
                   role="group"
-                  aria-label={t("thumbnailsAria")}
+                  aria-label={t("accessibility.thumbnails")}
                 >
                   {product.images.map((image, index) => (
                     <button
@@ -180,8 +180,8 @@ export default async function ProductDetail({ params }: Props) {
             <div className="flex items-center mb-4">
               <StarRating rating={product.rating.average} />
               <span className="text-sm text-gray-600 ml-2">
-                {product.rating.average.toFixed(1)} ({t("reviews", { count: product.rating.count })}
-                )
+                {product.rating.average.toFixed(1)} (
+                {t("reviews.count", { count: product.rating.count })})
               </span>
             </div>
 
@@ -194,14 +194,14 @@ export default async function ProductDetail({ params }: Props) {
 
             {/* Description */}
             <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-2">{t("description")}</h2>
+              <h2 className="text-lg font-semibold mb-2">{t("info.description")}</h2>
               <p className="text-gray-700">{product.description}</p>
             </div>
 
             {/* Variants */}
             {product.variants && product.variants.length > 0 && (
               <fieldset className="mb-6">
-                <legend className="text-lg font-semibold mb-2">{t("variants")}</legend>
+                <legend className="text-lg font-semibold mb-2">{t("info.variants")}</legend>
                 <div className="grid grid-cols-2 gap-2" role="radiogroup">
                   {product.variants.map((variant, index) => (
                     <label
@@ -230,7 +230,7 @@ export default async function ProductDetail({ params }: Props) {
 
             {/* Seller Info */}
             <div className="mt-8 p-4 border rounded-md">
-              <h2 className="text-lg font-semibold mb-2">{t("soldBy")}</h2>
+              <h2 className="text-lg font-semibold mb-2">{t("info.soldBy")}</h2>
               <div className="flex items-center">
                 {product.seller?.logo_url && (
                   <div className="relative h-12 w-12 mr-3">
@@ -250,7 +250,7 @@ export default async function ProductDetail({ params }: Props) {
                   <div className="font-medium">{product.seller?.business_name}</div>
                   <div className="text-sm text-gray-600">
                     {product.seller?.rating} ★ (
-                    {t("reviews", { count: product.seller?.total_reviews || 0 })})
+                    {t("reviews.count", { count: product.seller?.total_reviews || 0 })})
                   </div>
                 </div>
               </div>

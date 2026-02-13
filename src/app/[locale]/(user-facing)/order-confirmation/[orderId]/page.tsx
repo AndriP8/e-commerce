@@ -62,20 +62,20 @@ export default async function OrderConfirmationPage({
   if (!isAuthenticated) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">{tCart("pleaseLogin")}</h2>
-        <p className="text-lg mb-6">{tCart("loginRequired")}</p>
+        <h2 className="text-2xl font-bold mb-4">{tCart("errors.pleaseLogin")}</h2>
+        <p className="text-lg mb-6">{tCart("errors.loginRequired")}</p>
         <div className="flex justify-center space-x-4">
           <Link
             href="/login"
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            {tAuth("login")}
+            {tAuth("login.button")}
           </Link>
           <Link
             href="/register"
             className="border border-blue-600 text-blue-600 px-4 py-2 rounded hover:bg-blue-50"
           >
-            {tAuth("register")}
+            {tAuth("register.button")}
           </Link>
         </div>
       </div>
@@ -96,10 +96,10 @@ export default async function OrderConfirmationPage({
   if (!orderDetails) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">{t("notFound")}</h2>
-        <p className="text-lg mb-6">{t("notFoundDesc")}</p>
+        <h2 className="text-2xl font-bold mb-4">{t("errors.notFound")}</h2>
+        <p className="text-lg mb-6">{t("errors.notFoundDesc")}</p>
         <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">
-          {tCart("continueShopping")}
+          {tCart("actions.continueShopping")}
         </Link>
       </div>
     );
@@ -122,26 +122,26 @@ export default async function OrderConfirmationPage({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="text-3xl font-bold mb-2">{t("confirmedTitle")}</h1>
-        <p className="text-lg text-gray-600">{t("thankYou")}</p>
+        <h1 className="text-3xl font-bold mb-2">{t("confirmation.title")}</h1>
+        <p className="text-lg text-gray-600">{t("confirmation.thankYou")}</p>
       </div>
 
       <div className="bg-white rounded-lg border p-6 mb-8">
         <div className="flex flex-wrap justify-between mb-6">
           <div className="mb-4">
-            <h2 className="text-sm font-medium text-gray-500">{t("number")}</h2>
+            <h2 className="text-sm font-medium text-gray-500">{t("details.number")}</h2>
             <p className="text-lg font-medium">{order.order_number}</p>
           </div>
           <div className="mb-4">
-            <h2 className="text-sm font-medium text-gray-500">{t("date")}</h2>
+            <h2 className="text-sm font-medium text-gray-500">{t("details.date")}</h2>
             <p className="text-lg font-medium">{new Date(order.order_date).toLocaleDateString()}</p>
           </div>
           <div className="mb-4">
-            <h2 className="text-sm font-medium text-gray-500">{t("total")}</h2>
+            <h2 className="text-sm font-medium text-gray-500">{t("details.total")}</h2>
             <p className="text-lg font-medium">{formatPrice(order.total_amount, currency)}</p>
           </div>
           <div className="mb-4">
-            <h2 className="text-sm font-medium text-gray-500">{t("paymentMethod")}</h2>
+            <h2 className="text-sm font-medium text-gray-500">{t("details.paymentMethod")}</h2>
             <p className="text-lg font-medium capitalize">
               {order.payment_provider} ({order.payment_method})
             </p>
@@ -149,7 +149,7 @@ export default async function OrderConfirmationPage({
         </div>
 
         <div className="border-t pt-6">
-          <h2 className="text-xl font-bold mb-4">{t("status")}</h2>
+          <h2 className="text-xl font-bold mb-4">{t("status.label")}</h2>
           <div className="flex items-center mb-6">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -159,7 +159,7 @@ export default async function OrderConfirmationPage({
               1
             </div>
             <div className="ml-2 font-medium">
-              {t("paymentStatus", { status: order.payment_status || "" })}
+              {t("status.payment", { status: order.payment_status || "" })}
             </div>
             <div className="h-1 w-16 bg-gray-200 mx-4">
               <div
@@ -181,7 +181,7 @@ export default async function OrderConfirmationPage({
               2
             </div>
             <div className="ml-2 font-medium">
-              {t("orderStatus", { status: order.order_status || "" })}
+              {t("status.order", { status: order.order_status || "" })}
             </div>
             <div className="h-1 w-16 bg-gray-200 mx-4">
               <div
@@ -204,7 +204,7 @@ export default async function OrderConfirmationPage({
               3
             </div>
             <div className="ml-2 font-medium">
-              {t("shipmentStatus", { status: shipment ? shipment.shipment_status : "pending" })}
+              {t("status.shipment", { status: shipment ? shipment.shipment_status : "pending" })}
             </div>
           </div>
         </div>
@@ -213,7 +213,7 @@ export default async function OrderConfirmationPage({
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-2">
           <div className="bg-white rounded-lg border p-6 mb-8">
-            <h2 className="text-xl font-bold mb-4">{t("items")}</h2>
+            <h2 className="text-xl font-bold mb-4">{t("items.title")}</h2>
             <div className="space-y-6">
               {items.map((item) => (
                 <div key={item.id} className="flex border-b pb-4">
@@ -229,9 +229,9 @@ export default async function OrderConfirmationPage({
                   </div>
                   <div className="flex-1">
                     <h3 className="font-medium">{item.product_name}</h3>
-                    <p className="text-gray-500">{t("quantity", { count: item.quantity })}</p>
+                    <p className="text-gray-500">{t("items.quantity", { count: item.quantity })}</p>
                     <p className="font-medium mt-1">
-                      {formatPrice(item.unit_price, currency)} {t("each")}
+                      {formatPrice(item.unit_price, currency)} {t("items.each")}
                     </p>
                   </div>
                   <div className="text-right">
@@ -245,35 +245,35 @@ export default async function OrderConfirmationPage({
 
         <div>
           <div className="bg-white rounded-lg border p-6 mb-8">
-            <h2 className="text-xl font-bold mb-4">{tCart("orderSummary")}</h2>
+            <h2 className="text-xl font-bold mb-4">{tCart("summary.title")}</h2>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span>{tCart("subtotal")}</span>
+                <span>{tCart("summary.subtotal")}</span>
                 <span>{formatPrice(order.subtotal, currency)}</span>
               </div>
               <div className="flex justify-between">
-                <span>{tCart("shipping")}</span>
+                <span>{tCart("summary.shipping")}</span>
                 <span>{formatPrice(order.shipping_amount, currency)}</span>
               </div>
               <div className="flex justify-between">
-                <span>{tCart("tax")}</span>
+                <span>{tCart("summary.tax")}</span>
                 <span>{formatPrice(order.tax_amount, currency)}</span>
               </div>
               {order.discount_amount > 0 && (
                 <div className="flex justify-between text-green-600">
-                  <span>{t("discount")}</span>
+                  <span>{t("items.discount")}</span>
                   <span>{formatPrice(order.discount_amount, currency)}</span>
                 </div>
               )}
               <div className="border-t pt-3 mt-3 flex justify-between font-bold">
-                <span>{tCart("total")}</span>
+                <span>{tCart("summary.total")}</span>
                 <span>{formatPrice(order.total_amount, currency)}</span>
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-lg border p-6">
-            <h2 className="text-xl font-bold mb-4">{tAuth("shippingAddress")}</h2>
+            <h2 className="text-xl font-bold mb-4">{t("shippingAddress")}</h2>
             <address className="not-italic">
               <p>{shippingAddress.address_line1}</p>
               {shippingAddress.address_line2 && <p>{shippingAddress.address_line2}</p>}
@@ -291,7 +291,7 @@ export default async function OrderConfirmationPage({
           href="/"
           className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 inline-block"
         >
-          {tCart("continueShopping")}
+          {tCart("actions.continueShopping")}
         </Link>
       </div>
     </div>

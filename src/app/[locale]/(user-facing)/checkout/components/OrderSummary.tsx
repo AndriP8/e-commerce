@@ -36,7 +36,7 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
       role="region"
     >
       <h2 id="order-summary-heading" className="text-xl font-bold mb-4">
-        {t("orderSummary")}
+        {t("summary.title")}
       </h2>
       <div className="space-y-4 mb-6">
         <ul className="list-none p-0 m-0 space-y-4">
@@ -57,22 +57,24 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
       </div>
       <dl className="border-t border-gray-200 pt-4 space-y-4">
         <div className="flex justify-between">
-          <dt>{t("subtotal")}</dt>
+          <dt>{t("summary.subtotal")}</dt>
           <dd>{formatPrice(subtotal, cart.currency)}</dd>
         </div>
         <div className="flex justify-between">
-          <dt>{t("shipping")}</dt>
-          <dd>{shippingCost === 0 ? t("free") : formatPrice(shippingCost, cart.currency)}</dd>
+          <dt>{t("summary.shipping")}</dt>
+          <dd>
+            {shippingCost === 0 ? t("summary.free") : formatPrice(shippingCost, cart.currency)}
+          </dd>
         </div>
         <div className="flex justify-between">
-          <dt>{t("tax")}</dt>
+          <dt>{t("summary.tax")}</dt>
           <dd>{formatPrice(tax, cart.currency)}</dd>
         </div>
         <div
           className="border-t border-gray-200 pt-4 flex justify-between font-bold"
           aria-live="polite"
         >
-          <dt>{t("total")}</dt>
+          <dt>{t("summary.total")}</dt>
           <dd aria-label={`Total: ${formatPrice(total, cart.currency)}`}>
             {formatPrice(total, cart.currency)}
           </dd>

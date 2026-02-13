@@ -46,6 +46,7 @@ export default async function CheckoutPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "Checkout" });
+  const tCart = await getTranslations({ locale, namespace: "Cart" });
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value || "";
   const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
@@ -65,8 +66,8 @@ export default async function CheckoutPage({ params }: Props) {
   if (!isAuthenticated) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">{t("pleaseLogin")}</h2>
-        <p className="text-lg mb-6">{t("loginRequired")}</p>
+        <h2 className="text-2xl font-bold mb-4">{t("errors.pleaseLogin")}</h2>
+        <p className="text-lg mb-6">{t("errors.loginRequired")}</p>
         <div className="flex justify-center space-x-4">
           <Link
             href="/login"
@@ -94,9 +95,9 @@ export default async function CheckoutPage({ params }: Props) {
   if (!cartItems || cartItems.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-lg mb-4">{t("emptyCart")}</p>
+        <p className="text-lg mb-4">{t("errors.emptyCart")}</p>
         <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">
-          {t("continueShopping")}
+          {tCart("actions.continueShopping")}
         </Link>
       </div>
     );

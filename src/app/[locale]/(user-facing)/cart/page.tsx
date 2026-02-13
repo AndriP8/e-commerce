@@ -72,8 +72,8 @@ export default async function CartPage({ params }: Props) {
           <div className="mb-6">
             <ShoppingCart size={64} className="mx-auto text-gray-300" />
           </div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">{t("pleaseLogin")}</h2>
-          <p className="text-lg mb-6 text-gray-600">{t("loginRequired")}</p>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">{t("errors.pleaseLogin")}</h2>
+          <p className="text-lg mb-6 text-gray-600">{t("errors.loginRequired")}</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
               href="/login"
@@ -103,14 +103,14 @@ export default async function CartPage({ params }: Props) {
           <div className="mb-6">
             <ShoppingCart size={64} className="mx-auto text-gray-300" />
           </div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">{t("empty")}</h2>
-          <p className="text-lg mb-6 text-gray-600">{t("emptyDescription")}</p>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">{t("empty.title")}</h2>
+          <p className="text-lg mb-6 text-gray-600">{t("empty.description")}</p>
           <Link
             href="/"
             className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             <ArrowLeft size={20} />
-            {t("continueShopping")}
+            {t("actions.continueShopping")}
           </Link>
         </div>
       </div>
@@ -126,17 +126,17 @@ export default async function CartPage({ params }: Props) {
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
-          aria-label={t("backToProductsAria")}
+          aria-label={t("accessibility.backToProducts")}
         >
           <ArrowLeft size={20} />
-          <span className="hidden sm:inline">{t("backToShopping")}</span>
+          <span className="hidden sm:inline">{t("actions.backToShopping")}</span>
         </Link>
         <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <ShoppingCart size={32} />
           {t("title")} ({cartItems.length}{" "}
           {cartItems.length === 1
-            ? t("item", { count: 1 })
-            : t("items", { count: cartItems.length })}
+            ? t("items.single", { count: 1 })
+            : t("items.count", { count: cartItems.length })}
           )
         </h1>
       </div>
@@ -164,12 +164,12 @@ export default async function CartPage({ params }: Props) {
         {/* Order Summary */}
         <div className="lg:col-span-1">
           <div className="bg-gray-50 rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-6 text-gray-900">{t("orderSummary")}</h2>
+            <h2 className="text-xl font-bold mb-6 text-gray-900">{t("summary.title")}</h2>
 
             <div className="space-y-4 mb-6">
               <div className="flex justify-between items-center pb-4 border-b">
                 <span className="text-gray-600">
-                  {t("itemsCount", { count: cartItems.length })}
+                  {t("items.label", { count: cartItems.length })}
                 </span>
                 <span className="font-semibold">
                   {formatPrice(cart.data.total_price, cart.currency)}
@@ -177,14 +177,14 @@ export default async function CartPage({ params }: Props) {
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t("shipping")}</span>
-                <span className="font-medium text-green-600">{t("free")}</span>
+                <span className="text-gray-600">{t("summary.shipping")}</span>
+                <span className="font-medium text-green-600">{t("summary.free")}</span>
               </div>
 
               <hr className="border-gray-200" />
 
               <div className="flex justify-between items-center text-lg font-bold">
-                <span>{t("total")}</span>
+                <span>{t("summary.total")}</span>
                 <span className="font-bold">
                   {formatPrice(cart.data.total_price, cart.currency)}
                 </span>
@@ -195,14 +195,14 @@ export default async function CartPage({ params }: Props) {
               href="/checkout"
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-center block font-medium focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              {t("proceedToCheckout")}
+              {t("actions.proceedToCheckout")}
             </Link>
 
             <Link
               href="/"
               className="w-full mt-3 border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-center block focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
-              {t("continueShopping")}
+              {t("actions.continueShopping")}
             </Link>
           </div>
         </div>

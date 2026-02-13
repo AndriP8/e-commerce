@@ -75,7 +75,9 @@ export default function Pagination({
       className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-gray-200"
       aria-label={tA11y("pagination")}
     >
-      <p className="text-sm text-gray-700">{t("showing", { start, end, total: totalItems })}</p>
+      <p className="text-sm text-gray-700">
+        {t("pagination.showing", { start, end, total: totalItems })}
+      </p>
 
       <div className="flex items-center gap-1">
         {/* Previous button */}
@@ -83,20 +85,20 @@ export default function Pagination({
           <Link
             href={buildUrl(currentPage - 1)}
             className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label={t("previous")}
+            aria-label={t("pagination.previous")}
           >
             <ChevronLeft className="size-4" aria-hidden="true" />
-            <span className="hidden sm:inline">{t("previous")}</span>
+            <span className="hidden sm:inline">{t("pagination.previous")}</span>
           </Link>
         ) : (
           <button
             disabled
             aria-disabled="true"
-            aria-label={t("previous")}
+            aria-label={t("pagination.previous")}
             className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded-md cursor-not-allowed"
           >
             <ChevronLeft className="size-4" aria-hidden="true" />
-            <span className="hidden sm:inline">{t("previous")}</span>
+            <span className="hidden sm:inline">{t("pagination.previous")}</span>
           </button>
         )}
 
@@ -131,7 +133,7 @@ export default function Pagination({
 
         {/* Mobile page indicator */}
         <span className="sm:hidden px-3 py-2 text-sm text-gray-700">
-          {t("page", { current: currentPage, total: totalPages })}
+          {t("pagination.page", { current: currentPage, total: totalPages })}
         </span>
 
         {/* Next button */}
@@ -139,19 +141,19 @@ export default function Pagination({
           <Link
             href={buildUrl(currentPage + 1)}
             className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label={t("next")}
+            aria-label={t("pagination.next")}
           >
-            <span className="hidden sm:inline">{t("next")}</span>
+            <span className="hidden sm:inline">{t("pagination.next")}</span>
             <ChevronRight className="size-4" aria-hidden="true" />
           </Link>
         ) : (
           <button
             disabled
             aria-disabled="true"
-            aria-label={t("next")}
+            aria-label={t("pagination.next")}
             className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded-md cursor-not-allowed"
           >
-            <span className="hidden sm:inline">{t("next")}</span>
+            <span className="hidden sm:inline">{t("pagination.next")}</span>
             <ChevronRight className="size-4" aria-hidden="true" />
           </button>
         )}

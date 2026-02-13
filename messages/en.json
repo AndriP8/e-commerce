@@ -43,141 +43,223 @@
   },
   "Home": {
     "title": "Our Products",
-    "metaTitle": "E-Commerce Store - Fast & Reliable Shopping",
-    "metaDescription": "High-performance e-commerce platform with optimized loading times and excellent user experience",
-    "search": "Search products...",
-    "searchResults": "Search results for \"{query}\"",
-    "featuredProducts": "Featured Products",
-    "noProductsFound": "No products found",
-    "tryAdjusting": "Try adjusting your search criteria",
-    "cart": "Cart",
-    "showing": "Showing {start}-{end} of {total} products",
-    "previous": "Previous",
-    "next": "Next",
-    "page": "Page {current} of {total}"
+    "metadata": {
+      "title": "E-Commerce Store - Fast & Reliable Shopping",
+      "description": "High-performance e-commerce platform with optimized loading times and excellent user experience"
+    },
+    "search": {
+      "placeholder": "Search products...",
+      "results": "Search results for \"{query}\"",
+      "noResults": "No products found",
+      "tryAdjusting": "Try adjusting your search criteria"
+    },
+    "sections": {
+      "featured": "Featured Products"
+    },
+    "pagination": {
+      "showing": "Showing {start}-{end} of {total} products",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {current} of {total}"
+    },
+    "cart": "Cart"
   },
-  "Products": {
-    "addToCart": "Add to Cart",
-    "adding": "Adding...",
-    "outOfStock": "Out of Stock",
-    "price": "Price",
-    "description": "Description",
-    "reviews": "{count} reviews",
-    "soldBy": "Sold by",
-    "customerReviews": "Customer Reviews",
-    "noReviews": "No reviews yet.",
-    "verifiedPurchase": "Verified Purchase",
-    "variants": "Variants",
-    "addedToCart": "Product added to cart",
-    "failedToAdd": "Failed to add product to cart",
-    "pleaseLogin": "Please login to add items to your cart",
-    "thumbnailsAria": "Product image thumbnails"
+  "ProductList": {
+    "actions": {
+      "addToCart": "Add to Cart",
+      "adding": "Adding..."
+    },
+    "status": {
+      "outOfStock": "Out of Stock"
+    },
+    "messages": {
+      "addedToCart": "Product added to cart",
+      "failedToAdd": "Failed to add product to cart",
+      "pleaseLogin": "Please login to add items to your cart"
+    }
+  },
+  "ProductDetail": {
+    "info": {
+      "price": "Price",
+      "description": "Description",
+      "soldBy": "Sold by",
+      "variants": "Variants"
+    },
+    "reviews": {
+      "title": "Customer Reviews",
+      "count": "{count} reviews",
+      "noReviews": "No reviews yet.",
+      "verified": "Verified Purchase"
+    },
+    "accessibility": {
+      "thumbnails": "Product image thumbnails"
+    }
   },
   "Cart": {
     "title": "Your Shopping Cart",
-    "empty": "Your cart is empty",
-    "emptyDescription": "Looks like you haven't added anything to your cart yet",
-    "continueShopping": "Continue Shopping",
-    "proceedToCheckout": "Proceed to Checkout",
-    "backToShopping": "Back to Shopping",
-    "subtotal": "Subtotal",
-    "shipping": "Shipping",
-    "free": "Free",
-    "total": "Total",
-    "items": "{count} items",
-    "item": "{count} item",
-    "orderSummary": "Order Summary",
-    "pleaseLogin": "Please Login",
-    "loginRequired": "You need to be logged in to view your cart",
-    "remove": "Remove",
-    "backToProductsAria": "Back to products",
-    "itemsCount": "Items ({count})"
+    "empty": {
+      "title": "Your cart is empty",
+      "description": "Looks like you haven't added anything to your cart yet"
+    },
+    "actions": {
+      "continueShopping": "Continue Shopping",
+      "proceedToCheckout": "Proceed to Checkout",
+      "backToShopping": "Back to Shopping",
+      "remove": "Remove"
+    },
+    "summary": {
+      "title": "Order Summary",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "total": "Total",
+      "free": "Free"
+    },
+    "items": {
+      "count": "{count} items",
+      "single": "{count} item",
+      "label": "Items ({count})"
+    },
+    "errors": {
+      "loginRequired": "You need to be logged in to view your cart",
+      "pleaseLogin": "Please Login"
+    },
+    "accessibility": {
+      "backToProducts": "Back to products"
+    }
   },
   "Checkout": {
     "title": "Checkout",
-    "shippingAddress": "Shipping Address",
-    "billingAddress": "Billing Address",
-    "paymentMethod": "Payment Method",
-    "payment": "Payment",
-    "placeOrder": "Place Order",
-    "shipping": "Shipping",
-    "delivery": "Delivery",
-    "shippingMethod": "Shipping Method",
-    "sameAsBilling": "Same as shipping address",
-    "continue": "Continue",
-    "back": "Back",
-    "preparingPayment": "Preparing payment...",
-    "emptyCart": "Your cart is empty",
-    "loginRequired": "You need to be logged in to checkout",
-    "receiverName": "Receiver Name",
-    "receiverPhone": "Receiver Phone",
-    "addressLine1": "Address Line 1",
-    "addressLine2": "Address Line 2",
-    "city": "City",
-    "state": "State/Province",
-    "postalCode": "Postal Code",
-    "country": "Country",
-    "requiredField": "This field is required",
-    "fillAllFields": "Please fill in all required shipping address fields",
-    "selectShippingMethod": "Please select a shipping method",
-    "fillBillingFields": "Please fill in all required billing address fields",
-    "free": "Free",
-    "subtotal": "Subtotal",
-    "tax": "Tax",
-    "total": "Total",
-    "orderSummary": "Order Summary",
-    "loadingIndicator": "Loading indicator",
-    "shippingStandard": "Standard Shipping",
-    "shippingStandardDesc": "Delivery in 3-5 business days",
-    "shippingExpress": "Express Shipping",
-    "shippingExpressDesc": "Delivery in 1-2 business days",
-    "shippingMethodOptions": "Shipping Method Options",
-    "shippingAddressLegend": "Shipping Address Details",
-    "billingAddressLegend": "Billing Address Details",
-    "paymentMethodLegend": "Payment Method Details"
+    "steps": {
+      "shipping": "Shipping",
+      "delivery": "Delivery",
+      "payment": "Payment"
+    },
+    "address": {
+      "shipping": "Shipping Address",
+      "billing": "Billing Address",
+      "receiverName": "Receiver Name",
+      "receiverPhone": "Receiver Phone",
+      "addressLine1": "Address Line 1",
+      "addressLine2": "Address Line 2",
+      "city": "City",
+      "state": "State/Province",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "sameAsBilling": "Same as shipping address"
+    },
+    "shippingMethods": {
+      "title": "Shipping Method",
+      "options": "Shipping Method Options",
+      "standard": {
+        "name": "Standard Shipping",
+        "description": "Delivery in 3-5 business days"
+      },
+      "express": {
+        "name": "Express Shipping",
+        "description": "Delivery in 1-2 business days"
+      }
+    },
+    "summary": {
+      "title": "Order Summary",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "total": "Total",
+      "free": "Free"
+    },
+    "actions": {
+      "continue": "Continue",
+      "back": "Back",
+      "placeOrder": "Place Order",
+      "preparingPayment": "Preparing payment..."
+    },
+    "errors": {
+      "fillAllFields": "Please fill in all required shipping address fields",
+      "selectShippingMethod": "Please select a shipping method",
+      "fillBillingFields": "Please fill in all required billing address fields",
+      "emptyCart": "Your cart is empty",
+      "loginRequired": "You need to be logged in to checkout",
+      "pleaseLogin": "Please Login"
+    },
+    "accessibility": {
+      "loadingIndicator": "Loading indicator",
+      "shippingAddressLegend": "Shipping Address Details",
+      "billingAddressLegend": "Billing Address Details",
+      "paymentMethodLegend": "Payment Method Details"
+    }
   },
   "Auth": {
-    "login": "Login",
-    "register": "Register",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "forgotPassword": "Forgot Password?",
-    "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?",
-    "signInTitle": "Sign in to your account",
-    "orCreateAccount": "Or create a new account",
-    "signInButton": "Sign in",
-    "signingIn": "Signing in...",
-    "createAccountTitle": "Create a new account",
-    "orSignIn": "Or sign in to your account",
-    "createAccountButton": "Create account",
-    "creatingAccount": "Creating account...",
-    "firstName": "First Name",
-    "lastName": "Last Name",
-    "loginFailed": "Login failed",
-    "registrationFailed": "Registration failed",
-    "emailPlaceholder": "Email address",
-    "passwordPlaceholder": "Password",
-    "hidePassword": "Hide password",
-    "showPassword": "Show password"
+    "login": {
+      "title": "Sign in to your account",
+      "button": "Sign in",
+      "loading": "Signing in...",
+      "failed": "Login failed",
+      "forgotPassword": "Forgot Password?",
+      "noAccount": "Don't have an account?"
+    },
+    "register": {
+      "title": "Create a new account",
+      "button": "Create account",
+      "loading": "Creating account...",
+      "failed": "Registration failed",
+      "hasAccount": "Already have an account?"
+    },
+    "fields": {
+      "email": "Email",
+      "emailPlaceholder": "Email address",
+      "password": "Password",
+      "passwordPlaceholder": "Password",
+      "confirmPassword": "Confirm Password",
+      "firstName": "First Name",
+      "lastName": "Last Name"
+    },
+    "actions": {
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "links": {
+      "noAccount": "Don't have an account?",
+      "hasAccount": "Already have an account?",
+      "createAccount": "create account",
+      "signIn": "sign in"
+    }
+  },
+  "Error": {
+    "title": "Something went wrong!",
+    "description": "We apologize for the inconvenience. An unexpected error has occurred.",
+    "globalDescription": "A critical error has occurred. Please try refreshing the page.",
+    "errorId": "Error ID: {digest}",
+    "tryAgain": "Try again",
+    "home": "Go to home"
   },
   "Order": {
-    "confirmedTitle": "Order Confirmed!",
-    "thankYou": "Thank you for your purchase. Your order has been received.",
-    "number": "Order Number",
-    "date": "Date",
-    "total": "Total",
-    "paymentMethod": "Payment Method",
-    "status": "Order Status",
-    "paymentStatus": "Payment {status}",
-    "orderStatus": "Order {status}",
-    "shipmentStatus": "Shipment {status}",
-    "items": "Order Items",
-    "quantity": "Quantity: {count}",
-    "each": "each",
-    "discount": "Discount",
-    "notFound": "Order Not Found",
-    "notFoundDesc": "We couldn't find the order you're looking for"
+    "confirmation": {
+      "title": "Order Confirmed!",
+      "thankYou": "Thank you for your purchase. Your order has been received."
+    },
+    "details": {
+      "number": "Order Number",
+      "date": "Date",
+      "total": "Total",
+      "paymentMethod": "Payment Method"
+    },
+    "status": {
+      "label": "Order Status",
+      "payment": "Payment {status}",
+      "order": "Order {status}",
+      "shipment": "Shipment {status}"
+    },
+    "items": {
+      "title": "Order Items",
+      "quantity": "Quantity: {count}",
+      "each": "each",
+      "discount": "Discount"
+    },
+    "errors": {
+      "notFound": "Order Not Found",
+      "notFoundDesc": "We couldn't find the order you're looking for"
+    },
+    "shippingAddress": "Shipping Address"
   }
 }

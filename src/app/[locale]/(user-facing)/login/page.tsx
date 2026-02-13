@@ -37,7 +37,7 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t("loginFailed"));
+      toast.error(error instanceof Error ? error.message : t("login.failed"));
     } finally {
       setIsLoading(false);
     }
@@ -47,11 +47,11 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight">{t("signInTitle")}</h2>
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight">{t("login.title")}</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            {t("orCreateAccount")}{" "}
+            {t("links.noAccount")}{" "}
             <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              {t("createAccountTitle").toLowerCase()}
+              {t("register.title").toLowerCase()}
             </Link>
           </p>
         </div>
@@ -60,7 +60,7 @@ export default function LoginPage() {
           <div className="-space-y-px rounded-md shadow-sm">
             <div>
               <label htmlFor="email" className="sr-only">
-                {t("email")}
+                {t("fields.email")}
               </label>
               <input
                 id="email"
@@ -69,14 +69,14 @@ export default function LoginPage() {
                 autoComplete="email"
                 required
                 className="relative block w-full rounded-t-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("emailPlaceholder")}
+                placeholder={t("fields.emailPlaceholder")}
                 value={formData.email}
                 onChange={handleChange}
               />
             </div>
             <div className="relative">
               <label htmlFor="password" className="sr-only">
-                {t("password")}
+                {t("fields.password")}
               </label>
               <input
                 id="password"
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 required
                 className="relative block w-full rounded-b-md border-0 py-1.5 px-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("passwordPlaceholder")}
+                placeholder={t("fields.passwordPlaceholder")}
                 value={formData.password}
                 onChange={handleChange}
               />
@@ -93,7 +93,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600"
-                aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+                aria-label={showPassword ? t("actions.hidePassword") : t("actions.showPassword")}
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5" aria-hidden="true" />
@@ -112,7 +112,7 @@ export default function LoginPage() {
                 isLoading ? "opacity-70 cursor-not-allowed" : ""
               }`}
             >
-              {isLoading ? t("signingIn") : t("signInButton")}
+              {isLoading ? t("login.loading") : t("login.button")}
             </button>
           </div>
         </form>

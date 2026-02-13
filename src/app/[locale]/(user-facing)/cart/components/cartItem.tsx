@@ -188,7 +188,7 @@ export default function CartItem({
         onClick={handleDeleteItem}
         aria-label={tA11y("removeFromCart", { product: item.product_name })}
       >
-        {t("remove")}
+        {t("actions.remove")}
       </button>
     </div>
   );

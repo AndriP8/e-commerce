@@ -18,16 +18,16 @@ interface ReviewsSectionProps {
 }
 
 export default function ReviewsSection({ reviews }: ReviewsSectionProps) {
-  const t = useTranslations("Products");
+  const t = useTranslations("ProductDetail");
 
   return (
     <section className="mt-12" aria-labelledby="reviews-heading">
       <h2 id="reviews-heading" className="text-2xl font-bold mb-6">
-        {t("customerReviews")}
+        {t("reviews.title")}
       </h2>
 
       {reviews && reviews.length > 0 ? (
-        <div className="space-y-6" role="list" aria-label={t("customerReviews")}>
+        <div className="space-y-6" role="list" aria-label={t("reviews.title")}>
           {reviews.map((review, index) => (
             <article
               key={`${review.first_name}-${index}`}
@@ -49,14 +49,14 @@ export default function ReviewsSection({ reviews }: ReviewsSectionProps) {
                   {new Date(review.created_at).toLocaleDateString()}
                 </time>
                 {review.is_verified_purchase && (
-                  <span className="ml-2 text-green-600">{t("verifiedPurchase")}</span>
+                  <span className="ml-2 text-green-600">{t("reviews.verified")}</span>
                 )}
               </footer>
             </article>
           ))}
         </div>
       ) : (
-        <p className="text-gray-600">{t("noReviews")}</p>
+        <p className="text-gray-600">{t("reviews.noReviews")}</p>
       )}
     </section>
   );

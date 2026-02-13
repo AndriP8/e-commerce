@@ -135,7 +135,7 @@ export default function PaymentForm({
               fill="none"
               viewBox="0 0 24 24"
               role="img"
-              aria-label={t("loadingIndicator")}
+              aria-label={t("accessibility.loadingIndicator")}
             >
               <circle
                 className="opacity-25"

@@ -37,7 +37,7 @@ export default function RegisterPage() {
         router.refresh();
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t("registrationFailed"));
+      toast.error(error instanceof Error ? error.message : t("register.failed"));
     } finally {
       setIsLoading(false);
     }
@@ -48,12 +48,12 @@ export default function RegisterPage() {
       <div className="w-full max-w-md space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight">
-            {t("createAccountTitle")}
+            {t("register.title")}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            {t("orSignIn")}{" "}
+            {t("links.hasAccount")}{" "}
             <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              {t("signInTitle").toLowerCase()}
+              {t("login.title").toLowerCase()}
             </Link>
           </p>
         </div>
@@ -62,7 +62,7 @@ export default function RegisterPage() {
           <div className="-space-y-px rounded-md shadow-sm">
             <div>
               <label htmlFor="firstName" className="sr-only">
-                {t("firstName")}
+                {t("fields.firstName")}
               </label>
               <input
                 id="firstName"
@@ -70,14 +70,14 @@ export default function RegisterPage() {
                 type="text"
                 autoComplete="given-name"
                 className="relative block w-full rounded-t-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("firstName")}
+                placeholder={t("fields.firstName")}
                 value={formData.firstName}
                 onChange={handleChange}
               />
             </div>
             <div>
               <label htmlFor="lastName" className="sr-only">
-                {t("lastName")}
+                {t("fields.lastName")}
               </label>
               <input
                 id="lastName"
@@ -85,14 +85,14 @@ export default function RegisterPage() {
                 type="text"
                 autoComplete="family-name"
                 className="relative block w-full border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("lastName")}
+                placeholder={t("fields.lastName")}
                 value={formData.lastName}
                 onChange={handleChange}
               />
             </div>
             <div>
               <label htmlFor="email" className="sr-only">
-                {t("email")}
+                {t("fields.email")}
               </label>
               <input
                 id="email"
@@ -101,14 +101,14 @@ export default function RegisterPage() {
                 autoComplete="email"
                 required
                 className="relative block w-full border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("email")}
+                placeholder={t("fields.email")}
                 value={formData.email}
                 onChange={handleChange}
               />
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
-                {t("password")}
+                {t("fields.password")}
               </label>
               <input
                 id="password"
@@ -117,7 +117,7 @@ export default function RegisterPage() {
                 autoComplete="new-password"
                 required
                 className="relative block w-full rounded-b-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("password")}
+                placeholder={t("fields.password")}
                 value={formData.password}
                 onChange={handleChange}
               />
@@ -132,7 +132,7 @@ export default function RegisterPage() {
                 isLoading ? "opacity-70 cursor-not-allowed" : ""
               }`}
             >
-              {isLoading ? t("creatingAccount") : t("createAccountButton")}
+              {isLoading ? t("register.loading") : t("register.button")}
             </button>
           </div>
         </form>

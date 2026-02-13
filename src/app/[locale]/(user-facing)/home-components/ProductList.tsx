@@ -21,13 +21,13 @@ export default async function ProductList({
     <div>
       <div>
         <h1 className="text-3xl font-semibold mb-6 text-gray-900">
-          {searchQuery ? t("searchResults", { query: searchQuery }) : t("featuredProducts")}
+          {searchQuery ? t("search.results", { query: searchQuery }) : t("sections.featured")}
         </h1>
         {products.data.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Frown className="size-16 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900">{t("noProductsFound")}</h3>
-            <p className="text-gray-500">{t("tryAdjusting")}</p>
+            <h3 className="text-lg font-medium text-gray-900">{t("search.noResults")}</h3>
+            <p className="text-gray-500">{t("search.tryAdjusting")}</p>
           </div>
         ) : (
           <>

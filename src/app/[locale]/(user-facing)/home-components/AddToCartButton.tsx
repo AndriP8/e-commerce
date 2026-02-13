@@ -14,7 +14,7 @@ interface AddToCartButtonProps {
 }
 
 export default function AddToCartButton({ productId, productName }: AddToCartButtonProps) {
-  const t = useTranslations("Products");
+  const t = useTranslations("ProductList");
   const [isAdding, setIsAdding] = useState(false);
   const { isAuthenticated } = useAuth();
   const api = useApi();
@@ -22,7 +22,7 @@ export default function AddToCartButton({ productId, productName }: AddToCartBut
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      toast.error(t("pleaseLogin"));
+      toast.error(t("messages.pleaseLogin"));
       router.push("/login");
       return;
     }
@@ -32,10 +32,10 @@ export default function AddToCartButton({ productId, productName }: AddToCartBut
       const result = await addToCartAction(api, productId, 1);
 
       if (result.success) {
-        toast.success(result.message || t("addedToCart"));
+        toast.success(result.message || t("messages.addedToCart"));
         router.refresh();
       } else {
-        toast.error(result.error || t("failedToAdd"));
+        toast.error(result.error || t("messages.failedToAdd"));
 
         if (result.error?.includes("Authentication required")) {
           router.push("/login");
@@ -43,7 +43,7 @@ export default function AddToCartButton({ productId, productName }: AddToCartBut
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error(t("failedToAdd"));
+      toast.error(t("messages.failedToAdd"));
     } finally {
       setIsAdding(false);
     }
@@ -54,10 +54,12 @@ export default function AddToCartButton({ productId, productName }: AddToCartBut
       onClick={handleAddToCart}
       disabled={isAdding}
       aria-disabled={isAdding}
-      aria-label={productName ? `${t("addToCart")} - ${productName}` : t("addToCart")}
+      aria-label={
+        productName ? `${t("actions.addToCart")} - ${productName}` : t("actions.addToCart")
+      }
       className="bg-blue-600 text-white px-4 w-full py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
     >
-      {isAdding ? t("adding") : t("addToCart")}
+      {isAdding ? t("actions.adding") : t("actions.addToCart")}
     </button>
   );
 }
