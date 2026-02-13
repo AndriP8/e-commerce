@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "../../styles/performance.css";
 import { Providers } from "./components/Providers";
@@ -18,20 +17,6 @@ export type User = {
   lastName: string;
   email: string;
 };
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
-  preload: false,
-});
 
 export const metadata: Metadata = {
   title: "E-Commerce Store - Fast & Reliable Shopping",
@@ -113,7 +98,7 @@ const fetchUserCurrencyPreference = async (token?: string) => {
   }
 };
 
-export default async function RootLayout({
+export default async function LocaleLayout({
   children,
   params,
 }: Readonly<{

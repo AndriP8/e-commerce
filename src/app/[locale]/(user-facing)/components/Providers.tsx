@@ -5,7 +5,7 @@ import { CsrfProvider } from "@/app/contexts/CsrfContext";
 import { CurrencyProvider, SelectedCurrency } from "@/app/contexts/CurrencyContext";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { User } from "../layout";
-import Currencies from "@/schemas/public/Currencies";
+import { Currencies } from "@/schemas/db-schemas";
 
 interface ProvidersProps {
   children: React.ReactNode;
