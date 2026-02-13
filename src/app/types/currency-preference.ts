@@ -1,4 +1,4 @@
-import Currencies from "@/schemas/public/Currencies";
+import { Currencies } from "@/schemas/db-schemas";
 
 export type CurrencyPreferenceResponse = {
   currency: Omit<Currencies, "created_at" | "updated_at" | "id"> & {

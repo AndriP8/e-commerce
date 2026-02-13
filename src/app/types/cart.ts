@@ -1,13 +1,15 @@
-import CartItems from "@/schemas/public/CartItems";
-import Categories from "@/schemas/public/Categories";
-import Currencies from "@/schemas/public/Currencies";
-import Products from "@/schemas/public/Products";
-import ProductVariants from "@/schemas/public/ProductVariants";
-import ShoppingCarts from "@/schemas/public/ShoppingCarts";
-import Users from "@/schemas/public/Users";
+import {
+  CartItems,
+  Categories,
+  Currencies,
+  Products,
+  ProductVariants,
+  ShoppingCarts,
+  Users,
+} from "@/schemas/db-schemas";
 
 export type addToCartBody = {
-  product_id: number;
+  product_id: string;
   quantity: number;
 };
 

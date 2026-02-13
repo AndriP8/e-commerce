@@ -1,12 +1,14 @@
-import type Products from "@/schemas/public/Products";
-import type Categories from "@/schemas/public/Categories";
-import type { SellersInitializer } from "@/schemas/public/Sellers";
-import ProductVariants from "@/schemas/public/ProductVariants";
-import Reviews from "@/schemas/public/Reviews";
-import Users from "@/schemas/public/Users";
-import ProductImages from "@/schemas/public/ProductImages";
-import Sellers from "@/schemas/public/Sellers";
-import Currencies from "@/schemas/public/Currencies";
+import {
+  Products,
+  Categories,
+  SellersInitializer,
+  ProductVariants,
+  Reviews,
+  Users,
+  ProductImages,
+  Sellers,
+  Currencies,
+} from "@/schemas/db-schemas";
 
 export type Product = Omit<Products, "seller_id" | "category_id"> & {
   category?: Omit<Categories, "parent_category_id" | "is_active" | "created_at">;
