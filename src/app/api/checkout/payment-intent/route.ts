@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { handleApiError } from "@/app/utils/api-error-handler";
+import { paymentIntentSchema } from "@/schemas/checkout";
 
 function getStripeInstance() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -9,8 +10,6 @@ function getStripeInstance() {
   }
   return new Stripe(secretKey);
 }
-
-import { paymentIntentSchema } from "@/schemas/api-schemas";
 
 export async function POST(request: NextRequest) {
   try {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
 import { handleApiError, BadRequestError, NotFoundError } from "@/app/utils/api-error-handler";
 import { revalidateTag } from "next/cache";
-import { updateCartItemSchema } from "@/schemas/api-schemas";
+import { updateCartItemSchema } from "@/schemas/cart";
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {

@@ -3,7 +3,7 @@ import { pool } from "@/app/db/client";
 import { comparePassword, generateToken, setAuthCookie } from "@/app/utils/auth-utils";
 import { handleApiError, UnauthorizedError } from "@/app/utils/api-error-handler";
 
-import { loginSchema } from "@/schemas/api-schemas";
+import { loginSchema } from "@/schemas/auth";
 
 export async function POST(request: Request) {
   try {

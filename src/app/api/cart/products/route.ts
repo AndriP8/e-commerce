@@ -7,6 +7,7 @@ import { getPreferenceCurrency } from "@/middleware";
 import { convertCartPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 import { revalidateTag } from "next/cache";
+import { addToCartSchema } from "@/schemas/cart";
 
 export async function GET() {
   try {
@@ -120,8 +121,6 @@ export async function GET() {
     return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   }
 }
-
-import { addToCartSchema } from "@/schemas/api-schemas";
 
 export async function POST(request: NextRequest) {
   try {

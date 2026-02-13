@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { pool } from "@/app/db/client";
 import { handleApiError } from "@/app/utils/api-error-handler";
 
-import { updatePaymentSchema } from "@/schemas/api-schemas";
+import { updatePaymentSchema } from "@/schemas/checkout";
 
 export async function POST(
   request: NextRequest,

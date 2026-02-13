@@ -5,7 +5,7 @@ import { pool } from "@/app/db/client";
 import { calculateTax } from "@/app/utils/tax-utils";
 import { handleApiError } from "@/app/utils/api-error-handler";
 
-import { createOrderSchema } from "@/schemas/api-schemas";
+import { createOrderSchema } from "@/schemas/checkout";
 
 export async function POST(request: NextRequest) {
   let client;

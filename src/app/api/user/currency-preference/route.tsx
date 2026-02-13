@@ -7,6 +7,7 @@ import {
   getCurrencyByCode,
 } from "@/app/utils/currency-utils";
 import { handleApiError } from "@/app/utils/api-error-handler";
+import { currencyPreferenceSchema } from "@/schemas/user";
 
 export async function GET() {
   try {
@@ -44,8 +45,6 @@ export async function GET() {
     return NextResponse.json({ error: apiError.message }, { status: apiError.status });
   }
 }
-
-import { currencyPreferenceSchema } from "@/schemas/api-schemas";
 
 export async function POST(request: NextRequest) {
   try {
