@@ -12,7 +12,7 @@ export type AddressDetail = {
 };
 
 export type ShippingDetail = {
-  shipping_method_id: number;
+  shipping_method_id: string;
   estimated_delivery: string;
 };
 
@@ -58,7 +58,7 @@ export const initialState: CheckoutState = {
     receiver_phone: "",
   },
   shippingDetail: {
-    shipping_method_id: 0,
+    shipping_method_id: "",
     estimated_delivery: "",
   },
   paymentDetail: {
@@ -82,10 +82,7 @@ export const initialState: CheckoutState = {
   },
 };
 
-export function checkoutReducer(
-  state: CheckoutState,
-  action: CheckoutAction,
-): CheckoutState {
+export function checkoutReducer(state: CheckoutState, action: CheckoutAction): CheckoutState {
   switch (action.type) {
     case "SET_STEP":
       return { ...state, step: action.payload };

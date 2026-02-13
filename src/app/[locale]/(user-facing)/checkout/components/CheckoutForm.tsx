@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useState } from "react";
+import { useState, useEffect, useMemo, useReducer } from "react";
 import dynamic from "next/dynamic";
 import { GetCartResponse } from "@/app/types/cart";
 import { toast } from "sonner";
@@ -37,12 +37,13 @@ const getConversion = async ({
 };
 
 type ShippingMethod = {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  base_costs: string;
-  estimated_days_min: number;
-  estimated_days_max: number;
+  base_costs: number;
+  currency_id: string;
+  min_days: number;
+  max_days: number;
 };
 
 import { useTranslations } from "next-intl";
@@ -58,24 +59,29 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
   const { updateShippingCost, shippingCost, tax } = useCheckoutCost();
   const api = useApi();
 
-  const shippingMethods: ShippingMethod[] = [
-    {
-      id: 1,
-      name: t("shippingStandard"),
-      description: t("shippingStandardDesc"),
-      base_costs: "0",
-      estimated_days_min: 3,
-      estimated_days_max: 5,
-    },
-    {
-      id: 2,
-      name: t("shippingExpress"),
-      description: t("shippingExpressDesc"),
-      base_costs: "10.00",
-      estimated_days_min: 1,
-      estimated_days_max: 2,
-    },
-  ];
+  const shippingMethods: ShippingMethod[] = useMemo(
+    () => [
+      {
+        id: "1", // Database ID for Standard Shipping
+        name: t("standard"),
+        description: t("standardDesc"),
+        base_costs: 0,
+        currency_id: "USD",
+        min_days: 3,
+        max_days: 5,
+      },
+      {
+        id: "2", // Database ID for Express Shipping
+        name: t("express"),
+        description: t("expressDesc"),
+        base_costs: 10, // Updated to match database value
+        currency_id: "USD",
+        min_days: 1,
+        max_days: 2,
+      },
+    ],
+    [t],
+  );
 
   const nextStep = () => {
     if (state.step === 1) {
@@ -121,7 +127,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
   const createPaymentIntent = async () => {
     dispatch({ type: "SET_LOADING", payload: true });
     dispatch({ type: "SET_ERROR", payload: null });
-    const subTotal = cart.data.items.reduce((sum, item) => sum + parseFloat(item.total_price), 0);
+    const subTotal = cart.data.items.reduce((sum, item) => sum + item.total_price, 0);
     // Include tax in the total amount
     const total = subTotal + shippingCost + tax;
 
@@ -160,13 +166,13 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
 
   useEffect(() => {
     getConversion({
-      amount: parseFloat(shippingMethods[shippingMethods.length - 1].base_costs),
+      amount: shippingMethods[shippingMethods.length - 1].base_costs,
       from: "USD",
       to: cart.currency.code,
     }).then((data) => {
       setShippingCostConversion(data.convertedAmount);
     });
-  }, [cart.currency.code]);
+  }, [cart.currency.code, shippingMethods]);
 
   return (
     <div className="bg-white rounded-lg p-6 border">
@@ -452,8 +458,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 onClick={() => {
                   const today = new Date();
                   const deliveryDate = new Date(today);
-                  deliveryDate.setDate(today.getDate() + method.estimated_days_max);
-
+                  deliveryDate.setDate(today.getDate() + method.max_days);
                   // Update shipping method in local state
                   dispatch({
                     type: "UPDATE_SHIPPING",
@@ -465,9 +470,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
 
                   // Update shipping cost in context
                   updateShippingCost(
-                    method.base_costs === "0"
-                      ? parseFloat(method.base_costs)
-                      : shippingCostConversion,
+                    method.base_costs === 0 ? method.base_costs : shippingCostConversion,
                   );
                 }}
                 role="radio"
@@ -479,7 +482,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   if (e.key === "Enter" || e.key === " ") {
                     const today = new Date();
                     const deliveryDate = new Date(today);
-                    deliveryDate.setDate(today.getDate() + method.estimated_days_max);
+                    deliveryDate.setDate(today.getDate() + method.max_days);
 
                     dispatch({
                       type: "UPDATE_SHIPPING",
@@ -490,9 +493,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     });
 
                     updateShippingCost(
-                      method.base_costs === "0"
-                        ? parseFloat(method.base_costs)
-                        : shippingCostConversion,
+                      method.base_costs === 0 ? method.base_costs : shippingCostConversion,
                     );
                   }
                 }}
@@ -510,7 +511,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                     </p>
                   </div>
                   <div className="font-medium" id={`shipping_method_${method.id}_price`}>
-                    {parseFloat(method.base_costs) === 0
+                    {method.base_costs === 0
                       ? t("free")
                       : formatPrice(shippingCostConversion, cart.currency)}
                   </div>

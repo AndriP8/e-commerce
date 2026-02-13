@@ -102,7 +102,7 @@ export default function PaymentForm({
     }
   };
 
-  const subTotal = cart.data.items.reduce((sum, item) => sum + parseFloat(item.total_price), 0);
+  const subTotal = cart.data.items.reduce((sum, item) => sum + item.total_price, 0);
 
   const total = subTotal + shippingCost + tax;
 

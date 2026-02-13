@@ -17,7 +17,7 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
   const cartItems = cart.data.items;
 
   const subtotal = useMemo(() => {
-    return cartItems?.reduce((sum, item) => sum + parseFloat(item.total_price), 0);
+    return cartItems?.reduce((sum, item) => sum + item.total_price, 0);
   }, [cartItems]);
 
   // Update subtotal in context whenever it changes
@@ -48,10 +48,8 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
                   x{item.quantity}
                 </span>
               </div>
-              <span
-                aria-label={`Price: ${formatPrice(parseFloat(item.total_price), cart.currency)}`}
-              >
-                {formatPrice(parseFloat(item.total_price), cart.currency)}
+              <span aria-label={`Price: ${formatPrice(item.total_price, cart.currency)}`}>
+                {formatPrice(item.total_price, cart.currency)}
               </span>
             </li>
           ))}
