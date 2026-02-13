@@ -7,10 +7,10 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useApi } from "@/app/utils/api-client";
 import { addToCart as addToCartAction } from "@/app/utils/cart-client-actions";
 import { useTranslations } from "next-intl";
+import QuantitySelector from "@/app/components/QuantitySelector";
 
 export default function AddToCart({ productId }: { productId: string }) {
   const t = useTranslations("ProductList");
-  const tA11y = useTranslations("Accessibility");
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -46,40 +46,28 @@ export default function AddToCart({ productId }: { productId: string }) {
     }
   };
 
+  const handleQuantityChange = (newQuantity: string) => {
+    const num = Number(newQuantity);
+    if (!isNaN(num) && num >= 1) {
+      setQuantity(num);
+    }
+  };
+
   return (
     <div className="mb-6">
-      <div
-        className="flex items-center mb-4"
-        role="group"
-        aria-label={tA11y("quantityFor", { product: "this product" })}
-      >
-        <button
-          onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-          className="w-10 h-10 border rounded-l-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10"
-          aria-label={tA11y("decreaseQuantity", { product: "product" })}
-          disabled={quantity <= 1}
-          aria-disabled={quantity <= 1}
-        >
-          <span aria-hidden="true">-</span>
-        </button>
-        <div className="w-16 h-10 border-t border-b flex items-center justify-center">
-          <span className="sr-only">{tA11y("quantityLabel")}</span>
-          {quantity}
-        </div>
-        <button
-          onClick={() => setQuantity((prev) => prev + 1)}
-          className="w-10 h-10 border rounded-r-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10"
-          aria-label={tA11y("increaseQuantity", { product: "product" })}
-        >
-          <span aria-hidden="true">+</span>
-        </button>
-      </div>
+      <QuantitySelector
+        quantity={quantity}
+        onQuantityChange={handleQuantityChange}
+        disabled={isAdding}
+        productName="this product"
+        className="mb-4"
+      />
 
       <button
         onClick={handleAddToCart}
         disabled={isAdding}
         aria-disabled={isAdding}
-        className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 disabled:bg-blue-400 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
       >
         {isAdding ? <span>{t("actions.adding")}</span> : <span>{t("actions.addToCart")}</span>}
       </button>
