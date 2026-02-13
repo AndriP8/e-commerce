@@ -1,14 +1,18 @@
 "use client";
 
-import { useState, useEffect, useMemo, useReducer } from "react";
+import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { GetCartResponse } from "@/app/types/cart";
 import { toast } from "sonner";
-import { initialState, checkoutReducer } from "./checkoutReducer";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
 import { CurrencyConversion } from "@/app/types/currency";
 import { formatPrice } from "@/app/utils/format-price-currency";
 import { useApi } from "@/app/utils/api-client";
+import { useTranslations } from "next-intl";
+import { useForm, useWatch, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { checkoutFormSchema, CheckoutFormInput } from "@/schemas/checkout";
+import { FormField } from "@/app/components/FormField";
 
 // Dynamically import Stripe components only when needed
 const StripePaymentSection = dynamic(() => import("./StripePaymentSection"), {
@@ -46,23 +50,66 @@ type ShippingMethod = {
   max_days: number;
 };
 
-import { useTranslations } from "next-intl";
-
 interface CheckoutFormProps {
   cart: GetCartResponse;
 }
 
 function CheckoutForm({ cart }: CheckoutFormProps) {
   const t = useTranslations("Checkout");
+  const [step, setStep] = useState(1);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [shippingCostConversion, setShippingCostConversion] = useState(0);
-  const [state, dispatch] = useReducer(checkoutReducer, initialState);
   const { updateShippingCost, shippingCost, tax } = useCheckoutCost();
   const api = useApi();
+
+  const {
+    register,
+    handleSubmit,
+    trigger,
+    setValue,
+    getValues,
+    control,
+    formState: { errors },
+  } = useForm<CheckoutFormInput>({
+    resolver: zodResolver(checkoutFormSchema),
+    defaultValues: {
+      addressDetail: {
+        address_line1: "",
+        city: "",
+        state: "",
+        postal_code: "",
+        country: "",
+        receiver_name: "",
+        receiver_phone: "",
+        address_type: "shipping",
+      },
+      useSameForBilling: true,
+      billingAddress: {
+        address_line1: "",
+        city: "",
+        state: "",
+        postal_code: "",
+        country: "",
+        receiver_name: "",
+        receiver_phone: "",
+        address_type: "billing",
+      },
+      shippingDetail: {
+        shipping_method_id: "",
+        estimated_delivery: "",
+      },
+    },
+    mode: "onBlur",
+  });
+
+  const useSameForBilling = useWatch({ control, name: "useSameForBilling" });
+  const selectedShippingMethodId = useWatch({ control, name: "shippingDetail.shipping_method_id" });
 
   const shippingMethods: ShippingMethod[] = useMemo(
     () => [
       {
-        id: "1", // Database ID for Standard Shipping
+        id: "1",
         name: t("shippingMethods.standard.name"),
         description: t("shippingMethods.standard.description"),
         base_costs: 0,
@@ -71,10 +118,10 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
         max_days: 5,
       },
       {
-        id: "2", // Database ID for Express Shipping
+        id: "2",
         name: t("shippingMethods.express.name"),
         description: t("shippingMethods.express.description"),
-        base_costs: 10, // Updated to match database value
+        base_costs: 10,
         currency_id: "USD",
         min_days: 1,
         max_days: 2,
@@ -83,52 +130,40 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
     [t],
   );
 
-  const nextStep = () => {
-    if (state.step === 1) {
-      // Validate shipping address
-      const { address_line1, city, state: stateValue, postal_code, country } = state.addressDetail;
-      if (!address_line1 || !city || !stateValue || !postal_code || !country) {
-        toast.error(t("errors.fillAllFields"));
-        return;
-      }
-    } else if (state.step === 2) {
-      // Validate shipping method
-      if (!state.shippingDetail.shipping_method_id) {
-        toast.error(t("errors.selectShippingMethod"));
-        return;
-      }
+  const nextStep = async () => {
+    let isValid = false;
 
-      // If not using same address for billing, validate billing address
-      if (!state.useSameForBilling) {
-        const {
-          address_line1,
-          city,
-          state: stateValue,
-          postal_code,
-          country,
-        } = state.billingAddress;
-        if (!address_line1 || !city || !stateValue || !postal_code || !country) {
-          toast.error(t("errors.fillBillingFields"));
-          return;
-        }
+    if (step === 1) {
+      isValid = await trigger("addressDetail");
+    } else if (step === 2) {
+      const isShippingValid = await trigger("shippingDetail");
+      let isBillingValid = true;
+      if (!useSameForBilling) {
+        isBillingValid = await trigger("billingAddress");
       }
+      isValid = isShippingValid && isBillingValid;
 
-      // Create payment intent and get client secret
-      createPaymentIntent();
+      if (isValid) {
+        await createPaymentIntent();
+      }
     }
 
-    dispatch({ type: "SET_STEP", payload: state.step + 1 });
+    if (isValid) {
+      setStep(step + 1);
+    } else {
+      toast.error(
+        t("errors.fixValidationIssues") || "Please fix validation issues before continuing",
+      );
+    }
   };
 
   const prevStep = () => {
-    dispatch({ type: "SET_STEP", payload: state.step - 1 });
+    setStep(step - 1);
   };
 
   const createPaymentIntent = async () => {
-    dispatch({ type: "SET_LOADING", payload: true });
-    dispatch({ type: "SET_ERROR", payload: null });
+    setIsLoading(true);
     const subTotal = cart.data.items.reduce((sum, item) => sum + item.total_price, 0);
-    // Include tax in the total amount
     const total = subTotal + shippingCost + tax;
 
     try {
@@ -143,24 +178,17 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
       }
 
       const data = await response.json();
-      dispatch({ type: "SET_CLIENT_SECRET", payload: data.clientSecret });
+      setClientSecret(data.clientSecret);
     } catch (error) {
-      dispatch({
-        type: "SET_ERROR",
-        payload: "Error creating payment: " + (error as Error).message,
-      });
-      toast.error("Error creating payment");
+      toast.error("Error creating payment: " + (error as Error).message);
     } finally {
-      dispatch({ type: "SET_LOADING", payload: false });
+      setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (state.step !== 3) {
-      nextStep();
-      return;
+  const onSubmit: SubmitHandler<CheckoutFormInput> = async (data) => {
+    if (step < 3) {
+      await nextStep();
     }
   };
 
@@ -175,39 +203,43 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
   }, [cart.currency.code, shippingMethods]);
 
   return (
-    <div className="bg-white rounded-lg p-6 border">
+    <div className="bg-white rounded-lg p-6 border shadow-sm">
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                state.step >= 1 ? "bg-blue-600 text-white" : "bg-gray-200"
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                step >= 1 ? "bg-blue-600 text-white" : "bg-gray-200"
               }`}
             >
               1
             </div>
             <div className="ml-2 font-medium">{t("steps.shipping")}</div>
           </div>
-          <div className="h-1 w-16 bg-gray-200 mx-2">
-            <div className={`h-full ${state.step >= 2 ? "bg-blue-600" : "bg-gray-200"}`}></div>
+          <div className="h-1 flex-1 bg-gray-200 mx-4">
+            <div
+              className={`h-full transition-all duration-300 ${step >= 2 ? "bg-blue-600 w-full" : "bg-gray-200 w-0"}`}
+            ></div>
           </div>
           <div className="flex items-center">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                state.step >= 2 ? "bg-blue-600 text-white" : "bg-gray-200"
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                step >= 2 ? "bg-blue-600 text-white" : "bg-gray-200"
               }`}
             >
               2
             </div>
             <div className="ml-2 font-medium">{t("steps.delivery")}</div>
           </div>
-          <div className="h-1 w-16 bg-gray-200 mx-2">
-            <div className={`h-full ${state.step >= 3 ? "bg-blue-600" : "bg-gray-200"}`}></div>
+          <div className="h-1 flex-1 bg-gray-200 mx-4">
+            <div
+              className={`h-full transition-all duration-300 ${step >= 3 ? "bg-blue-600 w-full" : "bg-gray-200 w-0"}`}
+            ></div>
           </div>
           <div className="flex items-center">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                state.step >= 3 ? "bg-blue-600 text-white" : "bg-gray-200"
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                step >= 3 ? "bg-blue-600 text-white" : "bg-gray-200"
               }`}
             >
               3
@@ -217,584 +249,271 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
         </div>
       </div>
 
-      {state.step === 1 && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold mb-4">{t("address.shipping")}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label
-                className="block text-sm font-medium mb-1"
-                htmlFor="receiver_name"
-                id="receiver_name_label"
-              >
-                {t("address.receiverName")} *
-              </label>
-              <input
-                type="text"
-                id="receiver_name"
-                className="w-full border rounded-md px-3 py-2"
-                value={state.addressDetail.receiver_name}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_ADDRESS",
-                    payload: { receiver_name: e.target.value },
-                  })
-                }
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {step === 1 && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold mb-4">{t("address.shipping")}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                label={t("address.receiverName")}
+                placeholder={t("address.receiverName")}
+                registration={register("addressDetail.receiver_name")}
+                error={errors.addressDetail?.receiver_name}
+                containerClassName="col-span-2"
                 autoComplete="shipping name"
-                autoCorrect="off"
-                spellCheck="false"
-                aria-required="true"
-                aria-labelledby="receiver_name_label"
-                aria-invalid={
-                  !state.addressDetail.receiver_name && state.step > 1 ? "true" : "false"
-                }
-                required
+                schema={checkoutFormSchema}
               />
-            </div>
-            <div className="col-span-2">
-              <label
-                className="block text-sm font-medium mb-1"
-                htmlFor="receiver_phone"
-                id="receiver_phone_label"
-              >
-                {t("address.receiverPhone")} *
-              </label>
-              <input
-                type="tel"
-                id="receiver_phone"
-                className="w-full border rounded-md px-3 py-2"
-                value={state.addressDetail.receiver_phone}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_ADDRESS",
-                    payload: { receiver_phone: e.target.value },
-                  })
-                }
+              <FormField
+                label={t("address.receiverPhone")}
+                placeholder={t("address.receiverPhone")}
+                registration={register("addressDetail.receiver_phone")}
+                error={errors.addressDetail?.receiver_phone}
+                containerClassName="col-span-2"
                 autoComplete="shipping tel"
-                autoCorrect="off"
-                spellCheck="false"
-                inputMode="tel"
-                aria-required="true"
-                aria-labelledby="receiver_phone_label"
-                aria-invalid={
-                  !state.addressDetail.receiver_phone && state.step > 1 ? "true" : "false"
-                }
-                required
+                type="tel"
+                schema={checkoutFormSchema}
               />
-            </div>
-            <div className="col-span-2">
-              <label
-                className="block text-sm font-medium mb-1"
-                htmlFor="address_line1"
-                id="address_line1_label"
-              >
-                {t("address.addressLine1")} *
-              </label>
-              <input
-                type="text"
-                id="address_line1"
-                className="w-full border rounded-md px-3 py-2"
-                value={state.addressDetail.address_line1}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_ADDRESS",
-                    payload: { address_line1: e.target.value },
-                  })
-                }
+              <FormField
+                label={t("address.addressLine1")}
+                placeholder={t("address.addressLine1")}
+                registration={register("addressDetail.address_line1")}
+                error={errors.addressDetail?.address_line1}
+                containerClassName="col-span-2"
                 autoComplete="shipping address-line1"
-                autoCorrect="off"
-                spellCheck="false"
-                aria-required="true"
-                aria-labelledby="address_line1_label"
-                aria-invalid={
-                  !state.addressDetail.address_line1 && state.step > 1 ? "true" : "false"
-                }
-                required
+                schema={checkoutFormSchema}
               />
-            </div>
-            <div className="col-span-2">
-              <label
-                className="block text-sm font-medium mb-1"
-                htmlFor="address_line2"
-                id="address_line2_label"
-              >
-                {t("address.addressLine2")}
-              </label>
-              <input
-                type="text"
-                id="address_line2"
-                className="w-full border rounded-md px-3 py-2"
-                value={state.addressDetail.address_line2}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_ADDRESS",
-                    payload: { address_line2: e.target.value },
-                  })
-                }
+              <FormField
+                label={t("address.addressLine2")}
+                placeholder={t("address.addressLine2")}
+                registration={register("addressDetail.address_line2")}
+                error={errors.addressDetail?.address_line2}
+                containerClassName="col-span-2"
                 autoComplete="shipping address-line2"
-                autoCorrect="off"
-                spellCheck="false"
-                aria-labelledby="address_line2_label"
+                schema={checkoutFormSchema}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="city" id="city_label">
-                {t("address.city")} *
-              </label>
-              <input
-                type="text"
-                id="city"
-                className="w-full border rounded-md px-3 py-2"
-                value={state.addressDetail.city}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_ADDRESS",
-                    payload: { city: e.target.value },
-                  })
-                }
+              <FormField
+                label={t("address.city")}
+                placeholder={t("address.city")}
+                registration={register("addressDetail.city")}
+                error={errors.addressDetail?.city}
                 autoComplete="shipping address-level2"
-                autoCorrect="off"
-                spellCheck="false"
-                aria-required="true"
-                aria-labelledby="city_label"
-                aria-invalid={!state.addressDetail.city && state.step > 1 ? "true" : "false"}
-                required
+                schema={checkoutFormSchema}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="state" id="state_label">
-                {t("address.state")} *
-              </label>
-              <input
-                type="text"
-                id="state"
-                className="w-full border rounded-md px-3 py-2"
-                value={state.addressDetail.state}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_ADDRESS",
-                    payload: { state: e.target.value },
-                  })
-                }
+              <FormField
+                label={t("address.state")}
+                placeholder={t("address.state")}
+                registration={register("addressDetail.state")}
+                error={errors.addressDetail?.state}
                 autoComplete="shipping address-level1"
-                aria-required="true"
-                aria-labelledby="state_label"
-                aria-invalid={!state.addressDetail.state && state.step > 1 ? "true" : "false"}
-                required
+                schema={checkoutFormSchema}
               />
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                htmlFor="postal_code"
-                id="postal_code_label"
-              >
-                {t("address.postalCode")} *
-              </label>
-              <input
-                type="text"
-                id="postal_code"
-                className="w-full border rounded-md px-3 py-2"
-                value={state.addressDetail.postal_code}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_ADDRESS",
-                    payload: { postal_code: e.target.value },
-                  })
-                }
+              <FormField
+                label={t("address.postalCode")}
+                placeholder={t("address.postalCode")}
+                registration={register("addressDetail.postal_code")}
+                error={errors.addressDetail?.postal_code}
                 autoComplete="shipping postal-code"
-                autoCorrect="off"
-                spellCheck="false"
-                inputMode="numeric"
-                aria-required="true"
-                aria-labelledby="postal_code_label"
-                aria-invalid={!state.addressDetail.postal_code && state.step > 1 ? "true" : "false"}
-                required
+                schema={checkoutFormSchema}
               />
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                htmlFor="country"
-                id="country_label"
-              >
-                {t("address.country")} *
-              </label>
-              <input
-                type="text"
-                id="country"
-                className="w-full border rounded-md px-3 py-2"
-                value={state.addressDetail.country}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_ADDRESS",
-                    payload: { country: e.target.value },
-                  })
-                }
+              <FormField
+                label={t("address.country")}
+                placeholder={t("address.country")}
+                registration={register("addressDetail.country")}
+                error={errors.addressDetail?.country}
                 autoComplete="shipping country"
-                aria-required="true"
-                aria-labelledby="country_label"
-                aria-invalid={!state.addressDetail.country && state.step > 1 ? "true" : "false"}
-                required
+                schema={checkoutFormSchema}
               />
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {state.step === 2 && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold mb-4">{t("shippingMethods.title")}</h2>
-          <fieldset className="space-y-4">
-            <legend className="sr-only">{t("shippingMethods.options")}</legend>
-            {shippingMethods.map((method) => (
-              <div
-                key={method.id}
-                className={`border rounded-lg p-4 cursor-pointer ${
-                  state.shippingDetail.shipping_method_id === method.id
-                    ? "border-blue-600 bg-blue-50"
-                    : ""
-                }`}
-                onClick={() => {
-                  const today = new Date();
-                  const deliveryDate = new Date(today);
-                  deliveryDate.setDate(today.getDate() + method.max_days);
-                  // Update shipping method in local state
-                  dispatch({
-                    type: "UPDATE_SHIPPING",
-                    payload: {
-                      shipping_method_id: method.id,
-                      estimated_delivery: deliveryDate.toISOString(),
-                    },
-                  });
-
-                  // Update shipping cost in context
-                  updateShippingCost(
-                    method.base_costs === 0 ? method.base_costs : shippingCostConversion,
-                  );
-                }}
-                role="radio"
-                aria-checked={state.shippingDetail.shipping_method_id === method.id}
-                aria-labelledby={`shipping_method_${method.id}_name shipping_method_${method.id}_price`}
-                aria-describedby={`shipping_method_${method.id}_description`}
-                tabIndex={0}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
+        {step === 2 && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold mb-4">{t("shippingMethods.title")}</h2>
+            <div className="space-y-4">
+              {shippingMethods.map((method) => (
+                <div
+                  key={method.id}
+                  className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                    selectedShippingMethodId === method.id
+                      ? "border-blue-600 bg-blue-50 ring-1 ring-blue-600"
+                      : "hover:border-gray-400"
+                  }`}
+                  onClick={() => {
                     const today = new Date();
                     const deliveryDate = new Date(today);
                     deliveryDate.setDate(today.getDate() + method.max_days);
 
-                    dispatch({
-                      type: "UPDATE_SHIPPING",
-                      payload: {
-                        shipping_method_id: method.id,
-                        estimated_delivery: deliveryDate.toISOString(),
-                      },
+                    setValue("shippingDetail.shipping_method_id", method.id, {
+                      shouldValidate: true,
                     });
+                    setValue("shippingDetail.estimated_delivery", deliveryDate.toISOString());
 
                     updateShippingCost(
                       method.base_costs === 0 ? method.base_costs : shippingCostConversion,
                     );
-                  }
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium" id={`shipping_method_${method.id}_name`}>
-                      {method.name}
-                    </h3>
-                    <p
-                      className="text-sm text-gray-600"
-                      id={`shipping_method_${method.id}_description`}
-                    >
-                      {method.description}
-                    </p>
-                  </div>
-                  <div className="font-medium" id={`shipping_method_${method.id}_price`}>
-                    {method.base_costs === 0
-                      ? t("summary.free")
-                      : formatPrice(shippingCostConversion, cart.currency)}
+                  }}
+                  role="radio"
+                  aria-checked={selectedShippingMethodId === method.id}
+                  tabIndex={0}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium">{method.name}</h3>
+                      <p className="text-sm text-gray-600">{method.description}</p>
+                    </div>
+                    <div className="font-bold text-blue-600">
+                      {method.base_costs === 0
+                        ? t("summary.free")
+                        : formatPrice(shippingCostConversion, cart.currency)}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </fieldset>
+              ))}
+              {errors.shippingDetail?.shipping_method_id && (
+                <p className="text-sm text-red-600">
+                  {errors.shippingDetail.shipping_method_id.message}
+                </p>
+              )}
+            </div>
 
-          <div className="mt-8">
-            <h2 className="text-xl font-bold mb-4">{t("address.billing")}</h2>
-            <div className="mb-4">
-              <div className="flex items-center">
+            <div className="mt-8 border-t pt-8">
+              <h2 className="text-xl font-bold mb-4">{t("address.billing")}</h2>
+              <div className="mb-6 flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="same_billing_address"
-                  className="mr-2"
-                  checked={state.useSameForBilling}
-                  onChange={() => dispatch({ type: "TOGGLE_SAME_BILLING" })}
-                  aria-labelledby="same_billing_address_label"
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
+                  {...register("useSameForBilling")}
                 />
                 <label
                   htmlFor="same_billing_address"
-                  id="same_billing_address_label"
-                  className="cursor-pointer"
+                  className="text-sm font-medium text-gray-700 cursor-pointer"
                 >
                   {t("address.sameAsBilling")}
                 </label>
               </div>
-            </div>
 
-            {!state.useSameForBilling && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-1" htmlFor="billing_receiver_name">
-                    {t("address.receiverName")} *
-                  </label>
-                  <input
-                    type="text"
-                    id="billing_receiver_name"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={state.billingAddress.receiver_name}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "UPDATE_BILLING_ADDRESS",
-                        payload: { receiver_name: e.target.value },
-                      })
-                    }
-                    required
+              {!useSameForBilling && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                  <FormField
+                    label={t("address.receiverName")}
+                    placeholder={t("address.receiverName")}
+                    registration={register("billingAddress.receiver_name")}
+                    error={errors.billingAddress?.receiver_name}
+                    containerClassName="col-span-2"
+                    schema={checkoutFormSchema}
                   />
-                </div>
-                <div className="col-span-2">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="billing_receiver_phone"
-                  >
-                    {t("address.receiverPhone")} *
-                  </label>
-                  <input
+                  <FormField
+                    label={t("address.receiverPhone")}
+                    placeholder={t("address.receiverPhone")}
+                    registration={register("billingAddress.receiver_phone")}
+                    error={errors.billingAddress?.receiver_phone}
+                    containerClassName="col-span-2"
                     type="tel"
-                    id="billing_receiver_phone"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={state.billingAddress.receiver_phone}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "UPDATE_BILLING_ADDRESS",
-                        payload: { receiver_phone: e.target.value },
-                      })
-                    }
-                    required
+                    schema={checkoutFormSchema}
+                  />
+                  <FormField
+                    label={t("address.addressLine1")}
+                    placeholder={t("address.addressLine1")}
+                    registration={register("billingAddress.address_line1")}
+                    error={errors.billingAddress?.address_line1}
+                    containerClassName="col-span-2"
+                    schema={checkoutFormSchema}
+                  />
+                  <FormField
+                    label={t("address.addressLine2")}
+                    placeholder={t("address.addressLine2")}
+                    registration={register("billingAddress.address_line2")}
+                    error={errors.billingAddress?.address_line2}
+                    containerClassName="col-span-2"
+                    schema={checkoutFormSchema}
+                  />
+                  <FormField
+                    label={t("address.city")}
+                    placeholder={t("address.city")}
+                    registration={register("billingAddress.city")}
+                    error={errors.billingAddress?.city}
+                    schema={checkoutFormSchema}
+                  />
+                  <FormField
+                    label={t("address.state")}
+                    placeholder={t("address.state")}
+                    registration={register("billingAddress.state")}
+                    error={errors.billingAddress?.state}
+                    schema={checkoutFormSchema}
+                  />
+                  <FormField
+                    label={t("address.postalCode")}
+                    placeholder={t("address.postalCode")}
+                    registration={register("billingAddress.postal_code")}
+                    error={errors.billingAddress?.postal_code}
+                    schema={checkoutFormSchema}
+                  />
+                  <FormField
+                    label={t("address.country")}
+                    placeholder={t("address.country")}
+                    registration={register("billingAddress.country")}
+                    error={errors.billingAddress?.country}
+                    schema={checkoutFormSchema}
                   />
                 </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-1" htmlFor="billing_address_line1">
-                    {t("address.addressLine1")} *
-                  </label>
-                  <input
-                    type="text"
-                    id="billing_address_line1"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={state.billingAddress.address_line1}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "UPDATE_BILLING_ADDRESS",
-                        payload: { address_line1: e.target.value },
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-1" htmlFor="billing_address_line2">
-                    {t("address.addressLine2")}
-                  </label>
-                  <input
-                    type="text"
-                    id="billing_address_line2"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={state.billingAddress.address_line2}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "UPDATE_BILLING_ADDRESS",
-                        payload: { address_line2: e.target.value },
-                      })
-                    }
-                    autoComplete="billing address-line2"
-                    autoCorrect="off"
-                    spellCheck="false"
-                    aria-labelledby="billing_address_line2_label"
-                  />
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="billing_city"
-                    id="billing_city_label"
-                  >
-                    {t("address.city")} *
-                  </label>
-                  <input
-                    type="text"
-                    id="billing_city"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={state.billingAddress.city}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "UPDATE_BILLING_ADDRESS",
-                        payload: { city: e.target.value },
-                      })
-                    }
-                    autoComplete="billing address-level2"
-                    autoCorrect="off"
-                    spellCheck="false"
-                    aria-required="true"
-                    aria-labelledby="billing_city_label"
-                    aria-invalid={
-                      !state.billingAddress.city && !state.useSameForBilling && state.step > 2
-                        ? "true"
-                        : "false"
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="billing_state"
-                    id="billing_state_label"
-                  >
-                    {t("address.state")} *
-                  </label>
-                  <input
-                    type="text"
-                    id="billing_state"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={state.billingAddress.state}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "UPDATE_BILLING_ADDRESS",
-                        payload: { state: e.target.value },
-                      })
-                    }
-                    autoComplete="billing address-level1"
-                    aria-required="true"
-                    aria-labelledby="billing_state_label"
-                    aria-invalid={
-                      !state.billingAddress.state && !state.useSameForBilling && state.step > 2
-                        ? "true"
-                        : "false"
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="billing_postal_code"
-                    id="billing_postal_code_label"
-                  >
-                    {t("address.postalCode")} *
-                  </label>
-                  <input
-                    type="text"
-                    id="billing_postal_code"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={state.billingAddress.postal_code}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "UPDATE_BILLING_ADDRESS",
-                        payload: { postal_code: e.target.value },
-                      })
-                    }
-                    autoComplete="billing postal-code"
-                    autoCorrect="off"
-                    spellCheck="false"
-                    inputMode="numeric"
-                    aria-required="true"
-                    aria-labelledby="billing_postal_code_label"
-                    aria-invalid={
-                      !state.billingAddress.postal_code &&
-                      !state.useSameForBilling &&
-                      state.step > 2
-                        ? "true"
-                        : "false"
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="billing_country"
-                    id="billing_country_label"
-                  >
-                    {t("address.country")} *
-                  </label>
-                  <input
-                    type="text"
-                    id="billing_country"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={state.billingAddress.country}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "UPDATE_BILLING_ADDRESS",
-                        payload: { country: e.target.value },
-                      })
-                    }
-                    autoComplete="billing country"
-                    aria-required="true"
-                    aria-labelledby="billing_country_label"
-                    aria-invalid={
-                      !state.billingAddress.country && !state.useSameForBilling && state.step > 2
-                        ? "true"
-                        : "false"
-                    }
-                    required
-                  />
-                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <h2 className="text-xl font-bold mb-4">{t("steps.payment")}</h2>
+            {clientSecret ? (
+              <StripePaymentSection
+                clientSecret={clientSecret}
+                cart={cart}
+                addressDetail={
+                  useSameForBilling ? getValues("addressDetail") : getValues("billingAddress")!
+                }
+                shippingDetail={getValues("shippingDetail")}
+                shippingAddress={getValues("addressDetail")}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                <p className="text-gray-600 font-medium">{t("actions.preparingPayment")}</p>
               </div>
             )}
           </div>
-        </div>
-      )}
+        )}
 
-      {state.step === 3 && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold mb-4">{t("steps.payment")}</h2>
-          {state.clientSecret ? (
-            <StripePaymentSection
-              clientSecret={state.clientSecret}
-              cart={cart}
-              addressDetail={state.useSameForBilling ? state.addressDetail : state.billingAddress}
-              shippingDetail={state.shippingDetail}
-              shippingAddress={state.addressDetail}
-            />
-          ) : (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p>{t("actions.preparingPayment")}</p>
-            </div>
+        <div className="mt-12 flex justify-between border-t pt-6">
+          {step > 1 && (
+            <button
+              type="button"
+              onClick={prevStep}
+              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            >
+              {t("actions.back")}
+            </button>
+          )}
+          {step < 3 && (
+            <button
+              type="button"
+              onClick={nextStep}
+              disabled={isLoading}
+              className="ml-auto px-6 py-2 bg-blue-600 text-white rounded-md font-bold hover:bg-blue-700 disabled:bg-blue-300 transition-all shadow-md"
+            >
+              {isLoading ? (
+                <span className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  {t("actions.loading") || "Loading..."}
+                </span>
+              ) : (
+                t("actions.continue")
+              )}
+            </button>
           )}
         </div>
-      )}
-
-      <div className="mt-8 flex justify-between">
-        {state.step > 1 && (
-          <button
-            type="button"
-            onClick={prevStep}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            {t("actions.back")}
-          </button>
-        )}
-        {state.step < 3 && (
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            className="ml-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            {t("actions.continue")}
-          </button>
-        )}
-      </div>
+      </form>
     </div>
   );
 }

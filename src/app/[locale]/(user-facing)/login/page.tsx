@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, LoginInput } from "@/schemas/auth";
+import { FormField } from "@/app/components/FormField";
 
 export default function LoginPage() {
   const t = useTranslations("Auth");
@@ -13,25 +17,24 @@ export default function LoginPage() {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginInput) => {
     setIsLoading(true);
 
     try {
-      const success = await login(formData.email, formData.password);
+      const success = await login(data.email, data.password);
       if (success) {
         router.push("/");
         router.refresh();
@@ -56,39 +59,28 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="-space-y-px rounded-md shadow-sm">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                {t("fields.email")}
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="relative block w-full rounded-t-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("fields.emailPlaceholder")}
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="relative">
-              <label htmlFor="password" className="sr-only">
-                {t("fields.password")}
-              </label>
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                required
-                className="relative block w-full rounded-b-md border-0 py-1.5 px-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("fields.passwordPlaceholder")}
-                value={formData.password}
-                onChange={handleChange}
-              />
+            <FormField
+              label={t("fields.email")}
+              type="email"
+              placeholder={t("fields.emailPlaceholder")}
+              registration={register("email")}
+              error={errors.email}
+              autoComplete="email"
+              className="rounded-t-md"
+              schema={loginSchema}
+            />
+            <FormField
+              label={t("fields.password")}
+              type={showPassword ? "text" : "password"}
+              placeholder={t("fields.passwordPlaceholder")}
+              registration={register("password")}
+              error={errors.password}
+              autoComplete="current-password"
+              className="rounded-b-md"
+              schema={loginSchema}
+            >
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -101,7 +93,7 @@ export default function LoginPage() {
                   <Eye className="h-5 w-5" aria-hidden="true" />
                 )}
               </button>
-            </div>
+            </FormField>
           </div>
 
           <div>

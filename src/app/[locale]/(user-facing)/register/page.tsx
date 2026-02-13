@@ -1,37 +1,51 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerWithConfirmSchema, RegisterWithConfirmInput } from "@/schemas/auth";
+import { FormField } from "@/app/components/FormField";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
   const t = useTranslations("Auth");
   const router = useRouter();
-  const { register } = useAuth();
+  const { register: registerUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    firstName: "",
-    lastName: "",
+  const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterWithConfirmInput>({
+    resolver: zodResolver(registerWithConfirmSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      firstName: "",
+      lastName: "",
+    },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: RegisterWithConfirmInput) => {
     setIsLoading(true);
 
     try {
-      const success = await register(formData);
+      // Remove confirmPassword before sending to API if needed,
+      // though the API schema might just ignore it if it's strict.
+      // According to registerSchema in api-schemas.ts, it takes email, password, firstName, lastName.
+      const { confirmPassword, ...registerData } = data;
+      const success = await registerUser({
+        ...registerData,
+        firstName: registerData.firstName as string,
+        lastName: registerData.lastName as string,
+      });
       if (success) {
         router.push("/");
         router.refresh();
@@ -58,70 +72,68 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="-space-y-px rounded-md shadow-sm">
-            <div>
-              <label htmlFor="firstName" className="sr-only">
-                {t("fields.firstName")}
-              </label>
-              <input
-                id="firstName"
-                name="firstName"
-                type="text"
-                autoComplete="given-name"
-                className="relative block w-full rounded-t-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("fields.firstName")}
-                value={formData.firstName}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="lastName" className="sr-only">
-                {t("fields.lastName")}
-              </label>
-              <input
-                id="lastName"
-                name="lastName"
-                type="text"
-                autoComplete="family-name"
-                className="relative block w-full border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("fields.lastName")}
-                value={formData.lastName}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="sr-only">
-                {t("fields.email")}
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="relative block w-full border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("fields.email")}
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                {t("fields.password")}
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="relative block w-full rounded-b-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder={t("fields.password")}
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
+            <FormField
+              label={t("fields.firstName")}
+              type="text"
+              placeholder={t("fields.firstName")}
+              registration={register("firstName")}
+              error={errors.firstName}
+              autoComplete="given-name"
+              className="rounded-t-md"
+              schema={registerWithConfirmSchema}
+            />
+            <FormField
+              label={t("fields.lastName")}
+              type="text"
+              placeholder={t("fields.lastName")}
+              registration={register("lastName")}
+              error={errors.lastName}
+              autoComplete="family-name"
+              schema={registerWithConfirmSchema}
+            />
+            <FormField
+              label={t("fields.email")}
+              type="email"
+              placeholder={t("fields.email")}
+              registration={register("email")}
+              error={errors.email}
+              autoComplete="email"
+              schema={registerWithConfirmSchema}
+            />
+            <FormField
+              label={t("fields.password")}
+              type={showPassword ? "text" : "password"}
+              placeholder={t("fields.password")}
+              registration={register("password")}
+              error={errors.password}
+              autoComplete="new-password"
+              schema={registerWithConfirmSchema}
+            >
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600"
+                aria-label={showPassword ? t("actions.hidePassword") : t("actions.showPassword")}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <Eye className="h-5 w-5" aria-hidden="true" />
+                )}
+              </button>
+            </FormField>
+            <FormField
+              label={t("fields.confirmPassword") || "Confirm Password"}
+              type={showPassword ? "text" : "password"}
+              placeholder={t("fields.confirmPassword") || "Confirm Password"}
+              registration={register("confirmPassword")}
+              error={errors.confirmPassword}
+              autoComplete="new-password"
+              className="rounded-b-md"
+              schema={registerWithConfirmSchema}
+            />
           </div>
 
           <div>
