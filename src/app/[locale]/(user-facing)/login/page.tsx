@@ -59,8 +59,8 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <div className="-space-y-px rounded-md shadow-sm">
+        <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex flex-col gap-5">
             <FormField
               label={t("fields.email")}
               type="email"
@@ -68,7 +68,6 @@ export default function LoginPage() {
               registration={register("email")}
               error={errors.email}
               autoComplete="email"
-              className="rounded-t-md"
               schema={loginSchema}
             />
             <FormField
@@ -78,7 +77,6 @@ export default function LoginPage() {
               registration={register("password")}
               error={errors.password}
               autoComplete="current-password"
-              className="rounded-b-md"
               schema={loginSchema}
             >
               <button

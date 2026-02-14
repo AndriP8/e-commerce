@@ -72,8 +72,8 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <div className="-space-y-px rounded-md shadow-sm">
+        <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex flex-col gap-5">
             <FormField
               label={t("fields.firstName")}
               type="text"
@@ -81,7 +81,6 @@ export default function RegisterPage() {
               registration={register("firstName")}
               error={errors.firstName}
               autoComplete="given-name"
-              className="rounded-t-md"
               schema={registerWithConfirmSchema}
             />
             <FormField
@@ -131,7 +130,6 @@ export default function RegisterPage() {
               registration={register("confirmPassword")}
               error={errors.confirmPassword}
               autoComplete="new-password"
-              className="rounded-b-md"
               schema={registerWithConfirmSchema}
             />
           </div>
