@@ -133,7 +133,7 @@ export default async function CartPage({ params }: Props) {
         </Link>
         <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <ShoppingCart size={32} />
-          {t("title")} ({cartItems.length}{" "}
+          {t("title")} (
           {cartItems.length === 1
             ? t("items.single", { count: 1 })
             : t("items.count", { count: cartItems.length })}

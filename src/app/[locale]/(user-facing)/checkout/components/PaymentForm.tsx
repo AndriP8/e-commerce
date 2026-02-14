@@ -1,5 +1,6 @@
 import { GetCartResponse } from "@/app/types/cart";
-import { AddressDetail, ShippingDetail } from "./checkoutReducer";
+import { AddressDetail } from "@/schemas/common";
+import { ShippingDetail } from "@/schemas/checkout";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

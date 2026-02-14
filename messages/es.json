@@ -172,7 +172,8 @@
       "continue": "Continuar",
       "back": "Atrás",
       "placeOrder": "Realizar Pedido",
-      "preparingPayment": "Preparando pago..."
+      "preparingPayment": "Preparando pago...",
+      "loading": "Cargando..."
     },
     "errors": {
       "fillAllFields": "Por favor completa todos los campos obligatorios de la dirección de envío",
@@ -180,7 +181,8 @@
       "fillBillingFields": "Por favor completa todos los campos obligatorios de la dirección de facturación",
       "emptyCart": "Tu carrito está vacío",
       "loginRequired": "Debes iniciar sesión para pagar",
-      "pleaseLogin": "Por favor Inicia Sesión"
+      "pleaseLogin": "Por favor Inicia Sesión",
+      "fixValidationIssues": "Por favor corrija los problemas de validación antes de continuar"
     },
     "accessibility": {
       "loadingIndicator": "Indicador de carga",

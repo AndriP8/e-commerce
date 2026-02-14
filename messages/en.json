@@ -172,7 +172,8 @@
       "continue": "Continue",
       "back": "Back",
       "placeOrder": "Place Order",
-      "preparingPayment": "Preparing payment..."
+      "preparingPayment": "Preparing payment...",
+      "loading": "Loading..."
     },
     "errors": {
       "fillAllFields": "Please fill in all required shipping address fields",
@@ -180,7 +181,8 @@
       "fillBillingFields": "Please fill in all required billing address fields",
       "emptyCart": "Your cart is empty",
       "loginRequired": "You need to be logged in to checkout",
-      "pleaseLogin": "Please Login"
+      "pleaseLogin": "Please Login",
+      "fixValidationIssues": "Please fix validation issues before continuing"
     },
     "accessibility": {
       "loadingIndicator": "Loading indicator",
