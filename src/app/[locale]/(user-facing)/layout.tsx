@@ -132,8 +132,8 @@ export default async function LocaleLayout({
   const userCurrency = await fetchUserCurrencyPreference(token);
 
   return (
-    <html lang={locale} dir="ltr">
-      <body>
+    <html lang={locale} dir="ltr" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <WebVitals />
         <Toaster />
         <NextIntlClientProvider messages={messages}>

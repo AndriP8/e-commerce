@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
-import { type SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField } from "@/app/components/FormField";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
@@ -65,7 +65,6 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
 
   const {
     register,
-    handleSubmit,
     trigger,
     setValue,
     getValues,
@@ -190,12 +189,6 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
       toast.error(`Error creating payment: ${(error as Error).message}`);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const onSubmit: SubmitHandler<CheckoutFormInput> = async () => {
-    if (step < 3) {
-      await nextStep();
     }
   };
 
@@ -480,7 +473,14 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
       </div>
 
       {step < 3 ? (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={(e) => {
+            console.log("asd");
+            e.preventDefault();
+            nextStep();
+          }}
+          className="space-y-6"
+        >
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
 
@@ -505,7 +505,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   {t("actions.loading") || "Loading..."}
                 </span>
               ) : (
-                t("actions.continue")
+                `${t("actions.continue")} sasd`
               )}
             </button>
           </div>
