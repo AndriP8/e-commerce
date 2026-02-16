@@ -68,9 +68,8 @@ export default function QuantitySelector({
   };
 
   return (
-    <div
+    <fieldset
       className={`flex items-center gap-0 ${className}`}
-      role="group"
       aria-label={tA11y("quantityFor", { product: productName })}
     >
       <button
@@ -110,6 +109,6 @@ export default function QuantitySelector({
           +
         </span>
       </button>
-    </div>
+    </fieldset>
   );
 }

@@ -1,15 +1,15 @@
-import { cookies } from "next/headers";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 import "../../styles/performance.css";
-import { Providers } from "./components/Providers";
-import Navbar from "./components/Navbar";
+import { notFound } from "next/navigation";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { Toaster } from "sonner";
 import { WebVitals } from "@/app/components/WebVitals";
 import { routing } from "@/i18n/routing";
-import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { setRequestLocale, getMessages } from "next-intl/server";
-import { notFound } from "next/navigation";
+import Navbar from "./components/Navbar";
+import { Providers } from "./components/Providers";
 
 export type User = {
   id: string;
@@ -34,16 +34,21 @@ export const metadata: Metadata = {
   },
 };
 
-const fetchUser = async (token: string): Promise<{ data: { user: User } } | null> => {
+const fetchUser = async (
+  token: string,
+): Promise<{ data: { user: User } } | null> => {
   try {
     if (!token) {
       return null;
     }
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/me`, {
-      headers: {
-        Cookie: `token=${token}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/me`,
+      {
+        headers: {
+          Cookie: `token=${token}`,
+        },
       },
-    });
+    );
     if (!response.ok) {
       return null;
     }
@@ -57,10 +62,13 @@ const fetchUser = async (token: string): Promise<{ data: { user: User } } | null
 
 const fetchCurrencies = async () => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/currencies`, {
-      cache: "force-cache",
-      next: { revalidate: 3600 }, // Revalidate every hour
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/currencies`,
+      {
+        cache: "force-cache",
+        next: { revalidate: 3600 }, // Revalidate every hour
+      },
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch currencies");
     }

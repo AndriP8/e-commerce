@@ -1,38 +1,39 @@
 "use client";
 
-import { memo } from 'react';
+import { memo } from "react";
 
 interface SkeletonProps {
   className?: string;
-  variant?: 'text' | 'rectangular' | 'circular';
+  variant?: "text" | "rectangular" | "circular";
   width?: string | number;
   height?: string | number;
-  animation?: 'pulse' | 'wave' | 'none';
+  animation?: "pulse" | "wave" | "none";
 }
 
 const Skeleton = memo(function Skeleton({
-  className = '',
-  variant = 'rectangular',
+  className = "",
+  variant = "rectangular",
   width,
   height,
-  animation = 'pulse'
+  animation = "pulse",
 }: SkeletonProps) {
-  const baseClasses = 'bg-gray-200';
+  const baseClasses = "bg-gray-200";
   const animationClasses = {
-    pulse: 'animate-pulse',
-    wave: 'skeleton',
-    none: ''
+    pulse: "animate-pulse",
+    wave: "skeleton",
+    none: "",
   };
-  
+
   const variantClasses = {
-    text: 'skeleton-text',
-    rectangular: 'rounded',
-    circular: 'rounded-full'
+    text: "skeleton-text",
+    rectangular: "rounded",
+    circular: "rounded-full",
   };
 
   const style: React.CSSProperties = {};
-  if (width) style.width = typeof width === 'number' ? `${width}px` : width;
-  if (height) style.height = typeof height === 'number' ? `${height}px` : height;
+  if (width) style.width = typeof width === "number" ? `${width}px` : width;
+  if (height)
+    style.height = typeof height === "number" ? `${height}px` : height;
 
   return (
     <div
@@ -69,10 +70,15 @@ export const ProductCardSkeleton = memo(function ProductCardSkeleton() {
 });
 
 // Product List Skeleton
-export const ProductListSkeleton = memo(function ProductListSkeleton({ count = 8 }: { count?: number }) {
+export const ProductListSkeleton = memo(function ProductListSkeleton({
+  count = 8,
+}: {
+  count?: number;
+}) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {Array.from({ length: count }, (_, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: Skeletons are static
         <ProductCardSkeleton key={index} />
       ))}
     </div>
@@ -108,11 +114,12 @@ export const ProductDetailSkeleton = memo(function ProductDetailSkeleton() {
           <Skeleton className="h-96 w-full mb-4" variant="rectangular" />
           <div className="grid grid-cols-5 gap-2">
             {Array.from({ length: 5 }, (_, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: Skeletons are static
               <Skeleton key={index} className="h-20" variant="rectangular" />
             ))}
           </div>
         </div>
-        
+
         {/* Details Section */}
         <div>
           <Skeleton className="h-4 mb-2" width="30%" />
@@ -120,6 +127,7 @@ export const ProductDetailSkeleton = memo(function ProductDetailSkeleton() {
           <div className="flex items-center mb-4">
             <div className="flex gap-1 mr-2">
               {Array.from({ length: 5 }, (_, index) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: Skeletons are static
                 <Skeleton key={index} className="w-5 h-5" variant="circular" />
               ))}
             </div>

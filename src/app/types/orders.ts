@@ -1,4 +1,10 @@
-import { Orders, OrderItems, Shipments, Payments, Currencies } from "@/schemas/db-schemas";
+import type {
+  Currencies,
+  OrderItems,
+  Orders,
+  Payments,
+  Shipments,
+} from "@/schemas/db-schemas";
 
 export type OrderDetail = Omit<
   Orders,
@@ -19,7 +25,9 @@ export type OrderDetail = Omit<
   };
   payment_status: Pick<Payments, "payment_status">["payment_status"] | null;
   payment_method: Pick<Payments, "payment_method">["payment_method"] | null;
-  payment_provider: Pick<Payments, "payment_provider">["payment_provider"] | null;
+  payment_provider:
+    | Pick<Payments, "payment_provider">["payment_provider"]
+    | null;
   transaction_id: Pick<Payments, "transaction_id">["transaction_id"] | null;
 };
 
@@ -28,7 +36,10 @@ export type OrderItemDetail = OrderItems & {
   image_url: string | null;
 };
 
-export type ShipmentDetail = Omit<Shipments, "shipping_date" | "delivered_date"> & {
+export type ShipmentDetail = Omit<
+  Shipments,
+  "shipping_date" | "delivered_date"
+> & {
   shipping_date: string;
   delivered_date: string | null;
 };

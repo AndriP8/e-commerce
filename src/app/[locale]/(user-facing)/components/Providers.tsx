@@ -1,11 +1,14 @@
 "use client";
 
+import { NuqsAdapter } from "nuqs/adapters/next";
 import { AuthProvider } from "@/app/contexts/AuthContext";
 import { CsrfProvider } from "@/app/contexts/CsrfContext";
-import { CurrencyProvider, SelectedCurrency } from "@/app/contexts/CurrencyContext";
-import { NuqsAdapter } from "nuqs/adapters/next";
-import { User } from "../layout";
-import { Currencies } from "@/schemas/db-schemas";
+import {
+  CurrencyProvider,
+  type SelectedCurrency,
+} from "@/app/contexts/CurrencyContext";
+import type { Currencies } from "@/schemas/db-schemas";
+import type { User } from "../layout";
 
 interface ProvidersProps {
   children: React.ReactNode;

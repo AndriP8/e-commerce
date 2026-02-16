@@ -1,5 +1,5 @@
-import { Pool } from "pg";
 import dotenv from "dotenv";
+import { Pool } from "pg";
 
 dotenv.config();
 
@@ -55,7 +55,9 @@ async function dropDatabase() {
       if (sequencesResult.rows.length === 0) {
         console.log("ℹ️ No sequences found in the database.");
       } else {
-        console.log(`📋 Found ${sequencesResult.rows.length} sequences to drop:`);
+        console.log(
+          `📋 Found ${sequencesResult.rows.length} sequences to drop:`,
+        );
         sequencesResult.rows.forEach((row, index) => {
           console.log(`  ${index + 1}. ${row.sequence_name}`);
         });
@@ -64,7 +66,9 @@ async function dropDatabase() {
         for (const row of sequencesResult.rows) {
           const sequenceName = row.sequence_name;
           console.log(`⏳ Dropping sequence: ${sequenceName}...`);
-          await client.query(`DROP SEQUENCE IF EXISTS "${sequenceName}" CASCADE;`);
+          await client.query(
+            `DROP SEQUENCE IF EXISTS "${sequenceName}" CASCADE;`,
+          );
           console.log(`✅ Sequence ${sequenceName} dropped successfully`);
         }
       }

@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 
-export const useFocusTrap = (ref: React.RefObject<HTMLElement | null>, isActive: boolean) => {
+export const useFocusTrap = (
+  ref: React.RefObject<HTMLElement | null>,
+  isActive: boolean,
+) => {
   useEffect(() => {
     if (!isActive) return;
 
@@ -12,7 +15,9 @@ export const useFocusTrap = (ref: React.RefObject<HTMLElement | null>, isActive:
         if (!focusableElements || focusableElements.length === 0) return;
 
         const firstElement = focusableElements[0] as HTMLElement;
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+        const lastElement = focusableElements[
+          focusableElements.length - 1
+        ] as HTMLElement;
 
         if (e.shiftKey) {
           if (document.activeElement === firstElement) {

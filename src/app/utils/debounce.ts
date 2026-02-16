@@ -3,7 +3,10 @@ type DebouncedFunction = {
   cancel: () => void;
 };
 
-export const debounce = (fn: (arg0: string) => void, delay: number): DebouncedFunction => {
+export const debounce = (
+  fn: (arg0: string) => void,
+  delay: number,
+): DebouncedFunction => {
   let timeout: NodeJS.Timeout;
 
   const debouncedFn = (...args: [string]) => {

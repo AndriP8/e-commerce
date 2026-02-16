@@ -1,19 +1,25 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
+import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
 import { transformProductData } from "@/app/utils/product-utils";
-import { getPreferenceCurrency } from "@/middleware";
 import {
   convertProductPrices,
   convertProductVariantPrices,
 } from "@/app/utils/server-currency-utils";
-import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
+import { getPreferenceCurrency } from "@/middleware";
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
+) {
   const { slug } = await params;
 
   // Validate Slug
   if (!slug || typeof slug !== "string") {
-    return NextResponse.json({ error: "Invalid product slug" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid product slug" },
+      { status: 400 },
+    );
   }
 
   try {
@@ -139,15 +145,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         ORDER BY is_primary DESC, sort_order ASC
       `;
 
-      const [productResult, variantsResult, reviewsResult, imagesResult] = await Promise.all([
-        client.query(query, [slug]),
-        client.query(variantsQuery, [slug]),
-        client.query(reviewsQuery, [slug]),
-        client.query(imagesQuery, [slug]),
-      ]);
+      const [productResult, variantsResult, reviewsResult, imagesResult] =
+        await Promise.all([
+          client.query(query, [slug]),
+          client.query(variantsQuery, [slug]),
+          client.query(reviewsQuery, [slug]),
+          client.query(imagesQuery, [slug]),
+        ]);
 
       if (productResult.rows.length === 0) {
-        return NextResponse.json({ error: "Product not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Product not found" },
+          { status: 404 },
+        );
       }
 
       // Transform the product data
@@ -158,9 +168,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       const currencyCode = await getPreferenceCurrency();
       // Convert product prices to the user's preferred currency
       if (currencyCode && currencyCode !== "USD") {
-        const convertedProduct = await convertProductPrices([product], currencyCode, "USD");
+        const convertedProduct = await convertProductPrices(
+          [product],
+          currencyCode,
+          "USD",
+        );
         product = convertedProduct[0];
-        const convertedVariants = await convertProductVariantPrices(variants, currencyCode, "USD");
+        const convertedVariants = await convertProductVariantPrices(
+          variants,
+          currencyCode,
+          "USD",
+        );
         variants = convertedVariants;
       }
 
@@ -181,12 +199,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       );
     } catch (error) {
       console.error("Database query error:", error);
-      return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to fetch product" },
+        { status: 500 },
+      );
     } finally {
       client.release();
     }
   } catch (error) {
     console.error("Database connection error:", error);
-    return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Database connection failed" },
+      { status: 500 },
+    );
   }
 }

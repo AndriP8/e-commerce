@@ -1,8 +1,8 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { ProductsResponse } from "@/app/types/product-types";
-import ProductList from "./home-components/ProductList";
-import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { ProductsResponse } from "@/app/types/product-types";
+import ProductList from "./home-components/ProductList";
 
 export const revalidate = 300; // 5 minutes
 
@@ -13,7 +13,10 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Home" });
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -80,7 +83,10 @@ export default async function Page({ params, searchParams }: Props) {
 
   // Parse page number from query params
   const pageParam = resolvedSearchParams.page;
-  const currentPage = typeof pageParam === "string" ? Math.max(1, parseInt(pageParam, 10) || 1) : 1;
+  const currentPage =
+    typeof pageParam === "string"
+      ? Math.max(1, parseInt(pageParam, 10) || 1)
+      : 1;
 
   const products = await getProducts({
     search: resolvedSearchParams.search,

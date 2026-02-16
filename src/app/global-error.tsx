@@ -1,8 +1,8 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
-import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
+import { Link } from "@/i18n/navigation";
 
 export default function GlobalError({
   error,
@@ -18,7 +18,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html>
+    <html lang="en">
       <body>
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
@@ -39,7 +39,9 @@ export default function GlobalError({
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("title")}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {t("title")}
+              </h2>
               <p className="text-gray-600 mb-6">{t("globalDescription")}</p>
               {error.digest && (
                 <p className="text-sm text-gray-500 mb-4">
@@ -48,6 +50,7 @@ export default function GlobalError({
               )}
               <div className="space-y-3">
                 <button
+                  type="button"
                   onClick={reset}
                   className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
                 >

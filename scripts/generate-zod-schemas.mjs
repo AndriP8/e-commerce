@@ -1,8 +1,8 @@
+import { mkdirSync, writeFileSync } from "fs";
 import pg from "pg";
-import { writeFileSync, mkdirSync } from "fs";
-import { join } from "path";
 
-const connectionString = "postgresql://postgres:securedb@localhost:5432/e-commerce";
+const connectionString =
+  "postgresql://postgres:securedb@localhost:5432/e-commerce";
 
 const pool = new pg.Pool({ connectionString });
 
@@ -42,7 +42,8 @@ async function generate() {
 
     for (const row of enumsResult.rows) {
       const enumName = row.name.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-      const zodName = enumName.charAt(0).toLowerCase() + enumName.slice(1) + "Schema";
+      const zodName =
+        enumName.charAt(0).toLowerCase() + enumName.slice(1) + "Schema";
       const values = row.values.map((v) => `'${v}'`).join(", ");
       schemas.push(`export const ${zodName} = z.enum([${values}]);`);
     }
@@ -67,8 +68,13 @@ async function generate() {
         [tableName],
       );
 
-      const camelTableName = tableName.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-      const zodName = camelTableName.charAt(0).toLowerCase() + camelTableName.slice(1) + "Schema";
+      const camelTableName = tableName.replace(/_([a-z])/g, (g) =>
+        g[1].toUpperCase(),
+      );
+      const zodName =
+        camelTableName.charAt(0).toLowerCase() +
+        camelTableName.slice(1) +
+        "Schema";
 
       let zodFields = "";
       for (const col of columnsResult.rows) {
@@ -76,8 +82,11 @@ async function generate() {
 
         // Handle Enums correctly
         if (col.data_type === "USER-DEFINED") {
-          const enumName = col.udt_name.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-          zodType = enumName.charAt(0).toLowerCase() + enumName.slice(1) + "Schema";
+          const enumName = col.udt_name.replace(/_([a-z])/g, (g) =>
+            g[1].toUpperCase(),
+          );
+          zodType =
+            enumName.charAt(0).toLowerCase() + enumName.slice(1) + "Schema";
         }
 
         if (col.is_nullable === "YES") {
@@ -101,16 +110,22 @@ async function generate() {
     for (const row of enumsResult.rows) {
       const enumName = row.name.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
       const typeName = capitalize(enumName);
-      const zodName = enumName.charAt(0).toLowerCase() + enumName.slice(1) + "Schema";
+      const zodName =
+        enumName.charAt(0).toLowerCase() + enumName.slice(1) + "Schema";
       types.push(`export type ${typeName} = z.infer<typeof ${zodName}>;`);
     }
 
     // Add Table Types
     for (const table of tablesResult.rows) {
       const tableName = table.table_name;
-      const camelTableName = tableName.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      const camelTableName = tableName.replace(/_([a-z])/g, (g) =>
+        g[1].toUpperCase(),
+      );
       const typeName = capitalize(camelTableName);
-      const zodName = camelTableName.charAt(0).toLowerCase() + camelTableName.slice(1) + "Schema";
+      const zodName =
+        camelTableName.charAt(0).toLowerCase() +
+        camelTableName.slice(1) +
+        "Schema";
 
       types.push(`export type ${typeName} = z.infer<typeof ${zodName}>;`);
       types.push(

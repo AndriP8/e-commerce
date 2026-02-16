@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, lazy } from "react";
+import { lazy, Suspense } from "react";
 
 const ReviewsSection = lazy(() => import("./ReviewsSection"));
 
@@ -45,7 +45,9 @@ function ReviewsSkeleton() {
   );
 }
 
-export default function LazyReviewsSection({ reviews }: LazyReviewsSectionProps) {
+export default function LazyReviewsSection({
+  reviews,
+}: LazyReviewsSectionProps) {
   return (
     <Suspense fallback={<ReviewsSkeleton />}>
       <ReviewsSection reviews={reviews} />

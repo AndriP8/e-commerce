@@ -1,17 +1,16 @@
-import { NextResponse, NextRequest } from "next/server";
-
-import {
-  ProductFilters,
-  buildProductFilterConditions,
-  transformProductData,
-  ProductRow,
-  TransformedProduct,
-} from "@/app/utils/product-utils";
+import { type NextRequest, NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
-import { handleApiError, BadRequestError } from "@/app/utils/api-error-handler";
-import { getPreferenceCurrency } from "@/middleware";
-import { convertProductPrices } from "@/app/utils/server-currency-utils";
+import { BadRequestError, handleApiError } from "@/app/utils/api-error-handler";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
+import {
+  buildProductFilterConditions,
+  type ProductFilters,
+  type ProductRow,
+  type TransformedProduct,
+  transformProductData,
+} from "@/app/utils/product-utils";
+import { convertProductPrices } from "@/app/utils/server-currency-utils";
+import { getPreferenceCurrency } from "@/middleware";
 
 interface AggregateRow {
   id: number;
@@ -31,19 +30,19 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     // Pagination parameters
-    const pageInput = parseInt(searchParams.get("page") || "1");
+    const pageInput = parseInt(searchParams.get("page") || "1", 10);
     const page = Math.max(1, pageInput);
-    const sizeInput = parseInt(searchParams.get("size") || "10");
+    const sizeInput = parseInt(searchParams.get("size") || "10", 10);
     const size = Math.max(1, sizeInput);
     const offset = (page - 1) * size;
 
     // Filtering parameters
     const filters: ProductFilters = {
       category_id: searchParams.get("category_id")
-        ? parseInt(searchParams.get("category_id") as string)
+        ? parseInt(searchParams.get("category_id") as string, 10)
         : undefined,
       seller_id: searchParams.get("seller_id")
-        ? parseInt(searchParams.get("seller_id") as string)
+        ? parseInt(searchParams.get("seller_id") as string, 10)
         : undefined,
       min_price: searchParams.get("min_price")
         ? parseFloat(searchParams.get("min_price") as string)
@@ -53,32 +52,40 @@ export async function GET(request: NextRequest) {
         : undefined,
       brand: searchParams.get("brand") || undefined,
       search: searchParams.get("search") || undefined,
-      in_stock: searchParams.get("in_stock") ? searchParams.get("in_stock") === "true" : undefined,
+      in_stock: searchParams.get("in_stock")
+        ? searchParams.get("in_stock") === "true"
+        : undefined,
     };
 
     // Sorting parameters
     const sort_by = searchParams.get("sort_by") || "created_at";
-    const sort_order = searchParams.get("sort_order")?.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    const sort_order =
+      searchParams.get("sort_order")?.toUpperCase() === "ASC" ? "ASC" : "DESC";
 
     const client = await pool.connect();
 
     try {
       // Build the WHERE clause based on filters
-      const { whereConditions, queryParams, paramCounter } = buildProductFilterConditions(filters);
+      const { whereConditions, queryParams, paramCounter } =
+        buildProductFilterConditions(filters);
 
       // Validate sort_by to prevent SQL injection
       const validSortColumns = ["created_at", "name", "base_price"];
 
       if (!validSortColumns.includes(sort_by)) {
         throw new BadRequestError(
-          "Invalid sort field. Valid options: " + validSortColumns.join(", "),
+          `Invalid sort field. Valid options: ${validSortColumns.join(", ")}`,
         );
       }
 
       if (!["ASC", "DESC"].includes(sort_order)) {
-        throw new BadRequestError("Invalid sort order. Valid options: asc, desc");
+        throw new BadRequestError(
+          "Invalid sort order. Valid options: asc, desc",
+        );
       }
-      const sortColumn = validSortColumns.includes(sort_by) ? sort_by : "created_at";
+      const sortColumn = validSortColumns.includes(sort_by)
+        ? sort_by
+        : "created_at";
 
       // Optimized query with reduced JOINs and better performance
       const query = `
@@ -127,7 +134,9 @@ export async function GET(request: NextRequest) {
       `;
 
       // Function to get aggregated data for products
-      const getProductAggregates = async (productIds: number[]): Promise<AggregatesMap> => {
+      const getProductAggregates = async (
+        productIds: number[],
+      ): Promise<AggregatesMap> => {
         if (productIds.length === 0) return {};
 
         const aggregateQuery = `
@@ -142,11 +151,13 @@ export async function GET(request: NextRequest) {
           GROUP BY p.id
         `;
 
-        const result = await client.query<AggregateRow>(aggregateQuery, [productIds]);
+        const result = await client.query<AggregateRow>(aggregateQuery, [
+          productIds,
+        ]);
         return result.rows.reduce((acc: AggregatesMap, row) => {
           acc[row.id] = {
-            total_stock: parseInt(String(row.total_stock)),
-            variant_count: parseInt(String(row.variant_count)),
+            total_stock: parseInt(String(row.total_stock), 10),
+            variant_count: parseInt(String(row.variant_count), 10),
           };
           return acc;
         }, {} as AggregatesMap);
@@ -157,7 +168,7 @@ export async function GET(request: NextRequest) {
         client.query(countQuery, queryParams.slice(0, -2)), // Remove size and offset params
       ]);
 
-      const totalProducts = parseInt(countResult.rows[0].total);
+      const totalProducts = parseInt(countResult.rows[0].total, 10);
       const totalPages = Math.ceil(totalProducts / size);
 
       // Get product IDs for aggregate data
@@ -217,12 +228,18 @@ export async function GET(request: NextRequest) {
       console.error("Database query error:", error);
       const apiError = handleApiError(error);
 
-      return NextResponse.json({ error: apiError.message }, { status: apiError.status });
+      return NextResponse.json(
+        { error: apiError.message },
+        { status: apiError.status },
+      );
     } finally {
       client.release();
     }
   } catch (error) {
     console.error("Database connection error:", error);
-    return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Database connection failed" },
+      { status: 500 },
+    );
   }
 }

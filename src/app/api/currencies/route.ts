@@ -9,6 +9,9 @@ export async function GET() {
     const currencies = await getCurrencies();
     return NextResponse.json(currencies);
   } catch {
-    return NextResponse.json({ error: "Failed to fetch currencies" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch currencies" },
+      { status: 500 },
+    );
   }
 }

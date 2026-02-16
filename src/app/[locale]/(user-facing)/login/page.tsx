@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { Link, useRouter } from "@/i18n/navigation";
-import { toast } from "sonner";
-import { useAuth } from "@/app/contexts/AuthContext";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, LoginInput } from "@/schemas/auth";
+import { toast } from "sonner";
 import { FormField } from "@/app/components/FormField";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { Link, useRouter } from "@/i18n/navigation";
+import { type LoginInput, loginSchema } from "@/schemas/auth";
 
 export default function LoginPage() {
   const t = useTranslations("Auth");
@@ -50,10 +50,15 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight">{t("login.title")}</h2>
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight">
+            {t("login.title")}
+          </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             {t("links.noAccount")}{" "}
-            <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link
+              href="/register"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
               {t("register.title").toLowerCase()}
             </Link>
           </p>
@@ -83,7 +88,11 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600"
-                aria-label={showPassword ? t("actions.hidePassword") : t("actions.showPassword")}
+                aria-label={
+                  showPassword
+                    ? t("actions.hidePassword")
+                    : t("actions.showPassword")
+                }
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5" aria-hidden="true" />

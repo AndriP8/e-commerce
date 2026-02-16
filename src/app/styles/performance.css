@@ -127,7 +127,7 @@
     transform: none !important;
     transition: none !important;
   }
-  
+
   .mobile-simple-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
@@ -136,17 +136,17 @@
 
 /* Preload critical fonts */
 @font-face {
-  font-family: 'Geist';
+  font-family: "Geist";
   font-display: swap;
   font-weight: 400;
-  src: local('Geist');
+  src: local("Geist");
 }
 
 @font-face {
-  font-family: 'Geist';
+  font-family: "Geist";
   font-display: swap;
   font-weight: 600;
-  src: local('Geist');
+  src: local("Geist");
 }
 
 /* Optimize button interactions */
@@ -218,6 +218,10 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

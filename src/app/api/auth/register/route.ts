@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
-import { hashPassword, generateToken, setAuthCookie } from "@/app/utils/auth-utils";
-import { handleApiError, ConflictError } from "@/app/utils/api-error-handler";
+import { ConflictError, handleApiError } from "@/app/utils/api-error-handler";
+import {
+  generateToken,
+  hashPassword,
+  setAuthCookie,
+} from "@/app/utils/auth-utils";
 
 import { registerSchema } from "@/schemas/auth";
 
@@ -93,6 +97,9 @@ export async function POST(request: Request) {
     console.error("Registration error:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
+    return NextResponse.json(
+      { error: apiError.message },
+      { status: apiError.status },
+    );
   }
 }

@@ -1,16 +1,38 @@
 import { z } from "zod";
 
-export const addressTypeEnumSchema = z.enum(['shipping', 'billing']);
+export const addressTypeEnumSchema = z.enum(["shipping", "billing"]);
 
-export const orderStatusEnumSchema = z.enum(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded']);
+export const orderStatusEnumSchema = z.enum([
+  "pending",
+  "confirmed",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+  "refunded",
+]);
 
-export const paymentStatusEnumSchema = z.enum(['pending', 'completed', 'failed', 'refunded']);
+export const paymentStatusEnumSchema = z.enum([
+  "pending",
+  "completed",
+  "failed",
+  "refunded",
+]);
 
-export const sellerAddressTypeSchema = z.enum(['business', 'warehouse', 'return']);
+export const sellerAddressTypeSchema = z.enum([
+  "business",
+  "warehouse",
+  "return",
+]);
 
-export const shipmentStatusEnumSchema = z.enum(['pending', 'in_transit', 'delivered', 'failed']);
+export const shipmentStatusEnumSchema = z.enum([
+  "pending",
+  "in_transit",
+  "delivered",
+  "failed",
+]);
 
-export const userEnumSchema = z.enum(['buyer', 'seller', 'admin']);
+export const userEnumSchema = z.enum(["buyer", "seller", "admin"]);
 
 export const schemaMigrationsSchema = z.object({
   version: z.string(),
@@ -308,23 +330,35 @@ export type SellerAddressType = z.infer<typeof sellerAddressTypeSchema>;
 export type ShipmentStatusEnum = z.infer<typeof shipmentStatusEnumSchema>;
 export type UserEnum = z.infer<typeof userEnumSchema>;
 export type SchemaMigrations = z.infer<typeof schemaMigrationsSchema>;
-export type SchemaMigrationsInitializer = z.infer<typeof schemaMigrationsInitializerSchema>;
+export type SchemaMigrationsInitializer = z.infer<
+  typeof schemaMigrationsInitializerSchema
+>;
 export type Users = z.infer<typeof usersSchema>;
 export type UsersInitializer = z.infer<typeof usersInitializerSchema>;
 export type UserAddresses = z.infer<typeof userAddressesSchema>;
-export type UserAddressesInitializer = z.infer<typeof userAddressesInitializerSchema>;
+export type UserAddressesInitializer = z.infer<
+  typeof userAddressesInitializerSchema
+>;
 export type Categories = z.infer<typeof categoriesSchema>;
 export type CategoriesInitializer = z.infer<typeof categoriesInitializerSchema>;
 export type ProductVariants = z.infer<typeof productVariantsSchema>;
-export type ProductVariantsInitializer = z.infer<typeof productVariantsInitializerSchema>;
+export type ProductVariantsInitializer = z.infer<
+  typeof productVariantsInitializerSchema
+>;
 export type Products = z.infer<typeof productsSchema>;
 export type ProductsInitializer = z.infer<typeof productsInitializerSchema>;
 export type ProductImages = z.infer<typeof productImagesSchema>;
-export type ProductImagesInitializer = z.infer<typeof productImagesInitializerSchema>;
+export type ProductImagesInitializer = z.infer<
+  typeof productImagesInitializerSchema
+>;
 export type ProductAttributes = z.infer<typeof productAttributesSchema>;
-export type ProductAttributesInitializer = z.infer<typeof productAttributesInitializerSchema>;
+export type ProductAttributesInitializer = z.infer<
+  typeof productAttributesInitializerSchema
+>;
 export type ShoppingCarts = z.infer<typeof shoppingCartsSchema>;
-export type ShoppingCartsInitializer = z.infer<typeof shoppingCartsInitializerSchema>;
+export type ShoppingCartsInitializer = z.infer<
+  typeof shoppingCartsInitializerSchema
+>;
 export type CartItems = z.infer<typeof cartItemsSchema>;
 export type CartItemsInitializer = z.infer<typeof cartItemsInitializerSchema>;
 export type OrderItems = z.infer<typeof orderItemsSchema>;
@@ -336,11 +370,15 @@ export type PaymentsInitializer = z.infer<typeof paymentsInitializerSchema>;
 export type Orders = z.infer<typeof ordersSchema>;
 export type OrdersInitializer = z.infer<typeof ordersInitializerSchema>;
 export type ShippingMethods = z.infer<typeof shippingMethodsSchema>;
-export type ShippingMethodsInitializer = z.infer<typeof shippingMethodsInitializerSchema>;
+export type ShippingMethodsInitializer = z.infer<
+  typeof shippingMethodsInitializerSchema
+>;
 export type Shipments = z.infer<typeof shipmentsSchema>;
 export type ShipmentsInitializer = z.infer<typeof shipmentsInitializerSchema>;
 export type SellerAddresses = z.infer<typeof sellerAddressesSchema>;
-export type SellerAddressesInitializer = z.infer<typeof sellerAddressesInitializerSchema>;
+export type SellerAddressesInitializer = z.infer<
+  typeof sellerAddressesInitializerSchema
+>;
 export type Inventory = z.infer<typeof inventorySchema>;
 export type InventoryInitializer = z.infer<typeof inventoryInitializerSchema>;
 export type Reviews = z.infer<typeof reviewsSchema>;
@@ -348,6 +386,10 @@ export type ReviewsInitializer = z.infer<typeof reviewsInitializerSchema>;
 export type Currencies = z.infer<typeof currenciesSchema>;
 export type CurrenciesInitializer = z.infer<typeof currenciesInitializerSchema>;
 export type ExchangeRates = z.infer<typeof exchangeRatesSchema>;
-export type ExchangeRatesInitializer = z.infer<typeof exchangeRatesInitializerSchema>;
+export type ExchangeRatesInitializer = z.infer<
+  typeof exchangeRatesInitializerSchema
+>;
 export type UserPreferences = z.infer<typeof userPreferencesSchema>;
-export type UserPreferencesInitializer = z.infer<typeof userPreferencesInitializerSchema>;
+export type UserPreferencesInitializer = z.infer<
+  typeof userPreferencesInitializerSchema
+>;

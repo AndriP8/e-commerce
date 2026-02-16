@@ -8,7 +8,11 @@ interface StarRatingProps {
   size?: "sm" | "md" | "lg";
 }
 
-export default function StarRating({ rating, maxStars = 5, size = "md" }: StarRatingProps) {
+export default function StarRating({
+  rating,
+  maxStars = 5,
+  size = "md",
+}: StarRatingProps) {
   const tA11y = useTranslations("Accessibility");
   const roundedRating = Math.round(rating * 10) / 10;
 
@@ -26,6 +30,7 @@ export default function StarRating({ rating, maxStars = 5, size = "md" }: StarRa
     >
       {[...Array(maxStars)].map((_, i) => (
         <svg
+          // biome-ignore lint/suspicious/noArrayIndexKey: Stars are static
           key={i}
           className={`${sizeClasses[size]} ${i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"}`}
           fill="currentColor"

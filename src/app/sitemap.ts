@@ -1,5 +1,5 @@
-import { MetadataRoute } from "next";
-import { ProductsResponse } from "./types/product-types";
+import type { MetadataRoute } from "next";
+import type { ProductsResponse } from "./types/product-types";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Base URL for the site

@@ -27,13 +27,9 @@ export default function ReviewsSection({ reviews }: ReviewsSectionProps) {
       </h2>
 
       {reviews && reviews.length > 0 ? (
-        <div className="space-y-6" role="list" aria-label={t("reviews.title")}>
+        <ul className="space-y-6" aria-label={t("reviews.title")}>
           {reviews.map((review, index) => (
-            <article
-              key={`${review.first_name}-${index}`}
-              className="border-b pb-6"
-              role="listitem"
-            >
+            <li key={`${review.first_name}-${index}`} className="border-b pb-6">
               <div className="flex items-center mb-2">
                 <StarRating rating={review.rating} size="sm" />
               </div>
@@ -49,12 +45,14 @@ export default function ReviewsSection({ reviews }: ReviewsSectionProps) {
                   {new Date(review.created_at).toLocaleDateString()}
                 </time>
                 {review.is_verified_purchase && (
-                  <span className="ml-2 text-green-600">{t("reviews.verified")}</span>
+                  <span className="ml-2 text-green-600">
+                    {t("reviews.verified")}
+                  </span>
                 )}
               </footer>
-            </article>
+            </li>
           ))}
-        </div>
+        </ul>
       ) : (
         <p className="text-gray-600">{t("reviews.noReviews")}</p>
       )}

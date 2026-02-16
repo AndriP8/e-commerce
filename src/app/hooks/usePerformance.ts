@@ -46,8 +46,8 @@ export function usePerformance({
             value <= 2500
               ? "good"
               : value <= 4000
-              ? "needs-improvement"
-              : "poor";
+                ? "needs-improvement"
+                : "poor";
           break;
         case "FID":
           rating =
@@ -58,24 +58,24 @@ export function usePerformance({
             value <= 0.1
               ? "good"
               : value <= 0.25
-              ? "needs-improvement"
-              : "poor";
+                ? "needs-improvement"
+                : "poor";
           break;
         case "FCP":
           rating =
             value <= 1800
               ? "good"
               : value <= 3000
-              ? "needs-improvement"
-              : "poor";
+                ? "needs-improvement"
+                : "poor";
           break;
         case "TTFB":
           rating =
             value <= 800
               ? "good"
               : value <= 1800
-              ? "needs-improvement"
-              : "poor";
+                ? "needs-improvement"
+                : "poor";
           break;
       }
 

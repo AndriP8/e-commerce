@@ -1,9 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from "react";
-import { CurrencyPreferenceResponse } from "../types/currency-preference";
-import { Currencies } from "@/schemas/db-schemas";
 import { useRouter } from "next/navigation";
+import type React from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
+import type { Currencies } from "@/schemas/db-schemas";
+import type { CurrencyPreferenceResponse } from "../types/currency-preference";
 import { useCsrf } from "./CsrfContext";
 
 export type SelectedCurrency = CurrencyPreferenceResponse["currency"];
@@ -36,7 +37,10 @@ const initialState: CurrencyState = {
   error: null,
 };
 
-function currencyReducer(state: CurrencyState, action: CurrencyAction): CurrencyState {
+function currencyReducer(
+  state: CurrencyState,
+  action: CurrencyAction,
+): CurrencyState {
   switch (action.type) {
     case "SET_SELECTED_CURRENCY":
       return {
@@ -67,10 +71,12 @@ interface CurrencyContextType extends CurrencyState {
   changeCurrency: (currency: SelectedCurrency) => Promise<void>;
 }
 
-const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
+const CurrencyContext = createContext<CurrencyContextType | undefined>(
+  undefined,
+);
 
 interface CurrencyProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
   initialCurrencies?: Currencies[];
   initialSelectedCurrency?: SelectedCurrency;
 }
@@ -89,6 +95,7 @@ export function CurrencyProvider({
   const { csrfFetch } = useCsrf();
 
   // Load user preference on mount (currencies are now server-side)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: loadUserPreference is stable
   useEffect(() => {
     loadUserPreference();
   }, []);
@@ -99,14 +106,18 @@ export function CurrencyProvider({
       // Load user's preferred currency (if authenticated)
       const userCurrencyResponse = await fetch("/api/user/currency-preference");
       if (userCurrencyResponse.ok) {
-        const { currency } = (await userCurrencyResponse.json()) as CurrencyPreferenceResponse;
+        const { currency } =
+          (await userCurrencyResponse.json()) as CurrencyPreferenceResponse;
         dispatch({
           type: "SET_SELECTED_CURRENCY",
           payload: currency,
         });
       }
     } catch (error) {
-      dispatch({ type: "SET_ERROR", payload: "Failed to load currency preference" });
+      dispatch({
+        type: "SET_ERROR",
+        payload: "Failed to load currency preference",
+      });
       console.error("Error loading currency preference:", error);
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
@@ -149,7 +160,11 @@ export function CurrencyProvider({
     changeCurrency,
   };
 
-  return <CurrencyContext.Provider value={contextValue}>{children}</CurrencyContext.Provider>;
+  return (
+    <CurrencyContext.Provider value={contextValue}>
+      {children}
+    </CurrencyContext.Provider>
+  );
 }
 
 export function useCurrency() {

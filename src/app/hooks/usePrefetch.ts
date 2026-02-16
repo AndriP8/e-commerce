@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type NetworkEffectiveType = "slow-2g" | "2g" | "3g" | "4g";
 
@@ -10,14 +10,8 @@ interface NetworkInformation extends EventTarget {
   downlink: number;
   rtt: number;
   saveData: boolean;
-  addEventListener(
-    type: "change",
-    listener: EventListener
-  ): void;
-  removeEventListener(
-    type: "change",
-    listener: EventListener
-  ): void;
+  addEventListener(type: "change", listener: EventListener): void;
+  removeEventListener(type: "change", listener: EventListener): void;
 }
 
 declare global {
@@ -49,7 +43,8 @@ export function canPrefetch(): boolean {
  * Hook to get current network effective type
  */
 export function useNetworkType(): NetworkEffectiveType | null {
-  const [effectiveType, setEffectiveType] = useState<NetworkEffectiveType | null>(null);
+  const [effectiveType, setEffectiveType] =
+    useState<NetworkEffectiveType | null>(null);
 
   useEffect(() => {
     if (typeof navigator === "undefined") return;
@@ -94,7 +89,7 @@ export function useHoverPrefetch(delay: number = 300) {
         prefetchedRef.current.add(href);
       }, delay);
     },
-    [router, delay]
+    [router, delay],
   );
 
   const cancelPrefetch = useCallback(() => {

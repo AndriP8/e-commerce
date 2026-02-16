@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { clearAuthCookie } from "@/app/utils/auth-utils";
 import { handleApiError } from "@/app/utils/api-error-handler";
+import { clearAuthCookie } from "@/app/utils/auth-utils";
 
 export async function POST() {
   try {

@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { Link, useRouter } from "@/i18n/navigation";
-import { toast } from "sonner";
-import { useAuth } from "@/app/contexts/AuthContext";
-import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerWithConfirmSchema, RegisterWithConfirmInput } from "@/schemas/auth";
-import { FormField } from "@/app/components/FormField";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { FormField } from "@/app/components/FormField";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { Link, useRouter } from "@/i18n/navigation";
+import {
+  type RegisterWithConfirmInput,
+  registerWithConfirmSchema,
+} from "@/schemas/auth";
 
 export default function RegisterPage() {
   const t = useTranslations("Auth");
@@ -40,6 +43,7 @@ export default function RegisterPage() {
       // Remove confirmPassword before sending to API if needed,
       // though the API schema might just ignore it if it's strict.
       // According to registerSchema in api-schemas.ts, it takes email, password, firstName, lastName.
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...registerData } = data;
       const success = await registerUser({
         ...registerData,
@@ -51,7 +55,9 @@ export default function RegisterPage() {
         router.refresh();
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t("register.failed"));
+      toast.error(
+        error instanceof Error ? error.message : t("register.failed"),
+      );
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +72,10 @@ export default function RegisterPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             {t("links.hasAccount")}{" "}
-            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link
+              href="/login"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
               {t("login.title").toLowerCase()}
             </Link>
           </p>
@@ -114,7 +123,11 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600"
-                aria-label={showPassword ? t("actions.hidePassword") : t("actions.showPassword")}
+                aria-label={
+                  showPassword
+                    ? t("actions.hidePassword")
+                    : t("actions.showPassword")
+                }
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5" aria-hidden="true" />

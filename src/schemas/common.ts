@@ -6,7 +6,8 @@ import { addressTypeEnumSchema } from "./db-schemas";
  */
 
 // Phone number validation regex
-export const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/;
+export const phoneRegex =
+  /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/;
 
 // Address detail schema (address fields only)
 export const addressDetailSchema = z.object({

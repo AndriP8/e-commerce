@@ -1,6 +1,6 @@
-import createMiddleware from "next-intl/middleware";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import createMiddleware from "next-intl/middleware";
 import { csrfProtection } from "./app/utils/csrf";
 import { routing } from "./i18n/routing";
 

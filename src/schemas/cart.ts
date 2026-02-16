@@ -10,7 +10,10 @@ export const addToCartSchema = z.strictObject({
   product_id: z.string().min(1, "Valid product_id is required"),
   quantity: z.coerce
     .number()
-    .refine((val) => !isNaN(val) && val >= 1, "Valid quantity is required (minimum 1)"),
+    .refine(
+      (val) => !Number.isNaN(val) && val >= 1,
+      "Valid quantity is required (minimum 1)",
+    ),
 });
 
 // Update cart item schema

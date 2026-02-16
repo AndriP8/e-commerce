@@ -4,7 +4,11 @@ interface JsonLdProps {
 
 function JsonLdScript({ data }: JsonLdProps) {
   return (
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
+    <script
+      type="application/ld+json"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD requires this
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
   );
 }
 
@@ -25,8 +29,15 @@ interface ProductJsonLdProps {
   baseUrl: string;
 }
 
-export function ProductJsonLd({ product, currencyCode, baseUrl }: ProductJsonLdProps) {
-  const imageUrl = product.images && product.images.length > 0 ? product.images[0].image_url : null;
+export function ProductJsonLd({
+  product,
+  currencyCode,
+  baseUrl,
+}: ProductJsonLdProps) {
+  const imageUrl =
+    product.images && product.images.length > 0
+      ? product.images[0].image_url
+      : null;
 
   const availability =
     product.stock && product.stock.total_quantity > 0
@@ -73,7 +84,13 @@ interface BreadcrumbItem {
   url: string;
 }
 
-export function BreadcrumbJsonLd({ items, baseUrl }: { items: BreadcrumbItem[]; baseUrl: string }) {
+export function BreadcrumbJsonLd({
+  items,
+  baseUrl,
+}: {
+  items: BreadcrumbItem[];
+  baseUrl: string;
+}) {
   const data = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

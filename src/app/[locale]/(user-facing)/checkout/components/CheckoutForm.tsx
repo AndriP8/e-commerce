@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import dynamic from "next/dynamic";
-import { GetCartResponse } from "@/app/types/cart";
-import { toast } from "sonner";
-import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
-import { CurrencyConversion } from "@/app/types/currency";
-import { formatPrice } from "@/app/utils/format-price-currency";
-import { useApi } from "@/app/utils/api-client";
-import { useTranslations } from "next-intl";
-import { useForm, useWatch, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { checkoutFormSchema, CheckoutFormInput } from "@/schemas/checkout";
+import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
+import { type SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import { FormField } from "@/app/components/FormField";
+import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
+import type { GetCartResponse } from "@/app/types/cart";
+import type { CurrencyConversion } from "@/app/types/currency";
+import { useApi } from "@/app/utils/api-client";
+import { formatPrice } from "@/app/utils/format-price-currency";
+import { type CheckoutFormInput, checkoutFormSchema } from "@/schemas/checkout";
 
 // Dynamically import Stripe components only when needed
 const StripePaymentSection = dynamic(() => import("./StripePaymentSection"), {
@@ -104,7 +104,10 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
   });
 
   const useSameForBilling = useWatch({ control, name: "useSameForBilling" });
-  const selectedShippingMethodId = useWatch({ control, name: "shippingDetail.shipping_method_id" });
+  const selectedShippingMethodId = useWatch({
+    control,
+    name: "shippingDetail.shipping_method_id",
+  });
 
   const shippingMethods: ShippingMethod[] = useMemo(
     () => [
@@ -152,7 +155,8 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
       setStep(step + 1);
     } else {
       toast.error(
-        t("errors.fixValidationIssues") || "Please fix validation issues before continuing",
+        t("errors.fixValidationIssues") ||
+          "Please fix validation issues before continuing",
       );
     }
   };
@@ -163,7 +167,10 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
 
   const createPaymentIntent = async () => {
     setIsLoading(true);
-    const subTotal = cart.data.items.reduce((sum, item) => sum + item.total_price, 0);
+    const subTotal = cart.data.items.reduce(
+      (sum, item) => sum + item.total_price,
+      0,
+    );
     const total = subTotal + shippingCost + tax;
 
     try {
@@ -180,13 +187,13 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
       const data = await response.json();
       setClientSecret(data.clientSecret);
     } catch (error) {
-      toast.error("Error creating payment: " + (error as Error).message);
+      toast.error(`Error creating payment: ${(error as Error).message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const onSubmit: SubmitHandler<CheckoutFormInput> = async (data) => {
+  const onSubmit: SubmitHandler<CheckoutFormInput> = async () => {
     if (step < 3) {
       await nextStep();
     }
@@ -286,31 +293,39 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
       <h2 className="text-xl font-bold mb-4">{t("shippingMethods.title")}</h2>
       <div className="space-y-4">
         {shippingMethods.map((method) => (
-          <div
+          <label
             key={method.id}
-            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+            className={`border rounded-lg p-4 cursor-pointer transition-all block relative ${
               selectedShippingMethodId === method.id
                 ? "border-blue-600 bg-blue-50 ring-1 ring-blue-600"
                 : "hover:border-gray-400"
             }`}
-            onClick={() => {
-              const today = new Date();
-              const deliveryDate = new Date(today);
-              deliveryDate.setDate(today.getDate() + method.max_days);
-
-              setValue("shippingDetail.shipping_method_id", method.id, {
-                shouldValidate: true,
-              });
-              setValue("shippingDetail.estimated_delivery", deliveryDate.toISOString());
-
-              updateShippingCost(
-                method.base_costs === 0 ? method.base_costs : shippingCostConversion,
-              );
-            }}
-            role="radio"
-            aria-checked={selectedShippingMethodId === method.id}
-            tabIndex={0}
           >
+            <input
+              type="radio"
+              className="sr-only"
+              value={method.id}
+              checked={selectedShippingMethodId === method.id}
+              onChange={() => {
+                const today = new Date();
+                const deliveryDate = new Date(today);
+                deliveryDate.setDate(today.getDate() + method.max_days);
+
+                setValue("shippingDetail.shipping_method_id", method.id, {
+                  shouldValidate: true,
+                });
+                setValue(
+                  "shippingDetail.estimated_delivery",
+                  deliveryDate.toISOString(),
+                );
+
+                updateShippingCost(
+                  method.base_costs === 0
+                    ? method.base_costs
+                    : shippingCostConversion,
+                );
+              }}
+            />
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-medium">{method.name}</h3>
@@ -322,10 +337,12 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   : formatPrice(shippingCostConversion, cart.currency)}
               </div>
             </div>
-          </div>
+          </label>
         ))}
         {errors.shippingDetail?.shipping_method_id && (
-          <p className="text-sm text-red-600">{errors.shippingDetail.shipping_method_id.message}</p>
+          <p className="text-sm text-red-600">
+            {errors.shippingDetail.shipping_method_id.message}
+          </p>
         )}
       </div>
 
@@ -502,7 +519,10 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                 clientSecret={clientSecret}
                 cart={cart}
                 addressDetail={
-                  useSameForBilling ? getValues("addressDetail") : getValues("billingAddress")!
+                  useSameForBilling
+                    ? getValues("addressDetail")
+                    : // biome-ignore lint/style/noNonNullAssertion: billingAddress is required when useSameForBilling is false
+                      getValues("billingAddress")!
                 }
                 shippingDetail={getValues("shippingDetail")}
                 shippingAddress={getValues("addressDetail")}
@@ -510,7 +530,9 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
             ) : (
               <div className="flex flex-col items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                <p className="text-gray-600 font-medium">{t("actions.preparingPayment")}</p>
+                <p className="text-gray-600 font-medium">
+                  {t("actions.preparingPayment")}
+                </p>
               </div>
             )}
           </div>

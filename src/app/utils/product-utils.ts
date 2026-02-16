@@ -119,7 +119,9 @@ export interface FilterConditionsResult {
   paramCounter: number;
 }
 
-export const buildProductFilterConditions = (filters: ProductFilters): FilterConditionsResult => {
+export const buildProductFilterConditions = (
+  filters: ProductFilters,
+): FilterConditionsResult => {
   const whereConditions = ["p.is_active = true"];
   const queryParams: (string | number | boolean)[] = [];
   let paramCounter = 1;
@@ -155,7 +157,9 @@ export const buildProductFilterConditions = (filters: ProductFilters): FilterCon
   }
 
   if (filters.search) {
-    whereConditions.push(`(p.name ILIKE $${paramCounter} OR p.description ILIKE $${paramCounter})`);
+    whereConditions.push(
+      `(p.name ILIKE $${paramCounter} OR p.description ILIKE $${paramCounter})`,
+    );
     queryParams.push(`%${filters.search}%`);
     paramCounter++;
   }

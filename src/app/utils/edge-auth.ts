@@ -7,7 +7,9 @@ export interface JwtPayload {
   userType: string;
 }
 
-export async function verifyTokenEdge(token: string): Promise<JwtPayload | null> {
+export async function verifyTokenEdge(
+  token: string,
+): Promise<JwtPayload | null> {
   try {
     const secret = new TextEncoder().encode(JWT_SECRET);
     const { payload } = await jwtVerify<JwtPayload>(token, secret);

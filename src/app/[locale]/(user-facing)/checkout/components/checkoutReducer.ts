@@ -82,7 +82,10 @@ export const initialState: CheckoutState = {
   },
 };
 
-export function checkoutReducer(state: CheckoutState, action: CheckoutAction): CheckoutState {
+export function checkoutReducer(
+  state: CheckoutState,
+  action: CheckoutAction,
+): CheckoutState {
   switch (action.type) {
     case "SET_STEP":
       return { ...state, step: action.payload };

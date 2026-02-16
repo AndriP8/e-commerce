@@ -1,10 +1,10 @@
 "use client";
 
-import { GetCartResponse } from "@/app/types/cart";
-import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
-import { useEffect, useMemo } from "react";
-import { formatPrice } from "@/app/utils/format-price-currency";
 import { useTranslations } from "next-intl";
+import { useEffect, useMemo } from "react";
+import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
+import type { GetCartResponse } from "@/app/types/cart";
+import { formatPrice } from "@/app/utils/format-price-currency";
 
 interface OrderSummaryProps {
   cart: GetCartResponse;
@@ -30,10 +30,9 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
   }, [subtotal, shippingCost, tax]);
 
   return (
-    <div
+    <section
       className="border p-6 h-fit bg-gray-50 border-gray-200 rounded-lg"
       aria-labelledby="order-summary-heading"
-      role="region"
     >
       <h2 id="order-summary-heading" className="text-xl font-bold mb-4">
         {t("summary.title")}
@@ -44,13 +43,9 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
             <li key={item.id} className="flex justify-between items-center">
               <div className="flex items-center">
                 <span className="font-medium">{item.product_name}</span>
-                <span className="text-gray-500 ml-2" aria-label={`Quantity: ${item.quantity}`}>
-                  x{item.quantity}
-                </span>
+                <span className="text-gray-500 ml-2">x{item.quantity}</span>
               </div>
-              <span aria-label={`Price: ${formatPrice(item.total_price, cart.currency)}`}>
-                {formatPrice(item.total_price, cart.currency)}
-              </span>
+              <span>{formatPrice(item.total_price, cart.currency)}</span>
             </li>
           ))}
         </ul>
@@ -63,7 +58,9 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
         <div className="flex justify-between">
           <dt>{t("summary.shipping")}</dt>
           <dd>
-            {shippingCost === 0 ? t("summary.free") : formatPrice(shippingCost, cart.currency)}
+            {shippingCost === 0
+              ? t("summary.free")
+              : formatPrice(shippingCost, cart.currency)}
           </dd>
         </div>
         <div className="flex justify-between">
@@ -75,11 +72,9 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
           aria-live="polite"
         >
           <dt>{t("summary.total")}</dt>
-          <dd aria-label={`Total: ${formatPrice(total, cart.currency)}`}>
-            {formatPrice(total, cart.currency)}
-          </dd>
+          <dd>{formatPrice(total, cart.currency)}</dd>
         </div>
       </dl>
-    </div>
+    </section>
   );
 }

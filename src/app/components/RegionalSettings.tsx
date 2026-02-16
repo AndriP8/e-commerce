@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { createPortal } from "react-dom";
+import { Globe } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useCurrency } from "@/app/contexts/CurrencyContext";
 import { useFocusTrap } from "@/app/hooks/useFocusTrap";
-import { Globe } from "lucide-react";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 interface RegionalSettingsProps {
   className?: string;
@@ -17,12 +18,15 @@ const AVAILABLE_LOCALES = [
   { code: "es", name: "Español" },
 ] as const;
 
-export default function RegionalSettings({ className = "" }: RegionalSettingsProps) {
+export default function RegionalSettings({
+  className = "",
+}: RegionalSettingsProps) {
   const t = useTranslations("RegionalSettings");
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const { selectedCurrency, availableCurrencies, changeCurrency } = useCurrency();
+  const { selectedCurrency, availableCurrencies, changeCurrency } =
+    useCurrency();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -41,7 +45,8 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
   const currencyListRef = useRef<HTMLUListElement>(null);
   const saveButtonRef = useRef<HTMLButtonElement>(null);
 
-  const currentLanguageName = AVAILABLE_LOCALES.find((l) => l.code === locale)?.name || "English";
+  const currentLanguageName =
+    AVAILABLE_LOCALES.find((l) => l.code === locale)?.name || "English";
 
   useEffect(() => {
     setIsMounted(true);
@@ -82,7 +87,15 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
 
     setIsOpen(false);
     triggerRef.current?.focus();
-  }, [tempCurrency, tempLocale, selectedCurrency, locale, changeCurrency, router, pathname]);
+  }, [
+    tempCurrency,
+    tempLocale,
+    selectedCurrency,
+    locale,
+    changeCurrency,
+    router,
+    pathname,
+  ]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -143,7 +156,12 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
   );
 
   const handleLanguageButtonKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ") {
+    if (
+      e.key === "ArrowDown" ||
+      e.key === "ArrowUp" ||
+      e.key === "Enter" ||
+      e.key === " "
+    ) {
       e.preventDefault();
       setIsLanguageOpen(true);
     }
@@ -154,16 +172,23 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setLanguageFocusedIndex((prev) => (prev < AVAILABLE_LOCALES.length - 1 ? prev + 1 : 0));
+          setLanguageFocusedIndex((prev) =>
+            prev < AVAILABLE_LOCALES.length - 1 ? prev + 1 : 0,
+          );
           break;
         case "ArrowUp":
           e.preventDefault();
-          setLanguageFocusedIndex((prev) => (prev > 0 ? prev - 1 : AVAILABLE_LOCALES.length - 1));
+          setLanguageFocusedIndex((prev) =>
+            prev > 0 ? prev - 1 : AVAILABLE_LOCALES.length - 1,
+          );
           break;
         case "Enter":
         case " ":
           e.preventDefault();
-          if (languageFocusedIndex >= 0 && languageFocusedIndex < AVAILABLE_LOCALES.length) {
+          if (
+            languageFocusedIndex >= 0 &&
+            languageFocusedIndex < AVAILABLE_LOCALES.length
+          ) {
             setTempLocale(AVAILABLE_LOCALES[languageFocusedIndex].code);
             setIsLanguageOpen(false);
             languageButtonRef.current?.focus();
@@ -183,7 +208,12 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
   );
 
   const handleCurrencyButtonKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ") {
+    if (
+      e.key === "ArrowDown" ||
+      e.key === "ArrowUp" ||
+      e.key === "Enter" ||
+      e.key === " "
+    ) {
       e.preventDefault();
       setIsCurrencyOpen(true);
     }
@@ -194,16 +224,23 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setCurrencyFocusedIndex((prev) => (prev < availableCurrencies.length - 1 ? prev + 1 : 0));
+          setCurrencyFocusedIndex((prev) =>
+            prev < availableCurrencies.length - 1 ? prev + 1 : 0,
+          );
           break;
         case "ArrowUp":
           e.preventDefault();
-          setCurrencyFocusedIndex((prev) => (prev > 0 ? prev - 1 : availableCurrencies.length - 1));
+          setCurrencyFocusedIndex((prev) =>
+            prev > 0 ? prev - 1 : availableCurrencies.length - 1,
+          );
           break;
         case "Enter":
         case " ":
           e.preventDefault();
-          if (currencyFocusedIndex >= 0 && currencyFocusedIndex < availableCurrencies.length) {
+          if (
+            currencyFocusedIndex >= 0 &&
+            currencyFocusedIndex < availableCurrencies.length
+          ) {
             setTempCurrency(availableCurrencies[currencyFocusedIndex]);
             setIsCurrencyOpen(false);
             currencyButtonRef.current?.focus();
@@ -223,40 +260,57 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
   );
 
   useEffect(() => {
-    if (isLanguageOpen && languageListRef.current && languageFocusedIndex >= 0) {
+    if (
+      isLanguageOpen &&
+      languageListRef.current &&
+      languageFocusedIndex >= 0
+    ) {
       languageListRef.current.focus();
       const items = languageListRef.current.querySelectorAll('[role="option"]');
       if (items[languageFocusedIndex]) {
-        (items[languageFocusedIndex] as HTMLElement).scrollIntoView({ block: "nearest" });
+        (items[languageFocusedIndex] as HTMLElement).scrollIntoView({
+          block: "nearest",
+        });
       }
     }
   }, [languageFocusedIndex, isLanguageOpen]);
 
   useEffect(() => {
-    if (isCurrencyOpen && currencyListRef.current && currencyFocusedIndex >= 0) {
+    if (
+      isCurrencyOpen &&
+      currencyListRef.current &&
+      currencyFocusedIndex >= 0
+    ) {
       currencyListRef.current.focus();
       const items = currencyListRef.current.querySelectorAll('[role="option"]');
       if (items[currencyFocusedIndex]) {
-        (items[currencyFocusedIndex] as HTMLElement).scrollIntoView({ block: "nearest" });
+        (items[currencyFocusedIndex] as HTMLElement).scrollIntoView({
+          block: "nearest",
+        });
       }
     }
   }, [currencyFocusedIndex, isCurrencyOpen]);
 
   useEffect(() => {
     if (isLanguageOpen) {
-      const currentIndex = AVAILABLE_LOCALES.findIndex((l) => l.code === tempLocale);
+      const currentIndex = AVAILABLE_LOCALES.findIndex(
+        (l) => l.code === tempLocale,
+      );
       setLanguageFocusedIndex(currentIndex >= 0 ? currentIndex : 0);
     }
   }, [isLanguageOpen, tempLocale]);
 
   useEffect(() => {
     if (isCurrencyOpen) {
-      const currentIndex = availableCurrencies.findIndex((c) => c.code === tempCurrency.code);
+      const currentIndex = availableCurrencies.findIndex(
+        (c) => c.code === tempCurrency.code,
+      );
       setCurrencyFocusedIndex(currentIndex >= 0 ? currentIndex : 0);
     }
   }, [isCurrencyOpen, tempCurrency, availableCurrencies]);
 
-  const tempLanguageName = AVAILABLE_LOCALES.find((l) => l.code === tempLocale)?.name || "English";
+  const tempLanguageName =
+    AVAILABLE_LOCALES.find((l) => l.code === tempLocale)?.name || "English";
 
   return (
     <>
@@ -292,10 +346,16 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
               onKeyDown={handleModalKeyDown}
               className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 z-10 animate-in fade-in zoom-in-95 duration-200 transform-gpu will-change-transform"
             >
-              <h2 id="regional-settings-title" className="text-xl font-semibold text-gray-900 mb-2">
+              <h2
+                id="regional-settings-title"
+                className="text-xl font-semibold text-gray-900 mb-2"
+              >
                 {t("modalTitle")}
               </h2>
-              <p id="regional-settings-description" className="text-sm text-gray-600 mb-8">
+              <p
+                id="regional-settings-description"
+                className="text-sm text-gray-600 mb-8"
+              >
                 {t("modalDescription")}
               </p>
 
@@ -318,7 +378,9 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
                     aria-haspopup="listbox"
                     aria-expanded={isLanguageOpen}
                     aria-labelledby="language-label"
-                    aria-controls={isLanguageOpen ? "language-listbox" : undefined}
+                    aria-controls={
+                      isLanguageOpen ? "language-listbox" : undefined
+                    }
                   >
                     <span className="block truncate">{tempLanguageName}</span>
                     <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -342,6 +404,7 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
                     <ul
                       ref={languageListRef}
                       id="language-listbox"
+                      // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: ARIA pattern
                       role="listbox"
                       aria-labelledby="language-label"
                       aria-activedescendant={
@@ -357,9 +420,12 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
                         const isSelected = lang.code === tempLocale;
                         const isFocused = index === languageFocusedIndex;
                         return (
+                          // biome-ignore lint/a11y/useFocusableInteractive: Listbox items are managed via active-descendant
+                          // biome-ignore lint/a11y/useKeyWithClickEvents: Keyboard nav is handled by the listbox
                           <li
                             key={lang.code}
                             id={`language-option-${index}`}
+                            // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: ARIA pattern
                             role="option"
                             aria-selected={isSelected}
                             onClick={() => {
@@ -420,7 +486,9 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
                     aria-haspopup="listbox"
                     aria-expanded={isCurrencyOpen}
                     aria-labelledby="currency-label"
-                    aria-controls={isCurrencyOpen ? "currency-listbox" : undefined}
+                    aria-controls={
+                      isCurrencyOpen ? "currency-listbox" : undefined
+                    }
                   >
                     <span className="block truncate">
                       {tempCurrency.code} - {tempCurrency.name}
@@ -446,6 +514,7 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
                     <ul
                       ref={currencyListRef}
                       id="currency-listbox"
+                      // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: ARIA pattern
                       role="listbox"
                       aria-labelledby="currency-label"
                       aria-activedescendant={
@@ -461,9 +530,12 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
                         const isSelected = currency.code === tempCurrency.code;
                         const isFocused = index === currencyFocusedIndex;
                         return (
+                          // biome-ignore lint/a11y/useFocusableInteractive: Listbox items are managed via active-descendant
+                          // biome-ignore lint/a11y/useKeyWithClickEvents: Keyboard nav is handled by the listbox
                           <li
                             key={currency.id}
                             id={`currency-option-${index}`}
+                            // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: ARIA pattern
                             role="option"
                             aria-selected={isSelected}
                             onClick={() => {
@@ -478,7 +550,8 @@ export default function RegionalSettings({ className = "" }: RegionalSettingsPro
                             <span
                               className={`${isSelected ? "font-semibold" : "font-normal"} block truncate`}
                             >
-                              {currency.symbol} {currency.code} - {currency.name}
+                              {currency.symbol} {currency.code} -{" "}
+                              {currency.name}
                             </span>
                             {isSelected && (
                               <span className="text-white absolute inset-y-0 right-0 flex items-center pr-4">

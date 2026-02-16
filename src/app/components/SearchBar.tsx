@@ -1,9 +1,9 @@
 "use client";
 
-import { useId, useState, useEffect } from "react";
-import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { useQueryStates, parseAsInteger, parseAsString } from "nuqs";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
+import { useEffect, useId, useState } from "react";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 interface SearchBarProps {
   className?: string;
@@ -49,7 +49,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   };
 
   return (
-    <form onSubmit={handleSearch} className={`w-full ${className}`} role="search">
+    <form onSubmit={handleSearch} className={`w-full ${className}`}>
       <div className="relative">
         <label htmlFor={inputId} className="sr-only">
           {tA11y("searchProducts")}

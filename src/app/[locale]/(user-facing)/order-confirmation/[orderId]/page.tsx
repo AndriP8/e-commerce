@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
-import { verifyToken } from "@/app/utils/auth-utils";
-import { Link } from "@/i18n/navigation";
-import { OrderDetailResponse } from "@/app/types/orders";
 import Image from "next/image";
-import { formatPrice } from "@/app/utils/format-price-currency";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { OrderDetailResponse } from "@/app/types/orders";
+import { verifyToken } from "@/app/utils/auth-utils";
+import { formatPrice } from "@/app/utils/format-price-currency";
+import { Link } from "@/i18n/navigation";
 
 async function getOrderDetails({
   payload,
@@ -62,7 +62,9 @@ export default async function OrderConfirmationPage({
   if (!isAuthenticated) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">{tCart("errors.pleaseLogin")}</h2>
+        <h2 className="text-2xl font-bold mb-4">
+          {tCart("errors.pleaseLogin")}
+        </h2>
         <p className="text-lg mb-6">{tCart("errors.loginRequired")}</p>
         <div className="flex justify-center space-x-4">
           <Link
@@ -98,7 +100,10 @@ export default async function OrderConfirmationPage({
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold mb-4">{t("errors.notFound")}</h2>
         <p className="text-lg mb-6">{t("errors.notFoundDesc")}</p>
-        <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">
+        <Link
+          href="/"
+          className="text-blue-600 hover:text-blue-800 font-medium"
+        >
           {tCart("actions.continueShopping")}
         </Link>
       </div>
@@ -113,13 +118,19 @@ export default async function OrderConfirmationPage({
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
           <svg
+            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             className="h-8 w-8 text-green-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
           </svg>
         </div>
         <h1 className="text-3xl font-bold mb-2">{t("confirmation.title")}</h1>
@@ -129,19 +140,31 @@ export default async function OrderConfirmationPage({
       <div className="bg-white rounded-lg border p-6 mb-8">
         <div className="flex flex-wrap justify-between mb-6">
           <div className="mb-4">
-            <h2 className="text-sm font-medium text-gray-500">{t("details.number")}</h2>
+            <h2 className="text-sm font-medium text-gray-500">
+              {t("details.number")}
+            </h2>
             <p className="text-lg font-medium">{order.order_number}</p>
           </div>
           <div className="mb-4">
-            <h2 className="text-sm font-medium text-gray-500">{t("details.date")}</h2>
-            <p className="text-lg font-medium">{new Date(order.order_date).toLocaleDateString()}</p>
+            <h2 className="text-sm font-medium text-gray-500">
+              {t("details.date")}
+            </h2>
+            <p className="text-lg font-medium">
+              {new Date(order.order_date).toLocaleDateString()}
+            </p>
           </div>
           <div className="mb-4">
-            <h2 className="text-sm font-medium text-gray-500">{t("details.total")}</h2>
-            <p className="text-lg font-medium">{formatPrice(order.total_amount, currency)}</p>
+            <h2 className="text-sm font-medium text-gray-500">
+              {t("details.total")}
+            </h2>
+            <p className="text-lg font-medium">
+              {formatPrice(order.total_amount, currency)}
+            </p>
           </div>
           <div className="mb-4">
-            <h2 className="text-sm font-medium text-gray-500">{t("details.paymentMethod")}</h2>
+            <h2 className="text-sm font-medium text-gray-500">
+              {t("details.paymentMethod")}
+            </h2>
             <p className="text-lg font-medium capitalize">
               {order.payment_provider} ({order.payment_method})
             </p>
@@ -153,7 +176,9 @@ export default async function OrderConfirmationPage({
           <div className="flex items-center mb-6">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                order.payment_status === "completed" ? "bg-green-600 text-white" : "bg-gray-200"
+                order.payment_status === "completed"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-200"
               }`}
             >
               1
@@ -164,7 +189,9 @@ export default async function OrderConfirmationPage({
             <div className="h-1 w-16 bg-gray-200 mx-4">
               <div
                 className={`h-full ${
-                  order.order_status !== "pending" ? "bg-green-600" : "bg-gray-200"
+                  order.order_status !== "pending"
+                    ? "bg-green-600"
+                    : "bg-gray-200"
                 }`}
               ></div>
             </div>
@@ -195,8 +222,10 @@ export default async function OrderConfirmationPage({
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 shipment &&
-                (shipment.shipment_status === "in_transit" ||
-                  shipment.shipment_status === "delivered")
+                (
+                  shipment.shipment_status === "in_transit" ||
+                    shipment.shipment_status === "delivered"
+                )
                   ? "bg-green-600 text-white"
                   : "bg-gray-200"
               }`}
@@ -204,7 +233,9 @@ export default async function OrderConfirmationPage({
               3
             </div>
             <div className="ml-2 font-medium">
-              {t("status.shipment", { status: shipment ? shipment.shipment_status : "pending" })}
+              {t("status.shipment", {
+                status: shipment ? shipment.shipment_status : "pending",
+              })}
             </div>
           </div>
         </div>
@@ -229,13 +260,17 @@ export default async function OrderConfirmationPage({
                   </div>
                   <div className="flex-1">
                     <h3 className="font-medium">{item.product_name}</h3>
-                    <p className="text-gray-500">{t("items.quantity", { count: item.quantity })}</p>
+                    <p className="text-gray-500">
+                      {t("items.quantity", { count: item.quantity })}
+                    </p>
                     <p className="font-medium mt-1">
                       {formatPrice(item.unit_price, currency)} {t("items.each")}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{formatPrice(item.total_price, currency)}</p>
+                    <p className="font-medium">
+                      {formatPrice(item.total_price, currency)}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -276,9 +311,12 @@ export default async function OrderConfirmationPage({
             <h2 className="text-xl font-bold mb-4">{t("shippingAddress")}</h2>
             <address className="not-italic">
               <p>{shippingAddress.address_line1}</p>
-              {shippingAddress.address_line2 && <p>{shippingAddress.address_line2}</p>}
+              {shippingAddress.address_line2 && (
+                <p>{shippingAddress.address_line2}</p>
+              )}
               <p>
-                {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postal_code}
+                {shippingAddress.city}, {shippingAddress.state}{" "}
+                {shippingAddress.postal_code}
               </p>
               <p>{shippingAddress.country}</p>
             </address>

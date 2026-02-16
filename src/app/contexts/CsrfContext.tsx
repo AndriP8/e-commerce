@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { CSRF_TOKEN_HEADER } from "../utils/csrf";
 
 interface CsrfContextType {
@@ -16,7 +22,7 @@ const CsrfContext = createContext<CsrfContextType>({
 export function CsrfProvider({ children }: { children: React.ReactNode }) {
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
 
-  const refreshToken = async () => {
+  const refreshToken = useCallback(async () => {
     try {
       const response = await fetch("/api/csrf");
       if (response.ok) {
@@ -26,21 +32,26 @@ export function CsrfProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Failed to fetch CSRF token:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     refreshToken();
-  }, []);
+  }, [refreshToken]);
 
   return (
-    <CsrfContext.Provider value={{ csrfToken, refreshToken }}>{children}</CsrfContext.Provider>
+    <CsrfContext.Provider value={{ csrfToken, refreshToken }}>
+      {children}
+    </CsrfContext.Provider>
   );
 }
 
 export function useCsrf() {
   const { csrfToken, refreshToken } = useContext(CsrfContext);
 
-  const csrfFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
+  const csrfFetch = async (
+    url: string,
+    options: RequestInit = {},
+  ): Promise<Response> => {
     const headers = new Headers(options.headers);
 
     const method = options.method?.toUpperCase() || "GET";

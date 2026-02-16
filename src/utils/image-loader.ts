@@ -4,7 +4,11 @@ const normalizeSrc = (src: string) => {
   return src.startsWith("/") ? src.slice(1) : src;
 };
 
-export default function cloudflareLoader({ src, width, quality }: ImageLoaderProps) {
+export default function cloudflareLoader({
+  src,
+  width,
+  quality,
+}: ImageLoaderProps) {
   const normalizedSrc = normalizeSrc(src);
 
   const baseUrl = normalizedSrc.startsWith("e-commerce/")

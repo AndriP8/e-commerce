@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { handleApiError } from "@/app/utils/api-error-handler";
 import { paymentIntentSchema } from "@/schemas/checkout";
@@ -37,6 +37,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error creating payment intent:", error);
     const apiError = handleApiError(error);
-    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
+    return NextResponse.json(
+      { error: apiError.message },
+      { status: apiError.status },
+    );
   }
 }

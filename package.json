@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint && tsc --noEmit",
+    "lint": "biome lint --write . && next lint",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
     "type-check": "tsc --noEmit",
     "db:setup": "node scripts/setup-database.mjs",
     "db:drop": "node scripts/drop-database.mjs",
@@ -36,6 +38,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.15",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^3.0.0",
@@ -46,6 +49,7 @@
     "@types/react-dom": "19.1.7",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
+    "eslint-plugin-tailwindcss": "^3.18.2",
     "kanel": "^3.14.1",
     "tailwindcss": "^4",
     "ts-to-zod": "^5.1.0",

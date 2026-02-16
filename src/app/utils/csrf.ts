@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export const CSRF_TOKEN_COOKIE = "csrf-secret";
 export const CSRF_TOKEN_HEADER = "x-csrf-token";
@@ -39,9 +39,13 @@ export function csrfProtection(request: NextRequest): NextResponse | null {
   const host = request.headers.get("host");
 
   if (origin || referer) {
+    // biome-ignore lint/style/noNonNullAssertion: referer checks are guarded
     const originUrl = origin ? new URL(origin) : new URL(referer!);
     if (originUrl.host !== host) {
-      return NextResponse.json({ error: "Invalid Origin/Referer" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Invalid Origin/Referer" },
+        { status: 403 },
+      );
     }
   }
 
@@ -52,7 +56,10 @@ export function csrfProtection(request: NextRequest): NextResponse | null {
   return null;
 }
 
-export function setCsrfTokenCookie(response: NextResponse, secret: string): NextResponse {
+export function setCsrfTokenCookie(
+  response: NextResponse,
+  secret: string,
+): NextResponse {
   response.cookies.set(CSRF_TOKEN_COOKIE, secret, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

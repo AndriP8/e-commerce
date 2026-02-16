@@ -1,13 +1,13 @@
-import { ProductDetailResponse } from "@/app/types/product-types";
-import Image from "next/image";
-import AddToCart from "./components/AddToCart";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { formatPrice } from "@/app/utils/format-price-currency";
-import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/app/constants/images";
-import { Metadata } from "next";
+import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ImagePreload } from "@/app/components/ImagePreload";
-import { ProductJsonLd, BreadcrumbJsonLd } from "@/app/components/JsonLd";
+import { BreadcrumbJsonLd, ProductJsonLd } from "@/app/components/JsonLd";
+import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/app/constants/images";
+import type { ProductDetailResponse } from "@/app/types/product-types";
+import { formatPrice } from "@/app/utils/format-price-currency";
+import AddToCart from "./components/AddToCart";
 import LazyReviewsSection from "./components/LazyReviewsSection";
 import StarRating from "./components/StarRating";
 
@@ -18,11 +18,14 @@ type Props = {
 async function getProduct(slug: string): Promise<ProductDetailResponse> {
   const cookieStore = await cookies();
   const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${slug}`, {
-    headers: {
-      Cookie: `preferred_currency=${cookieCurrency}`,
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${slug}`,
+    {
+      headers: {
+        Cookie: `preferred_currency=${cookieCurrency}`,
+      },
     },
-  });
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch product");
   }
@@ -37,15 +40,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Get the first image URL if available
   const imageUrl =
-    product.images && product.images.length > 0 ? `${product.images[0].image_url}` : null;
+    product.images && product.images.length > 0
+      ? `${product.images[0].image_url}`
+      : null;
 
   return {
     title: `${product.name} | E-Commerce Store`,
-    description: product.description || `Buy ${product.name} at our E-Commerce Store`,
+    description:
+      product.description || `Buy ${product.name} at our E-Commerce Store`,
     keywords: `${product.name}, ${product.category?.name || "product"}, e-commerce, shopping`,
     openGraph: {
       title: product.name,
-      description: product.description || `Buy ${product.name} at our E-Commerce Store`,
+      description:
+        product.description || `Buy ${product.name} at our E-Commerce Store`,
       type: "website",
       url: `${baseUrl}/products/${slug}`,
       images: imageUrl ? [{ url: imageUrl }] : [],
@@ -67,7 +74,9 @@ export default async function ProductDetail({ params }: Props) {
 
   // Get first image URL for preloading
   const firstImageUrl =
-    product.images && product.images.length > 0 ? product.images[0].image_url : null;
+    product.images && product.images.length > 0
+      ? product.images[0].image_url
+      : null;
 
   // Breadcrumb items: Home > Category > Product
   const breadcrumbItems = [
@@ -140,9 +149,8 @@ export default async function ProductDetail({ params }: Props) {
 
               {/* Thumbnail Images */}
               {product.images && product.images.length > 1 && (
-                <div
+                <fieldset
                   className="grid grid-cols-5 gap-2"
-                  role="group"
                   aria-label={t("accessibility.thumbnails")}
                 >
                   {product.images.map((image, index) => (
@@ -164,7 +172,7 @@ export default async function ProductDetail({ params }: Props) {
                       />
                     </button>
                   ))}
-                </div>
+                </fieldset>
               )}
             </div>
           </div>
@@ -172,7 +180,9 @@ export default async function ProductDetail({ params }: Props) {
           {/* Product Details */}
           <div>
             <div className="mb-2">
-              <span className="text-sm text-blue-600">{product.category?.name}</span>
+              <span className="text-sm text-blue-600">
+                {product.category?.name}
+              </span>
             </div>
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
 
@@ -194,14 +204,18 @@ export default async function ProductDetail({ params }: Props) {
 
             {/* Description */}
             <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-2">{t("info.description")}</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                {t("info.description")}
+              </h2>
               <p className="text-gray-700">{product.description}</p>
             </div>
 
             {/* Variants */}
             {product.variants && product.variants.length > 0 && (
               <fieldset className="mb-6">
-                <legend className="text-lg font-semibold mb-2">{t("info.variants")}</legend>
+                <legend className="text-lg font-semibold mb-2">
+                  {t("info.variants")}
+                </legend>
                 <div className="grid grid-cols-2 gap-2" role="radiogroup">
                   {product.variants.map((variant, index) => (
                     <label
@@ -247,10 +261,15 @@ export default async function ProductDetail({ params }: Props) {
                   </div>
                 )}
                 <div>
-                  <div className="font-medium">{product.seller?.business_name}</div>
+                  <div className="font-medium">
+                    {product.seller?.business_name}
+                  </div>
                   <div className="text-sm text-gray-600">
                     {product.seller?.rating} ★ (
-                    {t("reviews.count", { count: product.seller?.total_reviews || 0 })})
+                    {t("reviews.count", {
+                      count: product.seller?.total_reviews || 0,
+                    })}
+                    )
                   </div>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useApi } from "./api-client";
+import type { useApi } from "./api-client";
 
 export interface CartActionResult {
   success: boolean;

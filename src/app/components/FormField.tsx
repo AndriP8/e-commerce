@@ -1,15 +1,21 @@
 "use client";
 
-import React from "react";
-import { FieldError, FieldErrorsImpl, Merge, UseFormRegisterReturn } from "react-hook-form";
-import { z } from "zod";
+import type React from "react";
+import type {
+  FieldError,
+  FieldErrorsImpl,
+  Merge,
+  UseFormRegisterReturn,
+} from "react-hook-form";
+import type { z } from "zod";
 import { isFieldRequired } from "@/app/utils/zod-utils";
 
 interface FormFieldProps {
   label: string;
   type?: string;
   placeholder?: string;
-  error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
+  // biome-ignore lint/suspicious/noExplicitAny: React Hook Form types are complex
+  error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>; // eslint-disable-line @typescript-eslint/no-explicit-any
   registration: UseFormRegisterReturn;
   className?: string; // Class for the input itself
   containerClassName?: string; // Class for the wrapper div
@@ -34,7 +40,8 @@ export const FormField = ({
   hideLabel = false,
   children,
 }: FormFieldProps) => {
-  const isRequired = manualRequired || isFieldRequired(schema, registration.name);
+  const isRequired =
+    manualRequired || isFieldRequired(schema, registration.name);
 
   return (
     <div className={`flex flex-col gap-1.5 ${containerClassName}`}>
@@ -44,7 +51,11 @@ export const FormField = ({
       >
         {label}
         {isRequired && (
-          <span className="text-red-500 ml-1" aria-hidden="true" title="Required">
+          <span
+            className="text-red-500 ml-1"
+            aria-hidden="true"
+            title="Required"
+          >
             *
           </span>
         )}

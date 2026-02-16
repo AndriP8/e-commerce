@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Link } from "@/i18n/navigation";
-import { useAuth } from "@/app/contexts/AuthContext";
-import SearchBar from "@/app/components/SearchBar";
-import RegionalSettings from "@/app/components/RegionalSettings";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import RegionalSettings from "@/app/components/RegionalSettings";
+import SearchBar from "@/app/components/SearchBar";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { Link } from "@/i18n/navigation";
 
 export default function Navbar() {
   const t = useTranslations("Navigation");
@@ -47,6 +47,7 @@ export default function Navbar() {
               </Link>
 
               <button
+                type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-gray-700 hover:text-blue-600"
                 aria-label={t("toggleMenu")}
@@ -85,7 +86,11 @@ export default function Navbar() {
 
           {/* Mobile Menu Dropdown */}
           {isMobileMenuOpen && (
-            <div id="mobile-menu" className="mt-4 py-4 border-t border-gray-200" role="menu">
+            <div
+              id="mobile-menu"
+              className="mt-4 py-4 border-t border-gray-200"
+              role="menu"
+            >
               <div className="flex flex-col space-y-3">
                 <Link
                   href="/"
@@ -98,7 +103,10 @@ export default function Navbar() {
                 {isAuthenticated ? (
                   <>
                     <div className="text-sm text-gray-600 py-2 border-b border-gray-100">
-                      {t("hello", { name: user?.firstName || user?.email.split("@")[0] || "" })}
+                      {t("hello", {
+                        name:
+                          user?.firstName || user?.email.split("@")[0] || "",
+                      })}
                     </div>
                     <Link
                       href="/orders"
@@ -111,6 +119,7 @@ export default function Navbar() {
                       <RegionalSettings className="w-full" />
                     </div>
                     <button
+                      type="button"
                       onClick={() => {
                         logout();
                         setIsMobileMenuOpen(false);
@@ -171,9 +180,12 @@ export default function Navbar() {
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-600">
-                  {t("hello", { name: user?.firstName || user?.email.split("@")[0] || "" })}
+                  {t("hello", {
+                    name: user?.firstName || user?.email.split("@")[0] || "",
+                  })}
                 </span>
                 <button
+                  type="button"
                   onClick={() => logout()}
                   className="text-sm text-red-600 hover:text-red-800"
                 >
@@ -182,7 +194,10 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link href="/login" className="text-sm text-blue-600 hover:text-blue-800">
+                <Link
+                  href="/login"
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
                   {t("login")}
                 </Link>
                 <Link

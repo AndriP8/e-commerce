@@ -1,17 +1,20 @@
 "use client";
-import { GetCartResponse } from "@/app/types/cart";
-import { debounce } from "@/app/utils/debounce";
-import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import Image from "next/image";
-import { formatPrice } from "@/app/utils/format-price-currency";
-import { DEFAULT_BLUR_DATA_URL } from "@/app/constants/images";
-import { useApi } from "@/app/utils/api-client";
-import { updateCartQuantity, removeFromCart } from "@/app/utils/cart-client-actions";
-import { cartItemReducer, createInitialCartItemState } from "./cartItemReducer";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import { toast } from "sonner";
 import QuantitySelector from "@/app/components/QuantitySelector";
+import { DEFAULT_BLUR_DATA_URL } from "@/app/constants/images";
+import type { GetCartResponse } from "@/app/types/cart";
+import { useApi } from "@/app/utils/api-client";
+import {
+  removeFromCart,
+  updateCartQuantity,
+} from "@/app/utils/cart-client-actions";
+import { debounce } from "@/app/utils/debounce";
+import { formatPrice } from "@/app/utils/format-price-currency";
+import { cartItemReducer, createInitialCartItemState } from "./cartItemReducer";
 
 export default function CartItem({
   item,
@@ -22,7 +25,10 @@ export default function CartItem({
 }) {
   const t = useTranslations("Cart");
   const tA11y = useTranslations("Accessibility");
-  const [state, dispatch] = useReducer(cartItemReducer, createInitialCartItemState(item.quantity));
+  const [state, dispatch] = useReducer(
+    cartItemReducer,
+    createInitialCartItemState(item.quantity),
+  );
   const { quantity, debouncedQuantity, isUpdating } = state;
   const api = useApi();
   const router = useRouter();
@@ -35,7 +41,7 @@ export default function CartItem({
     () =>
       debounce((newQuantity: string) => {
         const num = Number(newQuantity);
-        if (isNaN(num) || num < 1) {
+        if (Number.isNaN(num) || num < 1) {
           dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: "1" });
         } else {
           dispatch({ type: "SET_DEBOUNCED_QUANTITY", payload: newQuantity });
@@ -55,7 +61,11 @@ export default function CartItem({
 
       dispatch({ type: "SET_UPDATING", payload: true });
 
-      const result = await updateCartQuantity(api, item.id, Number(debouncedQuantity));
+      const result = await updateCartQuantity(
+        api,
+        item.id,
+        Number(debouncedQuantity),
+      );
 
       if (result.success) {
         if (debouncedQuantity !== quantity) {
@@ -79,7 +89,15 @@ export default function CartItem({
     } finally {
       dispatch({ type: "SET_UPDATING", payload: false });
     }
-  }, [api, router, item.id, item.quantity, debouncedQuantity, quantity, isUpdating]);
+  }, [
+    api,
+    router,
+    item.id,
+    item.quantity,
+    debouncedQuantity,
+    quantity,
+    isUpdating,
+  ]);
 
   // Handle item deletion
   const handleDeleteItem = async () => {
@@ -103,7 +121,7 @@ export default function CartItem({
     if (shouldUpdateRef.current) {
       handleUpdateQuantity();
     }
-  }, [debouncedQuantity, handleUpdateQuantity]);
+  }, [handleUpdateQuantity]);
 
   return (
     <div className="border rounded-lg p-4 flex gap-4 items-center">
@@ -121,7 +139,9 @@ export default function CartItem({
       </div>
       <div className="flex-1">
         <h3 className="font-medium">{item.product_name}</h3>
-        <p className="text-gray-600">{formatPrice(item.total_price, currency)}</p>
+        <p className="text-gray-600">
+          {formatPrice(item.total_price, currency)}
+        </p>
         <QuantitySelector
           quantity={quantity}
           onQuantityChange={(value) => {
@@ -134,6 +154,7 @@ export default function CartItem({
         />
       </div>
       <button
+        type="button"
         className="text-red-500 hover:text-red-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-2 py-1"
         onClick={handleDeleteItem}
         aria-label={tA11y("removeFromCart", { product: item.product_name })}

@@ -1,10 +1,10 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
-import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
+import { Link } from "@/i18n/navigation";
 
-export default function Error({
+export default function ErrorPage({
   error,
   reset,
 }: {
@@ -37,13 +37,18 @@ export default function Error({
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("title")}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {t("title")}
+          </h2>
           <p className="text-gray-600 mb-6">{t("description")}</p>
           {error.digest && (
-            <p className="text-sm text-gray-500 mb-4">{t("errorId", { digest: error.digest })}</p>
+            <p className="text-sm text-gray-500 mb-4">
+              {t("errorId", { digest: error.digest })}
+            </p>
           )}
           <div className="space-y-3">
             <button
+              type="button"
               onClick={reset}
               className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
             >

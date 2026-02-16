@@ -1,19 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
+import { handleApiError } from "@/app/utils/api-error-handler";
 import { getCurrentUser } from "@/app/utils/auth-utils";
 import {
-  updateUserPreferredCurrency,
-  getUserPreferredCurrency,
   getCurrencyByCode,
+  getUserPreferredCurrency,
+  updateUserPreferredCurrency,
 } from "@/app/utils/currency-utils";
-import { handleApiError } from "@/app/utils/api-error-handler";
 import { currencyPreferenceSchema } from "@/schemas/user";
 
 export async function GET() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
-    const preferred_currency = cookieStore.get("preferred_currency")?.value || "USD";
+    const preferred_currency =
+      cookieStore.get("preferred_currency")?.value || "USD";
 
     if (token) {
       try {
@@ -42,7 +43,10 @@ export async function GET() {
     console.error("Error fetching currency preference:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
+    return NextResponse.json(
+      { error: apiError.message },
+      { status: apiError.status },
+    );
   }
 }
 
@@ -94,6 +98,9 @@ export async function POST(request: NextRequest) {
     console.error("Error updating currency preference:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
+    return NextResponse.json(
+      { error: apiError.message },
+      { status: apiError.status },
+    );
   }
 }

@@ -56,11 +56,19 @@ export function useApi() {
       return apiRequest("GET", url, undefined, options);
     },
 
-    post: (url: string, data?: unknown, options?: ApiRequestOptions): Promise<Response> => {
+    post: (
+      url: string,
+      data?: unknown,
+      options?: ApiRequestOptions,
+    ): Promise<Response> => {
       return apiRequest("POST", url, data, options);
     },
 
-    put: (url: string, data?: unknown, options?: ApiRequestOptions): Promise<Response> => {
+    put: (
+      url: string,
+      data?: unknown,
+      options?: ApiRequestOptions,
+    ): Promise<Response> => {
       return apiRequest("PUT", url, data, options);
     },
     delete: (url: string, options?: ApiRequestOptions): Promise<Response> => {

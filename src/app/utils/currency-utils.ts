@@ -1,9 +1,12 @@
-import { pool } from "@/app/db/client";
-import { Currencies } from "@/schemas/db-schemas";
 import { cookies } from "next/headers";
+import { pool } from "@/app/db/client";
+import type { Currencies } from "@/schemas/db-schemas";
 
 // In-memory cache for exchange rates (1 hour TTL)
-const exchangeRateCache = new Map<string, { rate: number; timestamp: number }>();
+const exchangeRateCache = new Map<
+  string,
+  { rate: number; timestamp: number }
+>();
 const CACHE_TTL = 3600 * 1000; // 1 hour in milliseconds
 
 /**
@@ -24,7 +27,9 @@ export async function getCurrencies(): Promise<Currencies[]> {
 /**
  * Get currency by code
  */
-export async function getCurrencyByCode(code: string): Promise<Currencies | null> {
+export async function getCurrencyByCode(
+  code: string,
+): Promise<Currencies | null> {
   const client = await pool.connect();
   try {
     const result = await client.query(
@@ -92,7 +97,9 @@ export async function getExchangeRate(
       return rate;
     }
 
-    throw new Error(`Exchange rate not found for ${fromCurrencyCode} to ${toCurrencyCode}`);
+    throw new Error(
+      `Exchange rate not found for ${fromCurrencyCode} to ${toCurrencyCode}`,
+    );
   } finally {
     client.release();
   }
@@ -113,9 +120,12 @@ export async function convertPrice(
 /**
  * Get user's preferred currency
  */
-export async function getUserPreferredCurrency(userId?: string): Promise<Currencies> {
+export async function getUserPreferredCurrency(
+  userId?: string,
+): Promise<Currencies> {
   const cookieStore = await cookies();
-  const prefered_currency = cookieStore.get("preferred_currency")?.value || "USD";
+  const prefered_currency =
+    cookieStore.get("preferred_currency")?.value || "USD";
   const client = await pool.connect();
   try {
     const result = await client.query(

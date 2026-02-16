@@ -39,4 +39,6 @@ export const registerWithConfirmSchema = registerSchema
  */
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
-export type RegisterWithConfirmInput = z.infer<typeof registerWithConfirmSchema>;
+export type RegisterWithConfirmInput = z.infer<
+  typeof registerWithConfirmSchema
+>;

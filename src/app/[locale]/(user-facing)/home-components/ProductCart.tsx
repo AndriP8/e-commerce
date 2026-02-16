@@ -1,8 +1,8 @@
 import Image from "next/image";
-import { ProductsResponse } from "@/app/types/product-types";
-import { Link } from "@/i18n/navigation";
-import { formatPrice } from "@/app/utils/format-price-currency";
 import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/app/constants/images";
+import type { ProductsResponse } from "@/app/types/product-types";
+import { formatPrice } from "@/app/utils/format-price-currency";
+import { Link } from "@/i18n/navigation";
 import AddToCartButton from "./AddToCartButton";
 import ProductCardWrapper from "./ProductCardWrapper";
 
@@ -12,7 +12,11 @@ interface ProductCartProps {
   priority?: boolean;
 }
 
-export default function ProductCart({ product, currency, priority = false }: ProductCartProps) {
+export default function ProductCart({
+  product,
+  currency,
+  priority = false,
+}: ProductCartProps) {
   return (
     <ProductCardWrapper slug={product.slug}>
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
@@ -39,9 +43,13 @@ export default function ProductCart({ product, currency, priority = false }: Pro
             </h3>
           </Link>
 
-          <p className="text-gray-600 text-sm mb-3 line-clamp-1">{product.description}</p>
+          <p className="text-gray-600 text-sm mb-3 line-clamp-1">
+            {product.description}
+          </p>
           <div>
-            <span className="text-xl font-bold ">{formatPrice(product.base_price, currency)}</span>
+            <span className="text-xl font-bold ">
+              {formatPrice(product.base_price, currency)}
+            </span>
           </div>
           <AddToCartButton productId={product.id} />
         </div>

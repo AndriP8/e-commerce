@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getCurrentUser } from "@/app/utils/auth-utils";
+import { NextResponse } from "next/server";
 import { handleApiError } from "@/app/utils/api-error-handler";
+import { getCurrentUser } from "@/app/utils/auth-utils";
 
 export async function GET() {
   try {
@@ -42,6 +42,9 @@ export async function GET() {
     console.error("Get current user error:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
+    return NextResponse.json(
+      { error: apiError.message },
+      { status: apiError.status },
+    );
   }
 }

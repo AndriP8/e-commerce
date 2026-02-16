@@ -1,4 +1,4 @@
-import messages from "./messages/en.json";
+import type messages from "./messages/en.json";
 
 // Type-safe translations configuration
 declare module "next-intl" {

@@ -6,7 +6,8 @@ export function WebVitals() {
   useReportWebVitals((metric) => {
     if (process.env.NODE_ENV === "production") return;
 
-    const isDisableLog = process.env.NEXT_PUBLIC_DISABLE_WEB_VITALS_LOG === "true";
+    const isDisableLog =
+      process.env.NEXT_PUBLIC_DISABLE_WEB_VITALS_LOG === "true";
 
     if (isDisableLog) return;
 

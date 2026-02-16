@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
-import { comparePassword, generateToken, setAuthCookie } from "@/app/utils/auth-utils";
-import { handleApiError, UnauthorizedError } from "@/app/utils/api-error-handler";
+import {
+  handleApiError,
+  UnauthorizedError,
+} from "@/app/utils/api-error-handler";
+import {
+  comparePassword,
+  generateToken,
+  setAuthCookie,
+} from "@/app/utils/auth-utils";
 
 import { loginSchema } from "@/schemas/auth";
 
@@ -36,7 +43,10 @@ export async function POST(request: Request) {
       }
 
       // Verify password
-      const isPasswordValid = await comparePassword(password, user.password_hash);
+      const isPasswordValid = await comparePassword(
+        password,
+        user.password_hash,
+      );
 
       if (!isPasswordValid) {
         throw new UnauthorizedError("Invalid email or password");
@@ -73,6 +83,9 @@ export async function POST(request: Request) {
     console.error("Login error:", error);
     const apiError = handleApiError(error);
 
-    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
+    return NextResponse.json(
+      { error: apiError.message },
+      { status: apiError.status },
+    );
   }
 }

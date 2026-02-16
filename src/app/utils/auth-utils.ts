@@ -1,9 +1,9 @@
-import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
+import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
-import { UnauthorizedError } from "./api-error-handler";
 import { pool } from "../db/client";
-import { JWT_SECRET, JWT_EXPIRES_IN } from "./jwt-secret";
+import { UnauthorizedError } from "./api-error-handler";
+import { JWT_EXPIRES_IN, JWT_SECRET } from "./jwt-secret";
 
 // Interface for user data
 export interface UserData {
@@ -40,9 +40,13 @@ export async function generateToken(user: UserData): Promise<string> {
  * Verify a JWT token
  */
 export async function verifyToken(token: string): Promise<JwtPayload> {
-  return await jwtVerify<JwtPayload>(token, new TextEncoder().encode(JWT_SECRET), {
-    algorithms: ["HS256"],
-  })
+  return await jwtVerify<JwtPayload>(
+    token,
+    new TextEncoder().encode(JWT_SECRET),
+    {
+      algorithms: ["HS256"],
+    },
+  )
     .then(({ payload }) => {
       return payload;
     })
@@ -66,7 +70,10 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * Compare a password with a hash
  */
-export async function comparePassword(password: string, hashedPassword: string): Promise<boolean> {
+export async function comparePassword(
+  password: string,
+  hashedPassword: string,
+): Promise<boolean> {
   return bcrypt.compare(password, hashedPassword);
 }
 

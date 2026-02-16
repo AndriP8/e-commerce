@@ -1,11 +1,11 @@
-import { GetCartResponse } from "@/app/types/cart";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { GetCartResponse } from "@/app/types/cart";
 import { verifyToken } from "@/app/utils/auth-utils";
 import { Link } from "@/i18n/navigation";
 import CheckoutForm from "./components/CheckoutForm";
 import DynamicOrderSummary from "./components/DynamicOrderSummary";
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Metadata } from "next";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -29,12 +29,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-async function getCart({ cookieCurrency, token }: { cookieCurrency: string; token: string }) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/cart/products`, {
-    headers: {
-      Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
+async function getCart({
+  cookieCurrency,
+  token,
+}: {
+  cookieCurrency: string;
+  token: string;
+}) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart/products`,
+    {
+      headers: {
+        Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
+      },
     },
-  });
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch cart items");
   }
@@ -96,7 +105,10 @@ export default async function CheckoutPage({ params }: Props) {
     return (
       <div className="text-center py-12">
         <p className="text-lg mb-4">{t("errors.emptyCart")}</p>
-        <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">
+        <Link
+          href="/"
+          className="text-blue-600 hover:text-blue-800 font-medium"
+        >
           {tCart("actions.continueShopping")}
         </Link>
       </div>

@@ -1,15 +1,15 @@
-import { GetCartResponse } from "@/app/types/cart";
-import { Link } from "@/i18n/navigation";
-import CartItem from "./components/cartItem";
+import { ArrowLeft, ShoppingCart } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { verifyToken } from "@/app/utils/auth-utils";
-import { formatPrice } from "@/app/utils/format-price-currency";
-import { ShoppingCart, ArrowLeft } from "lucide-react";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { CartItemSkeleton } from "@/app/components/Skeleton";
-import { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { GetCartResponse } from "@/app/types/cart";
+import { verifyToken } from "@/app/utils/auth-utils";
+import { formatPrice } from "@/app/utils/format-price-currency";
+import { Link } from "@/i18n/navigation";
 import CheckoutPrefetcher from "./components/CheckoutPrefetcher";
+import CartItem from "./components/cartItem";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -29,16 +29,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-async function getCart({ token, cookieCurrency }: { token: string; cookieCurrency: string }) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/cart/products`, {
-    headers: {
-      Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
+async function getCart({
+  token,
+  cookieCurrency,
+}: {
+  token: string;
+  cookieCurrency: string;
+}) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart/products`,
+    {
+      headers: {
+        Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
+      },
+      next: {
+        revalidate: 60, // 1 minute
+        tags: ["cart"], // Add cache tag for targeted invalidation
+      },
     },
-    next: {
-      revalidate: 60, // 1 minute
-      tags: ["cart"], // Add cache tag for targeted invalidation
-    },
-  });
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch cart");
   }
@@ -72,8 +81,12 @@ export default async function CartPage({ params }: Props) {
           <div className="mb-6">
             <ShoppingCart size={64} className="mx-auto text-gray-300" />
           </div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">{t("errors.pleaseLogin")}</h2>
-          <p className="text-lg mb-6 text-gray-600">{t("errors.loginRequired")}</p>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">
+            {t("errors.pleaseLogin")}
+          </h2>
+          <p className="text-lg mb-6 text-gray-600">
+            {t("errors.loginRequired")}
+          </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
               href="/login"
@@ -103,7 +116,9 @@ export default async function CartPage({ params }: Props) {
           <div className="mb-6">
             <ShoppingCart size={64} className="mx-auto text-gray-300" />
           </div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">{t("empty.title")}</h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">
+            {t("empty.title")}
+          </h2>
           <p className="text-lg mb-6 text-gray-600">{t("empty.description")}</p>
           <Link
             href="/"
@@ -129,7 +144,9 @@ export default async function CartPage({ params }: Props) {
           aria-label={t("accessibility.backToProducts")}
         >
           <ArrowLeft size={20} />
-          <span className="hidden sm:inline">{t("actions.backToShopping")}</span>
+          <span className="hidden sm:inline">
+            {t("actions.backToShopping")}
+          </span>
         </Link>
         <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <ShoppingCart size={32} />
@@ -148,6 +165,7 @@ export default async function CartPage({ params }: Props) {
             fallback={
               <div className="space-y-4">
                 {Array.from({ length: 3 }, (_, index) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: Skeleton loading
                   <CartItemSkeleton key={index} />
                 ))}
               </div>
@@ -164,7 +182,9 @@ export default async function CartPage({ params }: Props) {
         {/* Order Summary */}
         <div className="lg:col-span-1">
           <div className="bg-gray-50 rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-6 text-gray-900">{t("summary.title")}</h2>
+            <h2 className="text-xl font-bold mb-6 text-gray-900">
+              {t("summary.title")}
+            </h2>
 
             <div className="space-y-4 mb-6">
               <div className="flex justify-between items-center pb-4 border-b">
@@ -178,7 +198,9 @@ export default async function CartPage({ params }: Props) {
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">{t("summary.shipping")}</span>
-                <span className="font-medium text-green-600">{t("summary.free")}</span>
+                <span className="font-medium text-green-600">
+                  {t("summary.free")}
+                </span>
               </div>
 
               <hr className="border-gray-200" />

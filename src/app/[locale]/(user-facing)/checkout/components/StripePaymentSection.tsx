@@ -1,11 +1,11 @@
 "use client";
 
 import { Elements } from "@stripe/react-stripe-js";
+import type { GetCartResponse } from "@/app/types/cart";
 import { getStripe } from "@/app/utils/stripe";
+import type { ShippingDetail } from "@/schemas/checkout";
+import type { AddressDetail } from "@/schemas/common";
 import PaymentForm from "./PaymentForm";
-import { GetCartResponse } from "@/app/types/cart";
-import { ShippingDetail } from "@/schemas/checkout";
-import { AddressDetail } from "@/schemas/common";
 
 const stripePromise = getStripe();
 

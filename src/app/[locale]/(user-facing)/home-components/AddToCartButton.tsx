@@ -1,19 +1,22 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useApi } from "@/app/utils/api-client";
 import { addToCart as addToCartAction } from "@/app/utils/cart-client-actions";
-import { useTranslations } from "next-intl";
 
 interface AddToCartButtonProps {
   productId: string;
   productName?: string;
 }
 
-export default function AddToCartButton({ productId, productName }: AddToCartButtonProps) {
+export default function AddToCartButton({
+  productId,
+  productName,
+}: AddToCartButtonProps) {
   const t = useTranslations("ProductList");
   const [isAdding, setIsAdding] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -51,11 +54,14 @@ export default function AddToCartButton({ productId, productName }: AddToCartBut
 
   return (
     <button
+      type="button"
       onClick={handleAddToCart}
       disabled={isAdding}
       aria-disabled={isAdding}
       aria-label={
-        productName ? `${t("actions.addToCart")} - ${productName}` : t("actions.addToCart")
+        productName
+          ? `${t("actions.addToCart")} - ${productName}`
+          : t("actions.addToCart")
       }
       className="bg-blue-600 text-white px-4 w-full py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
     >

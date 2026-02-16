@@ -1,4 +1,4 @@
-const path = require("path");
+const _path = require("node:path");
 const generateZodSchemas = require("./scripts/kanel-zod-local").default;
 
 /** @type {import('kanel').Config} */

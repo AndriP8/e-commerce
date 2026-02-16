@@ -33,7 +33,10 @@ class PerformanceMonitor {
     }
   }
 
-  end(operation: PerformanceOperation = "total", metadata?: Record<string, unknown>): number {
+  end(
+    operation: PerformanceOperation = "total",
+    metadata?: Record<string, unknown>,
+  ): number {
     const endTime = performance.now();
     const startTime = this.timers.get(operation);
 
@@ -56,13 +59,20 @@ class PerformanceMonitor {
   }
 
   getDetailedMetrics(): DetailedMetrics {
-    const totalTime = this.metrics.find((m) => m.operation === "total")?.duration || 0;
-    const apiResponseTime = this.metrics.find((m) => m.operation === "api-response")?.duration;
-    const dbQueryTime = this.metrics.find((m) => m.operation === "db-query")?.duration;
+    const totalTime =
+      this.metrics.find((m) => m.operation === "total")?.duration || 0;
+    const apiResponseTime = this.metrics.find(
+      (m) => m.operation === "api-response",
+    )?.duration;
+    const dbQueryTime = this.metrics.find(
+      (m) => m.operation === "db-query",
+    )?.duration;
     const currencyConversionTime = this.metrics.find(
       (m) => m.operation === "currency-conversion",
     )?.duration;
-    const renderTime = this.metrics.find((m) => m.operation === "render")?.duration;
+    const renderTime = this.metrics.find(
+      (m) => m.operation === "render",
+    )?.duration;
 
     return {
       totalTime,
@@ -87,15 +97,24 @@ class PerformanceMonitor {
     };
 
     if (metrics.totalTime > thresholds.totalTime) {
-      bottlenecks.push(`Total time (${metrics.totalTime.toFixed(2)}ms) exceeds threshold`);
+      bottlenecks.push(
+        `Total time (${metrics.totalTime.toFixed(2)}ms) exceeds threshold`,
+      );
     }
 
-    if (metrics.apiResponseTime && metrics.apiResponseTime > thresholds.apiResponseTime) {
-      bottlenecks.push(`API response time (${metrics.apiResponseTime.toFixed(2)}ms) is slow`);
+    if (
+      metrics.apiResponseTime &&
+      metrics.apiResponseTime > thresholds.apiResponseTime
+    ) {
+      bottlenecks.push(
+        `API response time (${metrics.apiResponseTime.toFixed(2)}ms) is slow`,
+      );
     }
 
     if (metrics.dbQueryTime && metrics.dbQueryTime > thresholds.dbQueryTime) {
-      bottlenecks.push(`Database query time (${metrics.dbQueryTime.toFixed(2)}ms) is slow`);
+      bottlenecks.push(
+        `Database query time (${metrics.dbQueryTime.toFixed(2)}ms) is slow`,
+      );
     }
 
     if (
@@ -108,7 +127,9 @@ class PerformanceMonitor {
     }
 
     if (metrics.renderTime && metrics.renderTime > thresholds.renderTime) {
-      bottlenecks.push(`Frontend rendering (${metrics.renderTime.toFixed(2)}ms) is slow`);
+      bottlenecks.push(
+        `Frontend rendering (${metrics.renderTime.toFixed(2)}ms) is slow`,
+      );
     }
 
     return bottlenecks;
@@ -121,12 +142,18 @@ class PerformanceMonitor {
     console.group(`🔍 ${context} Analysis`);
     console.log("📊 Detailed Metrics:", {
       "Total Time": `${metrics.totalTime.toFixed(2)}ms`,
-      "API Response": metrics.apiResponseTime ? `${metrics.apiResponseTime.toFixed(2)}ms` : "N/A",
-      "DB Query": metrics.dbQueryTime ? `${metrics.dbQueryTime.toFixed(2)}ms` : "N/A",
+      "API Response": metrics.apiResponseTime
+        ? `${metrics.apiResponseTime.toFixed(2)}ms`
+        : "N/A",
+      "DB Query": metrics.dbQueryTime
+        ? `${metrics.dbQueryTime.toFixed(2)}ms`
+        : "N/A",
       "Currency Conversion": metrics.currencyConversionTime
         ? `${metrics.currencyConversionTime.toFixed(2)}ms`
         : "N/A",
-      "Frontend Render": metrics.renderTime ? `${metrics.renderTime.toFixed(2)}ms` : "N/A",
+      "Frontend Render": metrics.renderTime
+        ? `${metrics.renderTime.toFixed(2)}ms`
+        : "N/A",
     });
 
     if (bottlenecks.length > 0) {

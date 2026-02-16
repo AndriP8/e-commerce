@@ -1,7 +1,7 @@
 "use client";
 
-import Image, { ImageProps } from "next/image";
-import { useState, useEffect } from "react";
+import Image, { type ImageProps } from "next/image";
+import { useEffect, useState } from "react";
 import { DEFAULT_BLUR_DATA_URL } from "@/app/constants/images";
 
 interface OptimizedImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
@@ -109,6 +109,7 @@ export default function OptimizedImage({
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"

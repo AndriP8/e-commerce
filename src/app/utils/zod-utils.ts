@@ -8,7 +8,10 @@ import { z } from "zod";
  * @param path The path to the field (e.g., "addressDetail.receiver_name")
  * @returns boolean True if the field is required
  */
-export function isFieldRequired(schema: z.ZodTypeAny | undefined, path: string): boolean {
+export function isFieldRequired(
+  schema: z.ZodTypeAny | undefined,
+  path: string,
+): boolean {
   if (!schema) return false;
 
   const parts = path.split(".");
@@ -16,7 +19,8 @@ export function isFieldRequired(schema: z.ZodTypeAny | undefined, path: string):
 
   for (const part of parts) {
     // Unwrap ZodEffects (common when using refine)
-    const def = currentSchema._def as any;
+    // biome-ignore lint/suspicious/noExplicitAny: Zod internal definition access
+    const def = currentSchema._def as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     if ("schema" in def) {
       currentSchema = def.schema;
     }
@@ -60,7 +64,8 @@ export function isFieldRequired(schema: z.ZodTypeAny | undefined, path: string):
     }
 
     // Unwrap ZodEffects, etc.
-    const def = checkSchema._def as any;
+    // biome-ignore lint/suspicious/noExplicitAny: Zod internal definition access
+    const def = checkSchema._def as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     if ("schema" in def) {
       checkSchema = def.schema;
     } else {

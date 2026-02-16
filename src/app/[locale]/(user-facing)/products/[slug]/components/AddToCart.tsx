@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { toast } from "sonner";
+import QuantitySelector from "@/app/components/QuantitySelector";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useApi } from "@/app/utils/api-client";
 import { addToCart as addToCartAction } from "@/app/utils/cart-client-actions";
-import { useTranslations } from "next-intl";
-import QuantitySelector from "@/app/components/QuantitySelector";
 
 export default function AddToCart({ productId }: { productId: string }) {
   const t = useTranslations("ProductList");
@@ -48,7 +48,7 @@ export default function AddToCart({ productId }: { productId: string }) {
 
   const handleQuantityChange = (newQuantity: string) => {
     const num = Number(newQuantity);
-    if (!isNaN(num) && num >= 1) {
+    if (!Number.isNaN(num) && num >= 1) {
       setQuantity(num);
     }
   };
@@ -64,12 +64,17 @@ export default function AddToCart({ productId }: { productId: string }) {
       />
 
       <button
+        type="button"
         onClick={handleAddToCart}
         disabled={isAdding}
         aria-disabled={isAdding}
         className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
       >
-        {isAdding ? <span>{t("actions.adding")}</span> : <span>{t("actions.addToCart")}</span>}
+        {isAdding ? (
+          <span>{t("actions.adding")}</span>
+        ) : (
+          <span>{t("actions.addToCart")}</span>
+        )}
       </button>
     </div>
   );

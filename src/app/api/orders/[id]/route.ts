@@ -1,13 +1,13 @@
+import { cookies } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
 import { pool } from "@/app/db/client";
 import handleApiError, {
   UnauthorizedError,
 } from "@/app/utils/api-error-handler";
 import { verifyToken } from "@/app/utils/auth-utils";
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
-import { getPreferenceCurrency } from "@/middleware";
-import { convertOrderPrices } from "@/app/utils/server-currency-utils";
 import { getUserPreferredCurrency } from "@/app/utils/currency-utils";
+import { convertOrderPrices } from "@/app/utils/server-currency-utils";
+import { getPreferenceCurrency } from "@/middleware";
 
 export async function GET(
   _request: NextRequest,

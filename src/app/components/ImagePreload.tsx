@@ -11,5 +11,13 @@ export function ImagePreload({
   type = "image/webp",
   fetchPriority = "high",
 }: ImagePreloadProps) {
-  return <link rel="preload" href={src} as={as} type={type} fetchPriority={fetchPriority} />;
+  return (
+    <link
+      rel="preload"
+      href={src}
+      as={as}
+      type={type}
+      fetchPriority={fetchPriority}
+    />
+  );
 }

@@ -1,14 +1,18 @@
-import { GetCartResponse } from "@/app/types/cart";
-import { AddressDetail } from "@/schemas/common";
-import { ShippingDetail } from "@/schemas/checkout";
-import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import { useState } from "react";
+import {
+  PaymentElement,
+  useElements,
+  useStripe,
+} from "@stripe/react-stripe-js";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
-import { formatPrice } from "@/app/utils/format-price-currency";
+import type { GetCartResponse } from "@/app/types/cart";
 import { useApi } from "@/app/utils/api-client";
-import { useTranslations } from "next-intl";
+import { formatPrice } from "@/app/utils/format-price-currency";
+import type { ShippingDetail } from "@/schemas/checkout";
+import type { AddressDetail } from "@/schemas/common";
 
 interface PaymentFormProps {
   cart: GetCartResponse;
@@ -62,13 +66,15 @@ export default function PaymentForm({
       const orderData = await orderResponse.json();
 
       // Confirm the payment with Stripe
-      const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/order-confirmation/${orderData.order_id}`,
+      const { error: stripeError, paymentIntent } = await stripe.confirmPayment(
+        {
+          elements,
+          confirmParams: {
+            return_url: `${window.location.origin}/order-confirmation/${orderData.order_id}`,
+          },
+          redirect: "if_required",
         },
-        redirect: "if_required",
-      });
+      );
 
       if (stripeError) {
         throw new Error(stripeError.message);
@@ -103,7 +109,10 @@ export default function PaymentForm({
     }
   };
 
-  const subTotal = cart.data.items.reduce((sum, item) => sum + item.total_price, 0);
+  const subTotal = cart.data.items.reduce(
+    (sum, item) => sum + item.total_price,
+    0,
+  );
 
   const total = subTotal + shippingCost + tax;
 
@@ -112,9 +121,9 @@ export default function PaymentForm({
       <h2 className="text-xl font-semibold mb-4" id="payment-section-title">
         Payment Information
       </h2>
-      <div aria-labelledby="payment-section-title">
+      <section aria-labelledby="payment-section-title">
         <PaymentElement />
-      </div>
+      </section>
       {error && (
         <div className="text-red-600 mt-4" role="alert" aria-live="assertive">
           {error}

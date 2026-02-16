@@ -1,8 +1,8 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 interface PaginationProps {
   currentPage: number;
@@ -92,6 +92,7 @@ export default function Pagination({
           </Link>
         ) : (
           <button
+            type="button"
             disabled
             aria-disabled="true"
             aria-label={t("pagination.previous")}
@@ -107,9 +108,9 @@ export default function Pagination({
           {pageNumbers.map((page, index) =>
             page === "ellipsis" ? (
               <span
+                // biome-ignore lint/suspicious/noArrayIndexKey: Ellipsis is static
                 key={`ellipsis-${index}`}
                 className="px-3 py-2 text-sm text-gray-500"
-                aria-label={tA11y("morePages")}
               >
                 <span aria-hidden="true">...</span>
               </span>
@@ -148,6 +149,7 @@ export default function Pagination({
           </Link>
         ) : (
           <button
+            type="button"
             disabled
             aria-disabled="true"
             aria-label={t("pagination.next")}

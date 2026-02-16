@@ -1,8 +1,8 @@
-import { Pool } from "pg";
-import { readdirSync, readFileSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+import { readdirSync, readFileSync } from "fs";
+import { dirname, join } from "path";
+import { Pool } from "pg";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -28,7 +28,9 @@ async function setupDatabase() {
       );
     `);
 
-    const { rows } = await client.query("SELECT version FROM schema_migrations ORDER BY version");
+    const { rows } = await client.query(
+      "SELECT version FROM schema_migrations ORDER BY version",
+    );
     const executedMigrations = new Set(rows.map((r) => r.version));
 
     // Get all SQL files and sort them by name (ensures correct order)
@@ -47,7 +49,9 @@ async function setupDatabase() {
       return;
     }
 
-    console.log(`📋 Found ${pendingMigrations.length} new migration(s) to execute:\n`);
+    console.log(
+      `📋 Found ${pendingMigrations.length} new migration(s) to execute:\n`,
+    );
     pendingMigrations.forEach((file, index) => {
       console.log(`  ${index + 1}. ${file}`);
     });
@@ -57,7 +61,9 @@ async function setupDatabase() {
       const version = file.replace(".sql", "");
 
       try {
-        console.log(`⏳ [${i + 1}/${pendingMigrations.length}] Executing ${file}...`);
+        console.log(
+          `⏳ [${i + 1}/${pendingMigrations.length}] Executing ${file}...`,
+        );
 
         const filePath = join(currentDir, file);
         const sql = readFileSync(filePath, "utf8");
@@ -72,7 +78,10 @@ async function setupDatabase() {
         try {
           await client.query(sql);
 
-          await client.query("INSERT INTO schema_migrations (version) VALUES ($1)", [version]);
+          await client.query(
+            "INSERT INTO schema_migrations (version) VALUES ($1)",
+            [version],
+          );
 
           await client.query("COMMIT");
           console.log(`✅ ${file} executed and recorded successfully`);
@@ -89,10 +98,14 @@ async function setupDatabase() {
       }
     }
 
-    console.log(`\n✅ Successfully executed ${pendingMigrations.length} migration(s)`);
+    console.log(
+      `\n✅ Successfully executed ${pendingMigrations.length} migration(s)`,
+    );
   } catch (err) {
     console.error("\n💥 Error setting up database:", err.message);
-    console.error("🔄 Database setup failed. Please fix the errors and try again.");
+    console.error(
+      "🔄 Database setup failed. Please fix the errors and try again.",
+    );
     process.exit(1);
   } finally {
     client.release();

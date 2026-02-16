@@ -1,26 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/app/utils/auth-utils";
 import { cookies } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
+import type { PoolClient } from "pg";
 import { pool } from "@/app/db/client";
-import { calculateTax } from "@/app/utils/tax-utils";
 import { handleApiError } from "@/app/utils/api-error-handler";
-
+import { verifyToken } from "@/app/utils/auth-utils";
+import { calculateTax } from "@/app/utils/tax-utils";
 import { createOrderSchema } from "@/schemas/checkout";
 
 export async function POST(request: NextRequest) {
-  let client;
+  let client: PoolClient | undefined;
   try {
     const body = await request.json();
 
     // Validate input parameters using Zod
-    const { cart_id, address_detail, shipping_detail, shipping_address, payment_detail } =
-      createOrderSchema.parse(body);
+    const {
+      cart_id,
+      address_detail,
+      shipping_detail,
+      shipping_address,
+      payment_detail,
+    } = createOrderSchema.parse(body);
 
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
     if (!token) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
     }
 
     let userId: string;
@@ -28,7 +36,10 @@ export async function POST(request: NextRequest) {
       const decoded = await verifyToken(token);
       userId = decoded.userId.toString();
     } catch {
-      return NextResponse.json({ error: "Invalid authentication token" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid authentication token" },
+        { status: 401 },
+      );
     }
 
     client = await pool.connect();
@@ -55,7 +66,8 @@ export async function POST(request: NextRequest) {
 
     // Calculate order totals
     const subtotal = cartItems.reduce(
-      (sum, item) => sum + parseFloat(item.unit_price) * item.quantity,
+      (sum: number, item: { unit_price: string; quantity: number }) =>
+        sum + Number.parseFloat(item.unit_price) * item.quantity,
       0,
     );
 
@@ -67,7 +79,10 @@ export async function POST(request: NextRequest) {
 
     if (shippingMethodResult.rows.length === 0) {
       await client.query("ROLLBACK");
-      return NextResponse.json({ error: "Invalid shipping method" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid shipping method" },
+        { status: 400 },
+      );
     }
 
     const shippingMethod = shippingMethodResult.rows[0];
@@ -219,7 +234,10 @@ export async function POST(request: NextRequest) {
     }
     console.error("Error creating order:", error);
     const apiError = handleApiError(error);
-    return NextResponse.json({ error: apiError.message }, { status: apiError.status });
+    return NextResponse.json(
+      { error: apiError.message },
+      { status: apiError.status },
+    );
   } finally {
     if (client) {
       client.release();
