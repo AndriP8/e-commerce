@@ -59,9 +59,10 @@ pnpm lint
 ### Key Architectural Patterns
 
 #### Database Connection
-- Uses PostgreSQL connection pool via `pg` library (`src/app/db/client.ts`)
-- Pool configuration: max 100 (prod) / 20 (dev) connections, min 5, 30s idle timeout
+- Uses Vercel Postgres (Neon) via `@neondatabase/serverless` (`src/app/db/client.ts`)
+- Neon manages connection pooling via HTTP/WebSocket (serverless-optimized)
 - Always use `pool.connect()` and release client in finally block
+- Local dev: `pnpm db:setup` runs migrations against remote Neon DATABASE_URL
 
 #### Authentication Flow
 - JWT-based authentication with httpOnly cookies
@@ -73,10 +74,10 @@ pnpm lint
 
 #### Middleware Layer (src/middleware.ts)
 Middleware runs in this order:
-1. Rate limiting (30 req/sec) via `rateLimitMiddleware`
-2. CSRF protection for all /api/* routes via `csrfProtection`
-3. Currency preference handling for product/cart/checkout/order APIs
-4. Authentication check for protected routes
+1. CSRF protection for all /api/* routes via `csrfProtection`
+2. Currency preference handling for product/cart/checkout/order APIs
+3. Authentication check for protected routes
+(Rate limiting removed - Vercel provides DDoS protection, in-memory rate limiting ineffective on serverless)
 
 #### Multi-Currency System
 - Supported currencies stored in database with exchange rates
@@ -103,8 +104,7 @@ Middleware runs in this order:
 
 #### Security Features
 - CSRF protection using `csrf` package (tokens in cookies and headers)
-- Rate limiting using in-memory store with IP-based tracking
-- Security headers configured in production (see DEPLOYMENT.md)
+- Security headers configured in production via next.config.mjs (CSP, HSTS, etc.)
 - Password requirements enforced server-side
 - HttpOnly cookies for JWT tokens (24h expiration)
 - Stripe payment integration with server-side validation
@@ -219,12 +219,11 @@ Required in `.env.local`:
 
 ## Deployment
 
-See `DEPLOYMENT.md` for comprehensive VPS deployment guide including:
-- Docker containerization
-- Nginx reverse proxy with SSL/TLS
-- GitHub Actions CI/CD
-- Database backups and health monitoring
-- Production ports: App (3002), PostgreSQL (5433)
+Production via Vercel + Neon Postgres:
+- App hosted on Vercel (auto-deploys from GitHub main branch)
+- Database: Vercel Postgres (Neon) - set DATABASE_URL in Vercel dashboard
+- GitHub Actions: CI only (lint + typecheck), no CD step (Vercel handles deployment)
+- Environment: Set `JWT_SECRET`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_*` vars in Vercel dashboard
 
 ## Testing and Debugging
 

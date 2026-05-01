@@ -201,4 +201,4 @@ export function measureSync<T>(
   }
 }
 
-export type { PerformanceMetrics, DetailedMetrics, PerformanceOperation };
+export type { DetailedMetrics, PerformanceMetrics, PerformanceOperation };
