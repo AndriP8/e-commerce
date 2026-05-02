@@ -47,3 +47,5 @@ deployment.log
 
 # vscode
 .vscode/*
+.vercel
+.env*.local

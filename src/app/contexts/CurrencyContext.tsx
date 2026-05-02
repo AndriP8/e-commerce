@@ -140,7 +140,6 @@ export function CurrencyProvider({
         },
         body: JSON.stringify({
           currencyCode: currency.code,
-          currencySymbol: currency.symbol,
         }),
       });
 
