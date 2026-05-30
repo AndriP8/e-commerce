@@ -122,7 +122,9 @@ export async function getCurrentUser(token: string) {
     } finally {
       client.release();
     }
-  } catch {
+  } catch (err) {
+    if (err instanceof UnauthorizedError) throw err;
+    console.error("getCurrentUser DB error:", err);
     throw new UnauthorizedError("Invalid authentication");
   }
 }

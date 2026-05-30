@@ -21,7 +21,11 @@ function isPublicPath(path: string) {
     if (publicPath === "/") {
       return pathWithoutLocale === "/";
     }
-    return pathWithoutLocale.startsWith(publicPath);
+    // Require exact match or a proper path prefix (not partial word match)
+    return (
+      pathWithoutLocale === publicPath ||
+      pathWithoutLocale.startsWith(`${publicPath}/`)
+    );
   });
 }
 
@@ -29,13 +33,11 @@ async function handleCurrencyMiddleware() {
   const response = NextResponse.next();
 
   const cookieStore = await cookies();
-  let currencyCode = cookieStore.get("preferred_currency")?.value;
+  const currencyCode = cookieStore.get("preferred_currency")?.value;
 
   if (!currencyCode) {
-    currencyCode = "USD";
+    cookieStore.set("preferred_currency", "USD");
   }
-
-  cookieStore.set("preferred_currency", currencyCode);
 
   return response;
 }
@@ -51,28 +53,34 @@ export async function getPreferenceCurrency(): Promise<string> {
 const intlMiddleware = createMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
-  const response = intlMiddleware(request);
-
   const path = request.nextUrl.pathname;
+
+  // API routes: only CSRF + currency, skip intl
+  if (path.startsWith("/api/")) {
+    const csrfError = csrfProtection(request);
+    if (csrfError) {
+      return csrfError;
+    }
+
+    if (
+      path.startsWith("/api/products") ||
+      path.startsWith("/api/cart") ||
+      path.startsWith("/api/orders") ||
+      path.startsWith("/api/checkout")
+    ) {
+      return handleCurrencyMiddleware();
+    }
+
+    return NextResponse.next();
+  }
+
+  // Page routes
+  const response = intlMiddleware(request);
 
   if (path === "/products" || path.match(/^\/[a-z]{2}\/products$/)) {
     const locale = path.match(/^\/([a-z]{2})\//)?.[1] || "";
     const redirectPath = locale ? `/${locale}` : "/";
     return NextResponse.redirect(new URL(redirectPath, request.url));
-  }
-
-  const csrfError = csrfProtection(request);
-  if (csrfError) {
-    return csrfError;
-  }
-
-  if (
-    path.startsWith("/api/products") ||
-    path.startsWith("/api/cart") ||
-    path.startsWith("/api/orders") ||
-    path.startsWith("/api/checkout")
-  ) {
-    return handleCurrencyMiddleware();
   }
 
   if (isPublicPath(path)) {
@@ -83,5 +91,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

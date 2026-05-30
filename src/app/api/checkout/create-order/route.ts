@@ -64,12 +64,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
-    // Calculate order totals
-    const subtotal = cartItems.reduce(
+    // Calculate order totals using integer cents to avoid float precision loss
+    const subtotalCents = cartItems.reduce(
       (sum: number, item: { unit_price: string; quantity: number }) =>
-        sum + Number.parseFloat(item.unit_price) * item.quantity,
+        sum +
+        Math.round(Number.parseFloat(item.unit_price) * 100) * item.quantity,
       0,
     );
+    const subtotal = subtotalCents / 100;
 
     // Get shipping method details
     const shippingMethodResult = await client.query(
@@ -95,8 +97,7 @@ export async function POST(request: NextRequest) {
 
     const totalAmount = subtotal + taxAmount + shippingAmount - discountAmount;
 
-    // Generate a unique order number
-    const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const orderNumber = `ORD-${crypto.randomUUID().replace(/-/g, "").slice(0, 16).toUpperCase()}`;
 
     // Create the order
     const orderResult = await client.query(
@@ -156,7 +157,9 @@ export async function POST(request: NextRequest) {
           item.seller_id,
           item.quantity,
           item.unit_price,
-          parseFloat(item.unit_price) * item.quantity,
+          (Math.round(Number.parseFloat(item.unit_price) * 100) *
+            item.quantity) /
+            100,
           "pending", // Initial item status
         ],
       );

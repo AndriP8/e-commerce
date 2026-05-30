@@ -2,12 +2,26 @@ import { cookies } from "next/headers";
 import { pool } from "@/app/db/client";
 import type { Currencies } from "@/schemas/db-schemas";
 
+const CACHE_TTL = 3600 * 1000; // 1 hour
+const USER_CURRENCY_TTL = 300 * 1000; // 5 minutes
+
 // In-memory cache for exchange rates (1 hour TTL)
 const exchangeRateCache = new Map<
   string,
   { rate: number; timestamp: number }
 >();
-const CACHE_TTL = 3600 * 1000; // 1 hour in milliseconds
+
+// In-memory cache for currency lookups by code (1 hour TTL)
+const currencyByCodeCache = new Map<
+  string,
+  { currency: Currencies | null; timestamp: number }
+>();
+
+// In-memory cache for user preferred currency (5 minute TTL)
+const userCurrencyCache = new Map<
+  string,
+  { currency: Currencies; timestamp: number }
+>();
 
 /**
  * Get all active currencies
@@ -25,18 +39,25 @@ export async function getCurrencies(): Promise<Currencies[]> {
 }
 
 /**
- * Get currency by code
+ * Get currency by code (cached)
  */
 export async function getCurrencyByCode(
   code: string,
 ): Promise<Currencies | null> {
+  const cached = currencyByCodeCache.get(code);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.currency;
+  }
+
   const client = await pool.connect();
   try {
     const result = await client.query(
       "SELECT * FROM currencies WHERE code = $1 AND is_active = true",
       [code],
     );
-    return result.rows[0] || null;
+    const currency = result.rows[0] || null;
+    currencyByCodeCache.set(code, { currency, timestamp: Date.now() });
+    return currency;
   } finally {
     client.release();
   }
@@ -118,7 +139,7 @@ export async function convertPrice(
 }
 
 /**
- * Get user's preferred currency
+ * Get user's preferred currency (cached per-user, 5 min TTL)
  */
 export async function getUserPreferredCurrency(
   userId?: string,
@@ -126,6 +147,15 @@ export async function getUserPreferredCurrency(
   const cookieStore = await cookies();
   const prefered_currency =
     cookieStore.get("preferred_currency")?.value || "USD";
+
+  if (userId) {
+    const cacheKey = `${userId}:${prefered_currency}`;
+    const cached = userCurrencyCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < USER_CURRENCY_TTL) {
+      return cached.currency;
+    }
+  }
+
   const client = await pool.connect();
   try {
     const result = await client.query(
@@ -136,24 +166,49 @@ export async function getUserPreferredCurrency(
       [userId, prefered_currency],
     );
 
-    if (result.rows.length > 0) {
-      return result.rows[0];
+    const currency: Currencies =
+      result.rows[0] ||
+      ((await getCurrencyByCode(prefered_currency)) as Currencies);
+
+    if (userId) {
+      userCurrencyCache.set(`${userId}:${prefered_currency}`, {
+        currency,
+        timestamp: Date.now(),
+      });
     }
 
-    // Return USD as default if no preference found
-    return (await getCurrencyByCode(prefered_currency)) as Currencies;
+    return currency;
   } finally {
     client.release();
   }
 }
 
 /**
- * Update user's preferred currency
+ * Get user's preferred currency using cookie-based code only (no DB when cookie is sufficient)
+ */
+export async function getCachedUserCurrency(
+  userId: string,
+  currencyCode: string,
+): Promise<Currencies> {
+  const cacheKey = `${userId}:${currencyCode}`;
+  const cached = userCurrencyCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < USER_CURRENCY_TTL) {
+    return cached.currency;
+  }
+  return getUserPreferredCurrency(userId);
+}
+
+/**
+ * Update user's preferred currency (also invalidates cache)
  */
 export async function updateUserPreferredCurrency(
   userId: string,
   currencyCode: string,
 ): Promise<void> {
+  // Evict all cache entries for this user
+  for (const key of userCurrencyCache.keys()) {
+    if (key.startsWith(`${userId}:`)) userCurrencyCache.delete(key);
+  }
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
