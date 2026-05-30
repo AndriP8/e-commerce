@@ -2,13 +2,14 @@
 
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { AuthProvider } from "@/app/contexts/AuthContext";
+import { CartProvider } from "@/app/contexts/CartContext";
 import { CsrfProvider } from "@/app/contexts/CsrfContext";
 import {
   CurrencyProvider,
   type SelectedCurrency,
 } from "@/app/contexts/CurrencyContext";
+import type { User } from "@/app/types/user";
 import type { Currencies } from "@/schemas/db-schemas";
-import type { User } from "../layout";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -30,7 +31,9 @@ export function Providers({
           initialCurrencies={initialCurrencies}
           initialSelectedCurrency={initialSelectedCurrency}
         >
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <CartProvider>
+            <NuqsAdapter>{children}</NuqsAdapter>
+          </CartProvider>
         </CurrencyProvider>
       </AuthProvider>
     </CsrfProvider>
