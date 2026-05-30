@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useCart } from "@/app/contexts/CartContext";
 import { useCheckoutCost } from "@/app/contexts/CheckoutCostContext";
 import type { GetCartResponse } from "@/app/types/cart";
 import { useApi } from "@/app/utils/api-client";
@@ -33,6 +34,7 @@ export default function PaymentForm({
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { shippingCost, tax } = useCheckoutCost();
+  const { refresh: refreshCart } = useCart();
   const api = useApi();
   const t = useTranslations("Checkout");
 
@@ -84,7 +86,6 @@ export default function PaymentForm({
           `/api/checkout/update-payment/${orderData.order_id}`,
           {
             transaction_id: paymentIntent.id,
-            payment_status: "completed",
           },
         );
 
@@ -94,6 +95,7 @@ export default function PaymentForm({
 
         try {
           await api.delete(`/api/cart/clear`);
+          refreshCart();
         } catch (cartError) {
           console.error("Failed to clear cart:", cartError);
         }

@@ -1,10 +1,15 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import {
+  getFormatter,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 import type { OrderDetailResponse } from "@/app/types/orders";
 import { verifyToken } from "@/app/utils/auth-utils";
 import { formatPrice } from "@/app/utils/format-price-currency";
 import { Link } from "@/i18n/navigation";
+import { OrderStatusStepper } from "./components/OrderStatusStepper";
 
 async function getOrderDetails({
   payload,
@@ -42,6 +47,7 @@ export default async function OrderConfirmationPage({
   const t = await getTranslations({ locale, namespace: "Order" });
   const tAuth = await getTranslations({ locale, namespace: "Auth" });
   const tCart = await getTranslations({ locale, namespace: "Cart" });
+  const format = await getFormatter({ locale });
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value || "";
   const cookieCurrency = cookieStore.get("preferred_currency")?.value || "";
@@ -58,7 +64,6 @@ export default async function OrderConfirmationPage({
     }
   }
 
-  // If not authenticated, show login message
   if (!isAuthenticated) {
     return (
       <div className="text-center py-12">
@@ -113,6 +118,37 @@ export default async function OrderConfirmationPage({
   const { order, items, shipment } = orderDetails;
   const shippingAddress = order.shipping_address;
 
+  const stepperLabels = {
+    steps: {
+      payment: t("status.steps.payment"),
+      order: t("status.steps.order"),
+      shipment: t("status.steps.shipment"),
+    },
+    values: {
+      payment: {
+        pending: t("status.values.payment.pending"),
+        completed: t("status.values.payment.completed"),
+        failed: t("status.values.payment.failed"),
+        refunded: t("status.values.payment.refunded"),
+      },
+      order: {
+        pending: t("status.values.order.pending"),
+        confirmed: t("status.values.order.confirmed"),
+        processing: t("status.values.order.processing"),
+        shipped: t("status.values.order.shipped"),
+        delivered: t("status.values.order.delivered"),
+        cancelled: t("status.values.order.cancelled"),
+        refunded: t("status.values.order.refunded"),
+      },
+      shipment: {
+        pending: t("status.values.shipment.pending"),
+        in_transit: t("status.values.shipment.in_transit"),
+        delivered: t("status.values.shipment.delivered"),
+        failed: t("status.values.shipment.failed"),
+      },
+    },
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
@@ -150,7 +186,11 @@ export default async function OrderConfirmationPage({
               {t("details.date")}
             </h2>
             <p className="text-lg font-medium">
-              {new Date(order.order_date).toLocaleDateString()}
+              {format.dateTime(new Date(order.order_date), {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
             </p>
           </div>
           <div className="mb-4">
@@ -173,71 +213,12 @@ export default async function OrderConfirmationPage({
 
         <div className="border-t pt-6">
           <h2 className="text-xl font-bold mb-4">{t("status.label")}</h2>
-          <div className="flex items-center mb-6">
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                order.payment_status === "completed"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200"
-              }`}
-            >
-              1
-            </div>
-            <div className="ml-2 font-medium">
-              {t("status.payment", { status: order.payment_status || "" })}
-            </div>
-            <div className="h-1 w-16 bg-gray-200 mx-4">
-              <div
-                className={`h-full ${
-                  order.order_status !== "pending"
-                    ? "bg-green-600"
-                    : "bg-gray-200"
-                }`}
-              ></div>
-            </div>
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                order.order_status === "confirmed" ||
-                order.order_status === "processing" ||
-                order.order_status === "shipped" ||
-                order.order_status === "delivered"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200"
-              }`}
-            >
-              2
-            </div>
-            <div className="ml-2 font-medium">
-              {t("status.order", { status: order.order_status || "" })}
-            </div>
-            <div className="h-1 w-16 bg-gray-200 mx-4">
-              <div
-                className={`h-full ${
-                  shipment && shipment.shipment_status !== "pending"
-                    ? "bg-green-600"
-                    : "bg-gray-200"
-                }`}
-              ></div>
-            </div>
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                shipment &&
-                (
-                  shipment.shipment_status === "in_transit" ||
-                    shipment.shipment_status === "delivered"
-                )
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200"
-              }`}
-            >
-              3
-            </div>
-            <div className="ml-2 font-medium">
-              {t("status.shipment", {
-                status: shipment ? shipment.shipment_status : "pending",
-              })}
-            </div>
-          </div>
+          <OrderStatusStepper
+            paymentStatus={order.payment_status}
+            orderStatus={order.order_status}
+            shipmentStatus={shipment?.shipment_status ?? null}
+            labels={stepperLabels}
+          />
         </div>
       </div>
 

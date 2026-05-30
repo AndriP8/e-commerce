@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import QuantitySelector from "@/app/components/QuantitySelector";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { useCart } from "@/app/contexts/CartContext";
 import { useApi } from "@/app/utils/api-client";
 import { addToCart as addToCartAction } from "@/app/utils/cart-client-actions";
 
@@ -14,6 +15,7 @@ export default function AddToCart({ productId }: { productId: string }) {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const { isAuthenticated } = useAuth();
+  const { refresh: refreshCart } = useCart();
   const api = useApi();
   const router = useRouter();
 
@@ -30,6 +32,7 @@ export default function AddToCart({ productId }: { productId: string }) {
 
       if (result.success) {
         toast.success(result.message || t("messages.addedToCart"));
+        refreshCart();
         router.refresh();
       } else {
         toast.error(result.error || t("messages.failedToAdd"));

@@ -43,8 +43,7 @@ async function getCart({
         Cookie: `token=${token}; preferred_currency=${cookieCurrency}`,
       },
       next: {
-        revalidate: 60, // 1 minute
-        tags: ["cart"], // Add cache tag for targeted invalidation
+        tags: ["cart"],
       },
     },
   );

@@ -60,7 +60,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [shippingCostConversion, setShippingCostConversion] = useState(0);
-  const { updateShippingCost, shippingCost, tax } = useCheckoutCost();
+  const { updateShippingCost } = useCheckoutCost();
   const api = useApi();
 
   const {
@@ -166,17 +166,10 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
 
   const createPaymentIntent = async () => {
     setIsLoading(true);
-    const subTotal = cart.data.items.reduce(
-      (sum, item) => sum + item.total_price,
-      0,
-    );
-    const total = subTotal + shippingCost + tax;
 
     try {
       const response = await api.post("/api/checkout/payment-intent", {
         cart_id: cart.data.cart_id,
-        amount: total,
-        currency: cart.currency.code,
       });
 
       if (!response.ok) {
@@ -505,7 +498,7 @@ function CheckoutForm({ cart }: CheckoutFormProps) {
                   {t("actions.loading") || "Loading..."}
                 </span>
               ) : (
-                `${t("actions.continue")} sasd`
+                t("actions.continue")
               )}
             </button>
           </div>

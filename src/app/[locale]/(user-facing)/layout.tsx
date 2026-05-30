@@ -7,16 +7,11 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { Toaster } from "sonner";
 import { WebVitals } from "@/app/components/WebVitals";
+import type { User } from "@/app/types/user";
 import { routing } from "@/i18n/routing";
-import Navbar from "./components/Navbar";
 import { Providers } from "./components/Providers";
 
-export type User = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-};
+export type { User };
 
 export const metadata: Metadata = {
   title: "E-Commerce Store - Fast & Reliable Shopping",
@@ -66,7 +61,7 @@ const fetchCurrencies = async () => {
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/currencies`,
       {
         cache: "force-cache",
-        next: { revalidate: 3600 }, // Revalidate every hour
+        next: { revalidate: 3600 },
       },
     );
     if (!response.ok) {
@@ -142,12 +137,7 @@ export default async function LocaleLayout({
             initialCurrencies={currencies}
             initialSelectedCurrency={userCurrency || undefined}
           >
-            <div className="min-h-screen flex flex-col">
-              <Navbar />
-              <main id="main-content" className="flex-grow" tabIndex={-1}>
-                {children}
-              </main>
-            </div>
+            {children}
           </Providers>
         </NextIntlClientProvider>
       </body>

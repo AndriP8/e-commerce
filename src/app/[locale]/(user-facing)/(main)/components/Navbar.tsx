@@ -5,13 +5,17 @@ import { useState } from "react";
 import RegionalSettings from "@/app/components/RegionalSettings";
 import SearchBar from "@/app/components/SearchBar";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { useCart } from "@/app/contexts/CartContext";
 import { Link } from "@/i18n/navigation";
 
 export default function Navbar() {
   const t = useTranslations("Navigation");
   const tA11y = useTranslations("Accessibility");
   const { isAuthenticated, user, logout } = useAuth();
+  const { count: cartCount } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const cartBadgeLabel = cartCount > 99 ? "99+" : String(cartCount);
 
   return (
     <nav className="bg-white shadow-sm" aria-label={t("home")}>
@@ -26,8 +30,8 @@ export default function Navbar() {
             <div className="flex items-center space-x-4">
               <Link
                 href="/cart"
-                className="text-gray-700 hover:text-blue-600"
-                aria-label={tA11y("openCart")}
+                className="relative text-gray-700 hover:text-blue-600"
+                aria-label={`${tA11y("openCart")}${isAuthenticated && cartCount > 0 ? `, ${cartBadgeLabel} items` : ""}`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -44,6 +48,14 @@ export default function Navbar() {
                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
+                {isAuthenticated && cartCount > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none"
+                  >
+                    {cartBadgeLabel}
+                  </span>
+                )}
               </Link>
 
               <button
@@ -172,8 +184,20 @@ export default function Navbar() {
               <Link href="/" className="text-gray-700 hover:text-blue-600">
                 {t("home")}
               </Link>
-              <Link href="/cart" className="text-gray-700 hover:text-blue-600">
+              <Link
+                href="/cart"
+                className="relative text-gray-700 hover:text-blue-600"
+                aria-label={`${t("cart")}${isAuthenticated && cartCount > 0 ? `, ${cartBadgeLabel} items` : ""}`}
+              >
                 {t("cart")}
+                {isAuthenticated && cartCount > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -top-2 -right-3 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none"
+                  >
+                    {cartBadgeLabel}
+                  </span>
+                )}
               </Link>
             </div>
 
