@@ -248,9 +248,34 @@
     },
     "status": {
       "label": "Estado del Pedido",
-      "payment": "Pago {status}",
-      "order": "Pedido {status}",
-      "shipment": "Envío {status}"
+      "steps": {
+        "payment": "Pago",
+        "order": "Pedido",
+        "shipment": "Envío"
+      },
+      "values": {
+        "payment": {
+          "pending": "Pendiente",
+          "completed": "Completado",
+          "failed": "Fallido",
+          "refunded": "Reembolsado"
+        },
+        "order": {
+          "pending": "Pendiente",
+          "confirmed": "Confirmado",
+          "processing": "Procesando",
+          "shipped": "Enviado",
+          "delivered": "Entregado",
+          "cancelled": "Cancelado",
+          "refunded": "Reembolsado"
+        },
+        "shipment": {
+          "pending": "Pendiente",
+          "in_transit": "En tránsito",
+          "delivered": "Entregado",
+          "failed": "Fallido"
+        }
+      }
     },
     "items": {
       "title": "Artículos del Pedido",

@@ -248,9 +248,34 @@
     },
     "status": {
       "label": "Order Status",
-      "payment": "Payment {status}",
-      "order": "Order {status}",
-      "shipment": "Shipment {status}"
+      "steps": {
+        "payment": "Payment",
+        "order": "Order",
+        "shipment": "Shipment"
+      },
+      "values": {
+        "payment": {
+          "pending": "Pending",
+          "completed": "Completed",
+          "failed": "Failed",
+          "refunded": "Refunded"
+        },
+        "order": {
+          "pending": "Pending",
+          "confirmed": "Confirmed",
+          "processing": "Processing",
+          "shipped": "Shipped",
+          "delivered": "Delivered",
+          "cancelled": "Cancelled",
+          "refunded": "Refunded"
+        },
+        "shipment": {
+          "pending": "Pending",
+          "in_transit": "In transit",
+          "delivered": "Delivered",
+          "failed": "Failed"
+        }
+      }
     },
     "items": {
       "title": "Order Items",
