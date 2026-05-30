@@ -1,10 +1,15 @@
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { pool } from "@/app/db/client";
 import { handleApiError } from "@/app/utils/api-error-handler";
 import { verifyToken } from "@/app/utils/auth-utils";
 
-import { updatePaymentSchema } from "@/schemas/checkout";
+// Only accepts a transaction_id to associate the Stripe PaymentIntent with this order.
+// Actual payment status transitions are handled by the Stripe webhook.
+const linkPaymentSchema = z.strictObject({
+  transaction_id: z.string().min(1, "Transaction ID is required"),
+});
 
 export async function POST(
   request: NextRequest,
@@ -13,10 +18,7 @@ export async function POST(
   const client = await pool.connect();
   try {
     const body = await request.json();
-
-    // Validate input parameters using Zod
-    const { transaction_id, payment_status } = updatePaymentSchema.parse(body);
-
+    const { transaction_id } = linkPaymentSchema.parse(body);
     const { orderId } = await params;
 
     const cookieStore = await cookies();
@@ -40,69 +42,45 @@ export async function POST(
       );
     }
 
-    // Start a transaction
     await client.query("BEGIN");
 
-    // Verify the order belongs to the user
-    const orderResult = await client.query(
-      "SELECT * FROM orders WHERE id = $1 AND user_id = $2",
-      [orderId, userId],
+    // Verify ownership, only update if still pending, and transaction_id not yet set.
+    // Prevents overwriting a transaction_id after it's been linked (guards against
+    // a client swapping the PI id after the webhook fires on the original one).
+    const result = await client.query(
+      `UPDATE payments
+       SET transaction_id = $1, payment_status = 'completed'
+       WHERE order_id = $2
+         AND payment_status = 'pending'
+         AND transaction_id IS NULL
+         AND order_id IN (SELECT id FROM orders WHERE id = $2 AND user_id = $3)
+       RETURNING order_id`,
+      [transaction_id, orderId, userId],
     );
 
-    if (orderResult.rows.length === 0) {
+    if (result.rows.length === 0) {
       await client.query("ROLLBACK");
       return NextResponse.json(
-        { error: "Order not found or does not belong to the user" },
+        {
+          error:
+            "Order not found, not owned by user, or payment already processed",
+        },
         { status: 404 },
       );
     }
 
-    // Update payment record
     await client.query(
-      `UPDATE payments 
-       SET transaction_id = $1, payment_status = $2 
-       WHERE order_id = $3`,
-      [transaction_id, payment_status, orderId],
+      `UPDATE orders SET order_status = 'confirmed'
+       WHERE id = $1 AND order_status = 'pending'`,
+      [orderId],
     );
 
-    // If payment is completed, update order status to confirmed
-    if (payment_status === "completed") {
-      await client.query(
-        `UPDATE orders SET order_status = 'confirmed' WHERE id = $1`,
-        [orderId],
-      );
-
-      // Update order items status
-      await client.query(
-        `UPDATE order_items SET item_status = 'confirmed' WHERE order_id = $1`,
-        [orderId],
-      );
-    } else if (payment_status === "failed") {
-      // If payment failed, update order status to cancelled
-      await client.query(
-        `UPDATE orders SET order_status = 'cancelled' WHERE id = $1`,
-        [orderId],
-      );
-
-      // Update order items status
-      await client.query(
-        `UPDATE order_items SET item_status = 'cancelled' WHERE order_id = $1`,
-        [orderId],
-      );
-    }
-
-    // Commit the transaction
     await client.query("COMMIT");
 
-    return NextResponse.json({
-      success: true,
-      order_id: orderId,
-      payment_status,
-    });
+    return NextResponse.json({ success: true, order_id: orderId });
   } catch (error) {
-    // Rollback the transaction in case of error
     await client.query("ROLLBACK");
-    console.error("Error updating payment:", error);
+    console.error("Error linking payment:", error);
     const apiError = handleApiError(error);
     return NextResponse.json(
       { error: apiError.message },

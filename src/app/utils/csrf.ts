@@ -30,7 +30,10 @@ export function csrfProtection(request: NextRequest): NextResponse | null {
   }
 
   // Skip CSRF check for specific routes
-  if (request.nextUrl.pathname === "/api/csrf") {
+  if (
+    request.nextUrl.pathname === "/api/csrf" ||
+    request.nextUrl.pathname === "/api/webhooks/stripe"
+  ) {
     return null;
   }
 

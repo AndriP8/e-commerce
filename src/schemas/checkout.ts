@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { fullAddressSchema } from "./common";
-import { paymentStatusEnumSchema } from "./db-schemas";
 
 /**
  * Checkout Schemas
@@ -21,19 +20,6 @@ export const checkoutFormSchema = z.object({
   billingAddress: fullAddressSchema,
 });
 
-// Payment intent schema
-export const paymentIntentSchema = z.strictObject({
-  cart_id: z.string().min(1, "Valid cart_id is required"),
-  amount: z.number().positive("Amount must be positive"),
-  currency: z.string().min(3).max(3),
-});
-
-// Update payment schema
-export const updatePaymentSchema = z.strictObject({
-  transaction_id: z.string().min(1, "Transaction ID is required"),
-  payment_status: paymentStatusEnumSchema,
-});
-
 // Create order schema (backend API)
 export const createOrderSchema = z.strictObject({
   cart_id: z.string().min(1, "Valid cart_id is required"),
@@ -51,6 +37,4 @@ export const createOrderSchema = z.strictObject({
  */
 export type ShippingDetail = z.infer<typeof shippingDetailSchema>;
 export type CheckoutFormInput = z.infer<typeof checkoutFormSchema>;
-export type PaymentIntentInput = z.infer<typeof paymentIntentSchema>;
-export type UpdatePaymentInput = z.infer<typeof updatePaymentSchema>;
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
