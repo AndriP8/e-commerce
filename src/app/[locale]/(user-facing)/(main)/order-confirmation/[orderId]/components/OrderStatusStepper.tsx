@@ -167,10 +167,7 @@ export function OrderStatusStepper({
   for (let i = 0; i < steps.length; i++) {
     const step = steps[i];
     nodes.push(
-      <div
-        key={step.name}
-        className="flex flex-col items-center shrink-0 w-24"
-      >
+      <div key={step.name} className="flex flex-col items-center shrink-0 w-24">
         <StepIcon state={step.state} index={i} />
         <div className="mt-2 text-center">
           <p className={`text-sm font-semibold ${labelStyle[step.state]}`}>
